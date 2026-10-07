@@ -1,0 +1,888 @@
+{
+  "schema_version": 1,
+  "source": "audited tests; nonliteral expressions preserved unevaluated",
+  "parameterized_tests": [
+    {
+      "id": "tests/test_async_sdk.py:test_curl_rotated_cookie_preserves_http_only_boolean",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_async_sdk.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_async_sdk.py",
+            "line": 367,
+            "end_line": 367,
+            "source_sha256": "214c6cefeba9c41d9e777db549755180b564dc4a24db27ef6a74c1cbdbd0b987"
+          },
+          "expression": "pytest.mark.parametrize('raw, expected', [('True', True), ('False', False)])",
+          "arguments_expression": "'raw, expected'",
+          "values_expression": "[('True', True), ('False', False)]",
+          "case_count": 2,
+          "values": [
+            [
+              "True",
+              true
+            ],
+            [
+              "False",
+              false
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_atomicity.py:test_bootstrap_resets_all_process_state_before_old_transport_close",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_atomicity.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_atomicity.py",
+            "line": 15,
+            "end_line": 15,
+            "source_sha256": "803481d7b8c29361f89e07997a2ebb72c28cdebe869114d6831315a8b5fff76d"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_atomicity.py:test_malformed_callback_state_is_rejected_before_any_adoption",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_atomicity.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_atomicity.py",
+            "line": 58,
+            "end_line": 58,
+            "source_sha256": "803481d7b8c29361f89e07997a2ebb72c28cdebe869114d6831315a8b5fff76d"
+          },
+          "expression": "pytest.mark.parametrize('malformed', ['duplicates', 'cookie_type', 'browser_type'])",
+          "arguments_expression": "'malformed'",
+          "values_expression": "['duplicates', 'cookie_type', 'browser_type']",
+          "case_count": 3,
+          "values": [
+            "duplicates",
+            "cookie_type",
+            "browser_type"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_cookie_metadata.py:test_browser_samesite_survives_full_roundtrip_and_migrates_v3",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 16,
+            "end_line": 16,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('same_site', ['Strict', 'Lax', 'None'])",
+          "arguments_expression": "'same_site'",
+          "values_expression": "['Strict', 'Lax', 'None']",
+          "case_count": 3,
+          "values": [
+            "Strict",
+            "Lax",
+            "None"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_cookie_metadata.py:test_cookie_rejects_unsupported_samesite",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 36,
+            "end_line": 36,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('same_site', [False, 'invalid', 'None\\r\\n', 1])",
+          "arguments_expression": "'same_site'",
+          "values_expression": "[False, 'invalid', 'None\\r\\n', 1]",
+          "case_count": 4,
+          "values": [
+            false,
+            "invalid",
+            "None\r\n",
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_cookie_metadata.py:test_response_samesite_case_variants_are_exported_canonically",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 61,
+            "end_line": 64,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('raw,canonical', [('strict', 'Strict'), ('STRICT', 'Strict'), ('lax', 'Lax'), ('LAX', 'Lax'), ('none', 'None'), ('NONE', 'None'), ('lAx', 'Lax')])",
+          "arguments_expression": "'raw,canonical'",
+          "values_expression": "[('strict', 'Strict'), ('STRICT', 'Strict'), ('lax', 'Lax'), ('LAX', 'Lax'), ('none', 'None'), ('NONE', 'None'), ('lAx', 'Lax')]",
+          "case_count": 7,
+          "values": [
+            [
+              "strict",
+              "Strict"
+            ],
+            [
+              "STRICT",
+              "Strict"
+            ],
+            [
+              "lax",
+              "Lax"
+            ],
+            [
+              "LAX",
+              "Lax"
+            ],
+            [
+              "none",
+              "None"
+            ],
+            [
+              "NONE",
+              "None"
+            ],
+            [
+              "lAx",
+              "Lax"
+            ]
+          ]
+        },
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 65,
+            "end_line": 65,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('attribute', ['SameSite', 'samesite', 'SAMESITE', 'SameSITE'])",
+          "arguments_expression": "'attribute'",
+          "values_expression": "['SameSite', 'samesite', 'SAMESITE', 'SameSITE']",
+          "case_count": 4,
+          "values": [
+            "SameSite",
+            "samesite",
+            "SAMESITE",
+            "SameSITE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_cookie_metadata.py:test_response_invalid_samesite_is_not_silently_normalized",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 76,
+            "end_line": 76,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('raw', ['invalid', 'unspecified', 'no_restriction', 'Strict-invalid'])",
+          "arguments_expression": "'raw'",
+          "values_expression": "['invalid', 'unspecified', 'no_restriction', 'Strict-invalid']",
+          "case_count": 4,
+          "values": [
+            "invalid",
+            "unspecified",
+            "no_restriction",
+            "Strict-invalid"
+          ]
+        },
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 77,
+            "end_line": 77,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('attribute', ['SameSite', 'samesite', 'SAMESITE', 'SameSITE'])",
+          "arguments_expression": "'attribute'",
+          "values_expression": "['SameSite', 'samesite', 'SAMESITE', 'SameSITE']",
+          "case_count": 4,
+          "values": [
+            "SameSite",
+            "samesite",
+            "SAMESITE",
+            "SameSITE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_cookie_metadata.py:test_authoritative_set_cookie_without_samesite_removes_previous_policy",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+            "line": 85,
+            "end_line": 85,
+            "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+          },
+          "expression": "pytest.mark.parametrize('value', ['rotated-synthetic', 'synthetic'])",
+          "arguments_expression": "'value'",
+          "values_expression": "['rotated-synthetic', 'synthetic']",
+          "case_count": 2,
+          "values": [
+            "rotated-synthetic",
+            "synthetic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_factories.py:test_ca_survives_initial_auth_and_browser_handoff",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_factories.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
+            "line": 56,
+            "end_line": 56,
+            "source_sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_factories.py:test_pin_profile_retains_provider_timeout_and_ca_through_initial_and_later_reauth",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_factories.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
+            "line": 90,
+            "end_line": 90,
+            "source_sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c"
+          },
+          "expression": "pytest.mark.parametrize('initial_ready', [True, False])",
+          "arguments_expression": "'initial_ready'",
+          "values_expression": "[True, False]",
+          "case_count": 2,
+          "values": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_factories.py:test_client_construction_factories_keep_explicit_ca",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_factories.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
+            "line": 140,
+            "end_line": 140,
+            "source_sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c"
+          },
+          "expression": "pytest.mark.parametrize('factory_name', ['from_session_file', 'from_credentials', 'from_files'])",
+          "arguments_expression": "'factory_name'",
+          "values_expression": "['from_session_file', 'from_credentials', 'from_files']",
+          "case_count": 3,
+          "values": [
+            "from_session_file",
+            "from_credentials",
+            "from_files"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_lifetime.py:test_shutdown_rejects_pending_bootstrap_without_resurrecting_transport",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_lifetime.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
+            "line": 15,
+            "end_line": 15,
+            "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        },
+        {
+          "source": {
+            "file": "tests/test_bootstrap_lifetime.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
+            "line": 16,
+            "end_line": 16,
+            "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
+          },
+          "expression": "pytest.mark.parametrize('entrypoint', ['loader', 'login'])",
+          "arguments_expression": "'entrypoint'",
+          "values_expression": "['loader', 'login']",
+          "case_count": 2,
+          "values": [
+            "loader",
+            "login"
+          ]
+        },
+        {
+          "source": {
+            "file": "tests/test_bootstrap_lifetime.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
+            "line": 17,
+            "end_line": 17,
+            "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
+          },
+          "expression": "pytest.mark.parametrize('close_outcome', ['success', 'failure', 'cancellation'])",
+          "arguments_expression": "'close_outcome'",
+          "values_expression": "['success', 'failure', 'cancellation']",
+          "case_count": 3,
+          "values": [
+            "success",
+            "failure",
+            "cancellation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_lifetime.py:test_concurrent_shutdown_during_retired_transport_cleanup_is_safe",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_lifetime.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
+            "line": 94,
+            "end_line": 94,
+            "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_bootstrap_seed_boundary.py:test_browser_seed_is_current_cookie_snapshot_before_failed_curl_probe",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_bootstrap_seed_boundary.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_seed_boundary.py",
+            "line": 17,
+            "end_line": 17,
+            "source_sha256": "4a914267e494a02df3667e978515a1dc1cc3655f702fd5596e42d1bc608befe1"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        },
+        {
+          "source": {
+            "file": "tests/test_bootstrap_seed_boundary.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_seed_boundary.py",
+            "line": 18,
+            "end_line": 18,
+            "source_sha256": "4a914267e494a02df3667e978515a1dc1cc3655f702fd5596e42d1bc608befe1"
+          },
+          "expression": "pytest.mark.parametrize('remembered', [False, True])",
+          "arguments_expression": "'remembered'",
+          "values_expression": "[False, True]",
+          "case_count": 2,
+          "values": [
+            false,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_browser_bootstrap.py:test_valid_config_with_tspd_boilerplate_is_not_misclassified_as_a_check",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_browser_bootstrap.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
+            "line": 62,
+            "end_line": 62,
+            "source_sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_browser_bootstrap.py:test_http_200_browser_check_is_actionable_and_never_submits_credentials",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_browser_bootstrap.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
+            "line": 79,
+            "end_line": 79,
+            "source_sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_browser_bootstrap.py:test_opt_in_bootstrap_atomically_adopts_valid_html_cookies_and_identity",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_browser_bootstrap.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
+            "line": 95,
+            "end_line": 95,
+            "source_sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_browser_bootstrap_failures.py:test_failed_optional_bootstrap_keeps_original_state_and_redacts_failures",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_browser_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
+            "line": 17,
+            "end_line": 17,
+            "source_sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        },
+        {
+          "source": {
+            "file": "tests/test_browser_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
+            "line": 18,
+            "end_line": 18,
+            "source_sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+          },
+          "expression": "pytest.mark.parametrize('failure_kind', ['exception', 'timeout', 'persistent', 'invalid', 'url', 'mode', 'srp', 'duplicate'])",
+          "arguments_expression": "'failure_kind'",
+          "values_expression": "['exception', 'timeout', 'persistent', 'invalid', 'url', 'mode', 'srp', 'duplicate']",
+          "case_count": 8,
+          "values": [
+            "exception",
+            "timeout",
+            "persistent",
+            "invalid",
+            "url",
+            "mode",
+            "srp",
+            "duplicate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_browser_bootstrap_failures.py:test_bootstrap_cancellation_propagates_without_credentials_or_adoption",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_browser_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
+            "line": 77,
+            "end_line": 77,
+            "source_sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+          },
+          "expression": "pytest.mark.parametrize('mode', ['primary', 'pin'])",
+          "arguments_expression": "'mode'",
+          "values_expression": "['primary', 'pin']",
+          "case_count": 2,
+          "values": [
+            "primary",
+            "pin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_cli.py:test_network_commands_read_pin_from_keychain_without_exposing_it",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_cli.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_cli.py",
+            "line": 295,
+            "end_line": 295,
+            "source_sha256": "a3b385f344b5e1dbc4c7beaf05bc9bb88147b62c25c6c66331bf12c0a515270d"
+          },
+          "expression": "pytest.mark.parametrize('command', ['balances', 'operations'])",
+          "arguments_expression": "'command'",
+          "values_expression": "['balances', 'operations']",
+          "case_count": 2,
+          "values": [
+            "balances",
+            "operations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_cli.py:test_network_command_requires_keychain_options_as_a_pair",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_cli.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_cli.py",
+            "line": 350,
+            "end_line": 353,
+            "source_sha256": "a3b385f344b5e1dbc4c7beaf05bc9bb88147b62c25c6c66331bf12c0a515270d"
+          },
+          "expression": "pytest.mark.parametrize('option', ['--pin-keychain-service', '--pin-keychain-account'])",
+          "arguments_expression": "'option'",
+          "values_expression": "['--pin-keychain-service', '--pin-keychain-account']",
+          "case_count": 2,
+          "values": [
+            "--pin-keychain-service",
+            "--pin-keychain-account"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_firefox_bootstrap_failures.py:test_firefox_owner_required_failures_are_redacted_and_close_browser",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_firefox_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
+            "line": 39,
+            "end_line": 39,
+            "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
+          },
+          "expression": "pytest.mark.parametrize('failure', ['captcha', 'timeout', 'exception', 'cancel'])",
+          "arguments_expression": "'failure'",
+          "values_expression": "['captcha', 'timeout', 'exception', 'cancel']",
+          "case_count": 4,
+          "values": [
+            "captcha",
+            "timeout",
+            "exception",
+            "cancel"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_firefox_bootstrap_failures.py:test_firefox_rejects_unrepresentable_cookie_metadata",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_firefox_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
+            "line": 76,
+            "end_line": 79,
+            "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
+          },
+          "expression": "pytest.mark.parametrize('bad_metadata', [{'partitionKey': 'https://example.org'}, {'partitionKeyOpaque': True}, {'expires': True}, {'expires': float('nan')}, {'sameSite': 'unsupported'}])",
+          "arguments_expression": "'bad_metadata'",
+          "values_expression": "[{'partitionKey': 'https://example.org'}, {'partitionKeyOpaque': True}, {'expires': True}, {'expires': float('nan')}, {'sameSite': 'unsupported'}]",
+          "case_count": 5,
+          "values": null,
+          "materialization": "expression_only; no executing nonliteral cases"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_firefox_bootstrap_failures.py:test_firefox_rejects_unsafe_setup_before_launch",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_firefox_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
+            "line": 90,
+            "end_line": 90,
+            "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
+          },
+          "expression": "pytest.mark.parametrize('kind', ['permissions', 'symlink', 'external_url', 'bool_timeout', 'infinite_timeout'])",
+          "arguments_expression": "'kind'",
+          "values_expression": "['permissions', 'symlink', 'external_url', 'bool_timeout', 'infinite_timeout']",
+          "case_count": 5,
+          "values": [
+            "permissions",
+            "symlink",
+            "external_url",
+            "bool_timeout",
+            "infinite_timeout"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_firefox_bootstrap_failures.py:test_firefox_aborts_unapproved_requests_without_continuing",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_firefox_bootstrap_failures.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
+            "line": 119,
+            "end_line": 125,
+            "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
+          },
+          "expression": "pytest.mark.parametrize('url,method,resource', [('https://example.org/fixture.js', 'GET', 'script'), (AUTH_PAGE, 'POST', 'document'), ('https://online.sberbank.ru/CSAFront/authMainJson.do', 'GET', 'document'), ('https://online.sberbank.ru/CSAFront/api/v1/pin/begin', 'POST', 'fetch'), ('https://online.sberbank.ru/CSAFront/authMainJson.do.js', 'GET', 'script')])",
+          "arguments_expression": "'url,method,resource'",
+          "values_expression": "[('https://example.org/fixture.js', 'GET', 'script'), (AUTH_PAGE, 'POST', 'document'), ('https://online.sberbank.ru/CSAFront/authMainJson.do', 'GET', 'document'), ('https://online.sberbank.ru/CSAFront/api/v1/pin/begin', 'POST', 'fetch'), ('https://online.sberbank.ru/CSAFront/authMainJson.do.js', 'GET', 'script')]",
+          "case_count": 5,
+          "values": null,
+          "materialization": "expression_only; no executing nonliteral cases"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_primary_auth.py:test_primary_retry_otp_reports_exhausted_state",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_primary_auth.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_primary_auth.py",
+            "line": 467,
+            "end_line": 473,
+            "source_sha256": "124c6572e0e126e639184a32e94856347faae5940e9a5a7a4ae9122d8afb75e5"
+          },
+          "expression": "pytest.mark.parametrize('transport_options', [{'retry_exhausted': True}, {'retry_exhausted_flag': True}])",
+          "arguments_expression": "'transport_options'",
+          "values_expression": "[{'retry_exhausted': True}, {'retry_exhausted_flag': True}]",
+          "case_count": 2,
+          "values": [
+            {
+              "retry_exhausted": true
+            },
+            {
+              "retry_exhausted_flag": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_sber_client.py:test_cookie_must_apply_to_both_session_hosts",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_sber_client.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_sber_client.py",
+            "line": 430,
+            "end_line": 430,
+            "source_sha256": "a920bacd4a9e3535779ab3c1f369483f675658121685a602f0a7eeada95618c2"
+          },
+          "expression": "pytest.mark.parametrize('cookie_domain', ['other.sberbank.ru', 'online.sberbank.ru'])",
+          "arguments_expression": "'cookie_domain'",
+          "values_expression": "['other.sberbank.ru', 'online.sberbank.ru']",
+          "case_count": 2,
+          "values": [
+            "other.sberbank.ru",
+            "online.sberbank.ru"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_transport_cookie_metadata.py:test_curl_response_honors_authoritative_samesite_without_losing_untouched_policy",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_transport_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
+            "line": 41,
+            "end_line": 55,
+            "source_sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"
+          },
+          "expression": "pytest.mark.parametrize('header,value,policy', [(None, 'synthetic', 'Strict'), ('fixture=rotated; Path=/; Secure', 'rotated', None), ('fixture=synthetic; Path=/; Secure', 'synthetic', None), ('fixture=rotated; Path=/; Secure; SameSite=Lax', 'rotated', 'Lax'), ('fixture=synthetic; Path=/; Secure; SameSite=LAX', 'synthetic', 'Lax'), ('fixture=rotated; Path=/; Secure; samesite=Lax', 'rotated', 'Lax'), ('fixture=synthetic; Path=/; Secure; SAMESITE=LAX', 'synthetic', 'Lax'), ('fixture=rotated; Path=/; Secure; SameSITE=lAx', 'rotated', 'Lax'), ('fixture=synthetic; Path=/; Secure; SameSite=None', 'synthetic', 'None'), ('fixture=gone; Path=/; Secure; Max-Age=0', None, None), ('fixture=gone; Path=/; Secure; Expires=Thu, 01 Jan 1970 00:00:00 GMT', None, None), ('unrelated=synthetic; Path=/; Secure', 'synthetic', 'Strict'), ('fixture=other-scope; Path=/CSAFront; Secure', 'synthetic', 'Strict')])",
+          "arguments_expression": "'header,value,policy'",
+          "values_expression": "[(None, 'synthetic', 'Strict'), ('fixture=rotated; Path=/; Secure', 'rotated', None), ('fixture=synthetic; Path=/; Secure', 'synthetic', None), ('fixture=rotated; Path=/; Secure; SameSite=Lax', 'rotated', 'Lax'), ('fixture=synthetic; Path=/; Secure; SameSite=LAX', 'synthetic', 'Lax'), ('fixture=rotated; Path=/; Secure; samesite=Lax', 'rotated', 'Lax'), ('fixture=synthetic; Path=/; Secure; SAMESITE=LAX', 'synthetic', 'Lax'), ('fixture=rotated; Path=/; Secure; SameSITE=lAx', 'rotated', 'Lax'), ('fixture=synthetic; Path=/; Secure; SameSite=None', 'synthetic', 'None'), ('fixture=gone; Path=/; Secure; Max-Age=0', None, None), ('fixture=gone; Path=/; Secure; Expires=Thu, 01 Jan 1970 00:00:00 GMT', None, None), ('unrelated=synthetic; Path=/; Secure', 'synthetic', 'Strict'), ('fixture=other-scope; Path=/CSAFront; Secure', 'synthetic', 'Strict')]",
+          "case_count": 13,
+          "values": [
+            [
+              null,
+              "synthetic",
+              "Strict"
+            ],
+            [
+              "fixture=rotated; Path=/; Secure",
+              "rotated",
+              null
+            ],
+            [
+              "fixture=synthetic; Path=/; Secure",
+              "synthetic",
+              null
+            ],
+            [
+              "fixture=rotated; Path=/; Secure; SameSite=Lax",
+              "rotated",
+              "Lax"
+            ],
+            [
+              "fixture=synthetic; Path=/; Secure; SameSite=LAX",
+              "synthetic",
+              "Lax"
+            ],
+            [
+              "fixture=rotated; Path=/; Secure; samesite=Lax",
+              "rotated",
+              "Lax"
+            ],
+            [
+              "fixture=synthetic; Path=/; Secure; SAMESITE=LAX",
+              "synthetic",
+              "Lax"
+            ],
+            [
+              "fixture=rotated; Path=/; Secure; SameSITE=lAx",
+              "rotated",
+              "Lax"
+            ],
+            [
+              "fixture=synthetic; Path=/; Secure; SameSite=None",
+              "synthetic",
+              "None"
+            ],
+            [
+              "fixture=gone; Path=/; Secure; Max-Age=0",
+              null,
+              null
+            ],
+            [
+              "fixture=gone; Path=/; Secure; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+              null,
+              null
+            ],
+            [
+              "unrelated=synthetic; Path=/; Secure",
+              "synthetic",
+              "Strict"
+            ],
+            [
+              "fixture=other-scope; Path=/CSAFront; Secure",
+              "synthetic",
+              "Strict"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_transport_cookie_metadata.py:test_curl_response_retains_mixed_case_previous_policy",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_transport_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
+            "line": 101,
+            "end_line": 101,
+            "source_sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"
+          },
+          "expression": "pytest.mark.parametrize('attribute', ['samesite', 'SAMESITE', 'SameSITE'])",
+          "arguments_expression": "'attribute'",
+          "values_expression": "['samesite', 'SAMESITE', 'SameSITE']",
+          "case_count": 3,
+          "values": [
+            "samesite",
+            "SAMESITE",
+            "SameSITE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tests/test_transport_cookie_metadata.py:test_curl_response_rejects_mixed_case_invalid_policy",
+      "axes": [
+        {
+          "source": {
+            "file": "tests/test_transport_cookie_metadata.py",
+            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
+            "line": 128,
+            "end_line": 128,
+            "source_sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"
+          },
+          "expression": "pytest.mark.parametrize('attribute', ['samesite', 'SAMESITE', 'SameSITE'])",
+          "arguments_expression": "'attribute'",
+          "values_expression": "['samesite', 'SAMESITE', 'SameSITE']",
+          "case_count": 3,
+          "values": [
+            "samesite",
+            "SAMESITE",
+            "SameSITE"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3678 @@
+{
+  "canonical_commit": "984d45ae6ddbf37224e8146df2788e8821108c9e",
+  "interpreter": {
+    "executable": "/usr/bin/python3.12",
+    "version": "3.12.3"
+  },
+  "selected_model_ast_sha256": "177e780f474206554d0ee272f44dc36ff7535acac6a0f20f434dcf13549e1cc8",
+  "selected_entity_ast_sha256": "78415ec34695402b88979ea2ea4d6337bd8f07af3538c11dc0e83b0f1f08e932",
+  "records": [
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "4111111111111111.50",
+        "currency": "4111111111111111"
+      },
+      "expected": {
+        "amount": "4111111111111111.50",
+        "currency": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "4111111111111111.50",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "4111111111111111.50",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "-4111111111111111.50",
+        "currency": "�"
+      },
+      "expected": {
+        "amount": "-4111111111111111.50",
+        "currency": "�"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "billing_amount": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "billing_amount": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": true,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": true,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-4111111111111111.50",
+          "currency": "�"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-4111111111111111.50",
+              "currency": "�"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "9007199254740993.0100",
+        "currency": "4111111111111111"
+      },
+      "expected": {
+        "amount": "9007199254740993.0100",
+        "currency": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "9007199254740993.0100",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "9007199254740993.0100",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "-0.00",
+        "currency": "�"
+      },
+      "expected": {
+        "amount": "-0.00",
+        "currency": "�"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "billing_amount": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "billing_amount": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": true,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "-0.00",
+              "currency": "�"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": true,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "-0.00",
+              "currency": "�"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "-0.00",
+          "currency": "�"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "-0.00",
+              "currency": "�"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "1.2300E-1000",
+        "currency": "4111111111111111"
+      },
+      "expected": {
+        "amount": "1.2300E-1000",
+        "currency": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "1.2300E-1000",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "1.2300E-1000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "0E-7",
+        "currency": "�"
+      },
+      "expected": {
+        "amount": "0E-7",
+        "currency": "�"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "billing_amount": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "billing_amount": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": true,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "0E-7",
+              "currency": "�"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": true,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "0E-7",
+              "currency": "�"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": true,
+        "arrested": false,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": true,
+        "is_main": true,
+        "balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "0E-7",
+          "currency": "�"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": true,
+            "arrested": false,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": true,
+            "is_main": true,
+            "balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "0E-7",
+              "currency": "�"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Money",
+      "raw": {
+        "amount": "10.5000",
+        "currency": "4111111111111111"
+      },
+      "expected": {
+        "amount": "10.5000",
+        "currency": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "Card",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "Products",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Resource",
+      "raw": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      },
+      "expected": {
+        "type": "4111111111111111",
+        "id": "4111111111111111"
+      }
+    },
+    {
+      "kind": "Operation",
+      "raw": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "date": "2026-10-07",
+        "form": "independent � 😀 PAN •••• 1111",
+        "type": "independent � 😀 PAN •••• 1111",
+        "classification_code": "4111111111111111",
+        "creation_channel": "independent � 😀 PAN •••• 1111",
+        "state": "independent � 😀 PAN •••• 1111",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "merchant": "independent � 😀 PAN •••• 1111",
+        "description": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "billing_amount": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "national_amount": null,
+        "commission": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "tips": null,
+        "refusal_reason": "independent � 😀 PAN •••• 1111",
+        "from_resource": {
+          "type": "4111111111111111",
+          "id": "4111111111111111"
+        },
+        "to_resource": null,
+        "scope_card_ids": [
+          "4111111111111111",
+          "�"
+        ],
+        "is_financial": false,
+        "is_hidden": false,
+        "balance_after": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "balance_after_resource_id": "4111111111111111",
+        "balance_after_resource_name": "independent � 😀 PAN •••• 1111"
+      }
+    },
+    {
+      "kind": "OperationDetail",
+      "raw": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      },
+      "expected": {
+        "uoh_id": "4111111111111111",
+        "form": "independent � 😀 PAN •••• 1111",
+        "title": "independent � 😀 PAN •••• 1111",
+        "amount": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "state": "DONE",
+        "state_name": "independent � 😀 PAN •••• 1111",
+        "state_description": "independent � 😀 PAN •••• 1111",
+        "statement_available": false,
+        "fields": [
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "money",
+            "value": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            }
+          },
+          {
+            "name": "independent � 😀 PAN •••• 1111",
+            "type": "text",
+            "value": "independent � 😀 PAN •••• 1111"
+          },
+          {
+            "name": "",
+            "type": "",
+            "value": null
+          }
+        ]
+      }
+    },
+    {
+      "kind": "BankAccount",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "kind": "ctaccount"
+      }
+    },
+    {
+      "kind": "BankCard",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        }
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "independent � 😀 PAN •••• 1111",
+        "last4": "1111",
+        "type": "debit",
+        "state": "OPEN",
+        "hidden": false,
+        "arrested": false,
+        "is_main": true,
+        "balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        },
+        "balance_source": "",
+        "account_id": "4111111111111111",
+        "account_balance": {
+          "amount": "10.5000",
+          "currency": "4111111111111111"
+        }
+      }
+    },
+    {
+      "kind": "BankPortfolioRaw",
+      "raw": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "accounts": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "kind": "ctaccount"
+          }
+        ],
+        "cards": [
+          {
+            "id": "4111111111111111",
+            "name": "independent � 😀 PAN •••• 1111",
+            "last4": "1111",
+            "type": "debit",
+            "state": "OPEN",
+            "hidden": false,
+            "arrested": false,
+            "is_main": true,
+            "balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            },
+            "balance_source": "",
+            "account_id": "4111111111111111",
+            "account_balance": {
+              "amount": "10.5000",
+              "currency": "4111111111111111"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Account",
+      "raw": {
+        "id": "4111111111111111",
+        "name": "",
+        "last4": "",
+        "state": "",
+        "hidden": false,
+        "arrested": false,
+        "balance": null,
+        "kind": "ctaccount"
+      },
+      "expected": {
+        "id": "4111111111111111",
+        "name": "",
+        "last4": "",
+        "state": "",
+        "hidden": false,
+        "arrested": false,
+        "balance": null,
+        "kind": "ctaccount"
+      }
+    }
+  ],
+  "decimals": [
+    {
+      "input": "0",
+      "valid": true,
+      "expected": "0"
+    },
+    {
+      "input": "-0",
+      "valid": true,
+      "expected": "-0"
+    },
+    {
+      "input": "-0.00",
+      "valid": true,
+      "expected": "-0.00"
+    },
+    {
+      "input": "+00012.5000",
+      "valid": true,
+      "expected": "12.5000"
+    },
+    {
+      "input": "1.2300e-1000",
+      "valid": true,
+      "expected": "1.2300E-1000"
+    },
+    {
+      "input": "1e200",
+      "valid": true,
+      "expected": "1E+200"
+    },
+    {
+      "input": "1e-200",
+      "valid": true,
+      "expected": "1E-200"
+    },
+    {
+      "input": "4111111111111111.50",
+      "valid": true,
+      "expected": "4111111111111111.50"
+    },
+    {
+      "input": "9007199254740993.0100",
+      "valid": true,
+      "expected": "9007199254740993.0100"
+    },
+    {
+      "input": "１２３.００",
+      "valid": true,
+      "expected": "123.00"
+    },
+    {
+      "input": "١٢٣.٠٠",
+      "valid": true,
+      "expected": "123.00"
+    },
+    {
+      "input": "4_111_111_111_111_111.50",
+      "valid": true,
+      "expected": "4111111111111111.50"
+    },
+    {
+      "input": "  10,50  ",
+      "valid": true,
+      "expected": "10.50"
+    },
+    {
+      "input": ".5",
+      "valid": true,
+      "expected": "0.5"
+    },
+    {
+      "input": "-.001",
+      "valid": true,
+      "expected": "-0.001"
+    },
+    {
+      "input": "1.",
+      "valid": true,
+      "expected": "1"
+    },
+    {
+      "input": "1e+0",
+      "valid": true,
+      "expected": "1"
+    },
+    {
+      "input": "NaN",
+      "valid": false,
+      "expected": ""
+    },
+    {
+      "input": "-Infinity",
+      "valid": false,
+      "expected": ""
+    },
+    {
+      "input": "",
+      "valid": false,
+      "expected": ""
+    },
+    {
+      "input": ",1",
+      "valid": true,
+      "expected": "0.1"
+    },
+    {
+      "input": "++1",
+      "valid": false,
+      "expected": ""
+    },
+    {
+      "input": "1.2.3",
+      "valid": false,
+      "expected": ""
+    },
+    {
+      "input": " 1.00 ",
+      "valid": true,
+      "expected": "1.00"
+    }
+  ],
+  "display": [
+    {
+      "input": "4111111111111111",
+      "expected": "•••• 1111"
+    },
+    {
+      "input": "4111111111111111.50",
+      "expected": "•••• 1111.50"
+    },
+    {
+      "input": "PAN 4111-1111-1111-1111",
+      "expected": "PAN •••• 1111"
+    },
+    {
+      "input": "4111111111111112",
+      "expected": "4111111111111112"
+    },
+    {
+      "input": "41111111111111111",
+      "expected": "41111111111111111"
+    },
+    {
+      "input": "x4111111111111111y",
+      "expected": "x•••• 1111y"
+    },
+    {
+      "input": "4111 1111 1111 1111",
+      "expected": "•••• 1111"
+    },
+    {
+      "input": "4111111111111111 4111111111111111",
+      "expected": "•••• 1111 •••• 1111"
+    },
+    {
+      "input": "4111111111111111-4111111111111111",
+      "expected": "•••• 1111-•••• 1111"
+    },
+    {
+      "input": "literal � 😀",
+      "expected": "literal � 😀"
+    },
+    {
+      "input": "４１１１１１１１１１１１１１１１",
+      "expected": "•••• １１１１"
+    },
+    {
+      "input": "٤١١١١١١١١١١١١١١١",
+      "expected": "•••• ١١١١"
+    },
+    {
+      "input": "४१११११११११११११११",
+      "expected": "•••• ११११"
+    },
+    {
+      "input": "4222222222222 4111-1111-1111-1111",
+      "expected": "4222222222222 4111-1111-1111-1111"
+    },
+    {
+      "input": "4222222222222-4111-1111-1111-1111",
+      "expected": "4222222222222-4111-1111-1111-1111"
+    },
+    {
+      "input": "4222222222222 / 4111-1111-1111-1111",
+      "expected": "•••• 2222 / •••• 1111"
+    },
+    {
+      "input": "378282246310005 4111-1111-1111-1111",
+      "expected": "378282246310005 4111-1111-1111-1111"
+    },
+    {
+      "input": "378282246310005-4111-1111-1111-1111",
+      "expected": "378282246310005-4111-1111-1111-1111"
+    },
+    {
+      "input": "378282246310005 / 4111-1111-1111-1111",
+      "expected": "•••• 0005 / •••• 1111"
+    },
+    {
+      "input": "6011111111111117 4111-1111-1111-1111",
+      "expected": "•••• 1117 •••• 1111"
+    },
+    {
+      "input": "6011111111111117-4111-1111-1111-1111",
+      "expected": "•••• 1117-•••• 1111"
+    },
+    {
+      "input": "6011111111111117 / 4111-1111-1111-1111",
+      "expected": "•••• 1117 / •••• 1111"
+    }
+  ],
+  "source_portfolio_boundary": "_jsonable(portfolio.raw)",
+  "network_or_package_import": false
+}

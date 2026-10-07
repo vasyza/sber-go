@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "resources",
+  "records": [
+    {
+      "id": "op_details",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "uohId": "op-uuid-1",
+            "form": "PAYMENT",
+            "statementAvailable": true,
+            "state": {
+              "name": "Выполнено",
+              "description": "по карте",
+              "category": "COMPLETED"
+            },
+            "header": {
+              "title": "Оплата",
+              "operationAmount": {
+                "amount": -1234.56,
+                "currencyCode": "RUB"
+              }
+            },
+            "fields": [
+              {
+                "name": "Категория",
+                "type": "TEXT",
+                "value": "Кафе"
+              },
+              {
+                "name": "Сумма",
+                "type": "AMOUNT",
+                "value": {
+                  "amount": -1234.56,
+                  "currencyCode": "RUB"
+                }
+              },
+              {
+                "name": "Пусто",
+                "type": "TEXT",
+                "value": null
+              }
+            ]
+          }
+        },
+        "expected": {
+          "uoh_id": "op-uuid-1",
+          "form": "PAYMENT",
+          "title": "Оплата",
+          "amount": {
+            "amount": "-1234.56",
+            "currency": "RUB"
+          },
+          "state": "COMPLETED",
+          "state_name": "Выполнено",
+          "state_description": "по карте",
+          "statement_available": true,
+          "fields": [
+            {
+              "name": "Категория",
+              "type": "TEXT",
+              "value": "Кафе"
+            },
+            {
+              "name": "Сумма",
+              "type": "AMOUNT",
+              "value": {
+                "amount": "-1234.56",
+                "currency": "RUB"
+              }
+            },
+            {
+              "name": "Пусто",
+              "type": "TEXT",
+              "value": null
+            }
+          ]
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_new_read_resources.py",
+          "line": 43,
+          "end_line": 52,
+          "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952"
+        },
+        {
+          "file": "tests/test_new_read_resources.py",
+          "line": 87,
+          "end_line": 94,
+          "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952"
+        }
+      ],
+      "python_test_ids": [
+        "test_parse_operation_details"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestNewReadResourcesOpDetails"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "card_info",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "cardDetails": {
+              "cards": [
+                {
+                  "id": 12345,
+                  "name": "Зарплатная",
+                  "number": "4111 1111 1111 1111",
+                  "state": "ACTIVE",
+                  "cardHolder": "IVAN IVANOV",
+                  "paySystemType": "VISA",
+                  "expireDate": "12/28",
+                  "limits": {
+                    "purchaseLimit": {
+                      "amount": "300000.00",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    },
+                    "availableLimit": {
+                      "amount": "84250.17",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    },
+                    "availableTotalLimit": {
+                      "amount": "84250.17",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    }
+                  },
+                  "creditType": {
+                    "creditLimit": {
+                      "amount": "120000.00",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    },
+                    "creditOwnSum": {
+                      "amount": "0.00",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    },
+                    "creditDebt": {
+                      "amount": "15000.00",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    },
+                    "creditMinPayment": {
+                      "amount": "3000.00",
+                      "currency": {
+                        "code": "RUB",
+                        "name": "руб."
+                      }
+                    },
+                    "creditMinPaymentDate": "2026-09-01"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "expected": [
+          {
+            "id": "12345",
+            "name": "Зарплатная",
+            "last4": "1111",
+            "state": "ACTIVE",
+            "card_holder": "IVAN IVANOV",
+            "pay_system_type": "VISA",
+            "expire_date": "12/28",
+            "limits": {
+              "purchase": {
+                "amount": "300000.00",
+                "currency": "RUB"
+              },
+              "available": {
+                "amount": "84250.17",
+                "currency": "RUB"
+              },
+              "available_total": {
+                "amount": "84250.17",
+                "currency": "RUB"
+              }
+            },
+            "credit": {
+              "limit": {
+                "amount": "120000.00",
+                "currency": "RUB"
+              },
+              "own_sum": {
+                "amount": "0.00",
+                "currency": "RUB"
+              },
+              "debt": {
+                "amount": "15000.00",
+                "currency": "RUB"
+              },
+              "min_payment": {
+                "amount": "3000.00",
+                "currency": "RUB"
+              },
+              "min_payment_date": "2026-09-01"
+            }
+          }
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_new_read_resources.py",
+          "line": 54,
+          "end_line": 69,
+          "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952"
+        },
+        {
+          "file": "tests/test_new_read_resources.py",
+          "line": 97,
+          "end_line": 109,
+          "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952"
+        }
+      ],
+      "python_test_ids": [
+        "test_parse_card_info_keeps_only_last4_never_full_pan"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestNewReadResourcesCardInfo"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "pfm",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "amounts": [
+              {
+                "from": "2026-08-01T00:00:00+03:00",
+                "to": "2026-08-31T23:59:59+03:00",
+                "incomeType": "outcome",
+                "nationalAmount": {
+                  "amount": "50000.00",
+                  "currency": "RUB"
+                },
+                "visibleAmount": {
+                  "amount": "50000.00",
+                  "currency": "RUB"
+                },
+                "categoryAmounts": [
+                  {
+                    "id": 1,
+                    "name": "Кафе и рестораны",
+                    "externalId": "CAFE",
+                    "nationalAmount": {
+                      "amount": "12000.00",
+                      "currency": "RUB"
+                    },
+                    "visibleAmount": {
+                      "amount": "12000.00",
+                      "currency": "RUB"
+                    },
+                    "countOperations": 8,
+                    "countHiddenOperations": 0
+                  }
+                ],
+                "productAmounts": []
+              }
+            ]
+          }
+        },
+        "expected": {
+          "periods": [
+            {
+              "from_": "2026-08-01T00:00:00+03:00",
+              "to": "2026-08-31T23:59:59+03:00",
+              "income_type": "outcome",
+              "national_amount": {
+                "amount": "50000.00",
+                "currency": "RUB"
+              },
+              "visible_amount": {
+                "amount": "50000.00",
+                "currency": "RUB"
+              },
+              "categories": [
+                {
+                  "id": "1",
+                  "name": "Кафе и рестораны",
+                  "external_id": "CAFE",
+                  "national_amount": {
+                    "amount": "12000.00",
+                    "currency": "RUB"
+                  },
+                  "visible_amount": {
+                    "amount": "12000.00",
+                    "currency": "RUB"
+                  },
+                  "count_operations": 8
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_new_read_resources.py",
+          "line": 71,
+          "end_line": 82,
+          "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952"
+        },
+        {
+          "file": "tests/test_new_read_resources.py",
+          "line": 112,
+          "end_line": 121,
+          "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952"
+        }
+      ],
+      "python_test_ids": [
+        "test_parse_pfm_amounts"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestNewReadResourcesPfm"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "all_account_kinds_ambiguous_parent",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "body": {
+            "sections": {
+              "technicalSection": {
+                "sectionProductData": {
+                  "ctaccounts": {
+                    "data": [
+                      {
+                        "id": 10,
+                        "number": "same",
+                        "name": "First"
+                      },
+                      {
+                        "id": 11,
+                        "number": "same",
+                        "name": "Duplicate"
+                      },
+                      {
+                        "id": 12,
+                        "number": "unique",
+                        "name": "Current"
+                      }
+                    ]
+                  },
+                  "accounts": {
+                    "data": [
+                      {
+                        "id": 20,
+                        "number": "saving",
+                        "name": "Savings"
+                      }
+                    ]
+                  },
+                  "cardsInWallet": {
+                    "data": [
+                      {
+                        "id": 30,
+                        "number": "0030",
+                        "isCTA": true,
+                        "cardAccount": "same"
+                      },
+                      {
+                        "id": 31,
+                        "number": "0031",
+                        "isCTA": true,
+                        "cardAccount": "unique"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expected": {
+          "accounts": [
+            {
+              "id": "10",
+              "name": "First",
+              "last4": "",
+              "state": "",
+              "hidden": false,
+              "arrested": false,
+              "balance": null,
+              "kind": "ctaccount"
+            },
+            {
+              "id": "11",
+              "name": "Duplicate",
+              "last4": "",
+              "state": "",
+              "hidden": false,
+              "arrested": false,
+              "balance": null,
+              "kind": "ctaccount"
+            },
+            {
+              "id": "12",
+              "name": "Current",
+              "last4": "",
+              "state": "",
+              "hidden": false,
+              "arrested": false,
+              "balance": null,
+              "kind": "ctaccount"
+            },
+            {
+              "id": "20",
+              "name": "Savings",
+              "last4": "",
+              "state": "",
+              "hidden": false,
+              "arrested": false,
+              "balance": null,
+              "kind": "account"
+            }
+          ],
+          "cards": [
+            {
+              "id": "30",
+              "name": "",
+              "last4": "0030",
+              "type": "",
+              "state": "",
+              "hidden": false,
+              "arrested": false,
+              "is_main": false,
+              "balance": null,
+              "balance_source": null,
+              "account_id": null,
+              "account_balance": null
+            },
+            {
+              "id": "31",
+              "name": "",
+              "last4": "0031",
+              "type": "",
+              "state": "",
+              "hidden": false,
+              "arrested": false,
+              "is_main": false,
+              "balance": null,
+              "balance_source": null,
+              "account_id": "12",
+              "account_balance": null
+            }
+          ]
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_entities.py",
+          "line": 47,
+          "end_line": 62,
+          "sha256": "abde8fcc8257e7c5ec5f83a25dc21daf3d047ba2ef00316ce600c3949343fd19"
+        }
+      ],
+      "python_test_ids": [
+        "test_parser_keeps_both_account_kinds_and_links_only_unique_ctaccount"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestEntitiesAllAccountKindsAmbiguousParent"
+      ],
+      "status": "pending"
+    }
+  ]
+}

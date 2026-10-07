@@ -1,0 +1,291 @@
+{
+  "source": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/mcp/sber_unofficial_mcp/server.py",
+  "source_sha256": "b4276ad77f35a8aa795ec61c159129f65714420f329e807c4c0f66304b6262e0",
+  "method": "AST top-level sber_ coroutine functions (registration read separately)",
+  "tool_count": 14,
+  "tools": [
+    {
+      "name": "sber_setup_status",
+      "line": 831,
+      "end_line": 869,
+      "arguments": [
+        "profile"
+      ],
+      "annotations": {
+        "profile": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_auth_start",
+      "line": 898,
+      "end_line": 918,
+      "arguments": [
+        "mode",
+        "profile"
+      ],
+      "annotations": {
+        "mode": "str",
+        "profile": "str"
+      },
+      "defaults": [
+        "'auto'",
+        "'default'"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_auth_continue",
+      "line": 1054,
+      "end_line": 1085,
+      "arguments": [
+        "session_id",
+        "wait_seconds",
+        "use_audio_captcha"
+      ],
+      "annotations": {
+        "session_id": "str | None",
+        "wait_seconds": "int",
+        "use_audio_captcha": "bool"
+      },
+      "defaults": [
+        "None",
+        "30",
+        "False"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_auth_resend_otp",
+      "line": 1170,
+      "end_line": 1182,
+      "arguments": [
+        "session_id"
+      ],
+      "annotations": {
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_session_info",
+      "line": 1185,
+      "end_line": 1208,
+      "arguments": [
+        "session_id",
+        "check_live"
+      ],
+      "annotations": {
+        "session_id": "str | None",
+        "check_live": "bool"
+      },
+      "defaults": [
+        "None",
+        "False"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_session_close",
+      "line": 1211,
+      "end_line": 1219,
+      "arguments": [
+        "session_id"
+      ],
+      "annotations": {
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_products",
+      "line": 1228,
+      "end_line": 1243,
+      "arguments": [
+        "session_id",
+        "force_update"
+      ],
+      "annotations": {
+        "session_id": "str | None",
+        "force_update": "bool"
+      },
+      "defaults": [
+        "None",
+        "False"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_operations",
+      "line": 1252,
+      "end_line": 1275,
+      "arguments": [
+        "session_id",
+        "resource",
+        "from_date",
+        "to_date",
+        "limit",
+        "max_pages"
+      ],
+      "annotations": {
+        "session_id": "str | None",
+        "resource": "str | None",
+        "from_date": "str | None",
+        "to_date": "str | None",
+        "limit": "int",
+        "max_pages": "int"
+      },
+      "defaults": [
+        "None",
+        "None",
+        "None",
+        "None",
+        "30",
+        "3"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_operations_page",
+      "line": 1278,
+      "end_line": 1296,
+      "arguments": [
+        "session_id",
+        "resource",
+        "offset",
+        "limit",
+        "from_date",
+        "to_date"
+      ],
+      "annotations": {
+        "session_id": "str | None",
+        "resource": "str | None",
+        "offset": "int",
+        "limit": "int",
+        "from_date": "str | None",
+        "to_date": "str | None"
+      },
+      "defaults": [
+        "None",
+        "None",
+        "0",
+        "30",
+        "None",
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_card_rename",
+      "line": 1299,
+      "end_line": 1321,
+      "arguments": [
+        "card_id",
+        "name",
+        "session_id"
+      ],
+      "annotations": {
+        "card_id": "str",
+        "name": "str",
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_transfer_start",
+      "line": 1324,
+      "end_line": 1344,
+      "arguments": [
+        "session_id"
+      ],
+      "annotations": {
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_transfer_prepare",
+      "line": 1347,
+      "end_line": 1396,
+      "arguments": [
+        "draft_id",
+        "source_id",
+        "destination_id",
+        "amount",
+        "currency",
+        "payment_purpose",
+        "session_id"
+      ],
+      "annotations": {
+        "draft_id": "str",
+        "source_id": "str",
+        "destination_id": "str",
+        "amount": "str",
+        "currency": "str",
+        "payment_purpose": "str",
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "'RUB'",
+        "''",
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_transfer_confirm",
+      "line": 1399,
+      "end_line": 1461,
+      "arguments": [
+        "confirmation_token",
+        "acknowledged_amount",
+        "acknowledged_destination_id",
+        "session_id"
+      ],
+      "annotations": {
+        "confirmation_token": "str",
+        "acknowledged_amount": "str",
+        "acknowledged_destination_id": "str",
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    },
+    {
+      "name": "sber_transfer_resolve_uncertain",
+      "line": 1464,
+      "end_line": 1478,
+      "arguments": [
+        "audit_id",
+        "found",
+        "session_id"
+      ],
+      "annotations": {
+        "audit_id": "str",
+        "found": "bool",
+        "session_id": "str | None"
+      },
+      "defaults": [
+        "None"
+      ],
+      "return": "dict"
+    }
+  ]
+}

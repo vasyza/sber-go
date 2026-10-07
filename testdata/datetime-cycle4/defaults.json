@@ -1,0 +1,88 @@
+[
+  {
+    "id": "default4-0",
+    "now": "1916-11-01T12:00:00Z",
+    "valid": true,
+    "body": {
+      "paginationOffset": 0,
+      "paginationSize": 3,
+      "showHidden": false,
+      "showNotTransactionBonuses": true,
+      "showOpenBanking": true,
+      "from": "04.07.1916T14:31:19",
+      "usedResource": [
+        "card:fixture"
+      ]
+    }
+  },
+  {
+    "id": "default4-1",
+    "now": "1917-11-01T12:00:00Z",
+    "valid": true,
+    "body": {
+      "paginationOffset": 0,
+      "paginationSize": 3,
+      "showHidden": false,
+      "showNotTransactionBonuses": true,
+      "showOpenBanking": true,
+      "from": "04.07.1917T15:31:19",
+      "usedResource": [
+        "card:fixture"
+      ]
+    }
+  },
+  {
+    "id": "default4-2",
+    "now": "2010-07-26T00:15:00Z",
+    "valid": true,
+    "body": {
+      "paginationOffset": 0,
+      "paginationSize": 3,
+      "showHidden": false,
+      "showNotTransactionBonuses": true,
+      "showOpenBanking": true,
+      "from": "28.03.2010T04:15:00",
+      "usedResource": [
+        "card:fixture"
+      ]
+    }
+  },
+  {
+    "id": "default4-3",
+    "now": "2014-12-15T00:00:00Z",
+    "valid": true,
+    "body": {
+      "paginationOffset": 0,
+      "paginationSize": 3,
+      "showHidden": false,
+      "showNotTransactionBonuses": true,
+      "showOpenBanking": true,
+      "from": "17.08.2014T03:00:00",
+      "usedResource": [
+        "card:fixture"
+      ]
+    }
+  },
+  {
+    "id": "default4-4",
+    "now": "2026-08-01T12:00:00.123456Z",
+    "valid": true,
+    "body": {
+      "paginationOffset": 0,
+      "paginationSize": 3,
+      "showHidden": false,
+      "showNotTransactionBonuses": true,
+      "showOpenBanking": true,
+      "from": "03.04.2026T15:00:00",
+      "usedResource": [
+        "card:fixture"
+      ]
+    }
+  },
+  {
+    "id": "default4-5",
+    "now": "0001-01-01T00:00:00Z",
+    "valid": false,
+    "body": null
+  }
+]

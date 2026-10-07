@@ -1,0 +1,11 @@
+/bin/
+/dist/
+/evidence/
+/private/
+/browsers/
+/.env
+*.har
+*.trace
+*.log
+*profile*.json
+!testdata/**

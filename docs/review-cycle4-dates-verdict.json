@@ -1,0 +1,142 @@
+{
+  "passed": true,
+  "security_concerns": [],
+  "logic_errors": [],
+  "suggestions": [
+    {
+      "topic": "Scope remains bounded",
+      "detail": "Retain full unfiltered source/new denominators and all historical failures. The 4058 new differential rows and two bounded fuzz targets do not prove every possible DATE/DATETIME grammar input, whole-root/full SDK acceptance, or live operation."
+    },
+    {
+      "topic": "Preserve the native/source split",
+      "detail": "NewSourceTimeFilter validates stripped request-wall order but returns truthful native instants; Contains and NewTimeFilter keep native instant semantics. An accepted source-wall window is not necessarily a native Contains window. SourceOperationCompare zero is not Python equality and is not an arbitrary Go sort contract."
+    },
+    {
+      "topic": "Keep versioned source scheduling",
+      "detail": "Pin comparison, powersort/merge/gallop scheduling and asymmetric bank Unicode semantics to the audited CPython3.12.3/Unicode15 source. Revalidate these contracts if the canonical runtime changes."
+    }
+  ],
+  "summary": "PASS for the sealed combined SDK4 date/application slice and the parent source-grounded active fuzz-test amendment: DATES-C3-001..004 independently closed in scope; no new production date/application defect found. Financial, client, foundation, MCP and whole-SDK acceptance remain separate and unapproved.",
+  "scope": {
+    "SDK_cycle": 4,
+    "new_round_started": false,
+    "candidate_manifest": "/home/hermes/workspace/rental-monitoring/research/go-migration/repair-cycle4/parent-combined/review-manifest.json",
+    "candidate_manifest_sha256": "e9df701bf7e1770b3bb0f18a16351edb23cb8da27098d7236a30c2c57bfc1d72",
+    "candidate_file_count": 206,
+    "production_files": [
+      "parsers.go",
+      "resources_operations.go",
+      "resources_collection.go"
+    ],
+    "original_assigned_production_hashes": {
+      "parsers.go": "7f9356c9e753730df29b0657049e7e160bde0ff0d6335c44b188034cbd467366",
+      "resources_operations.go": "5fd125c7aa47381b7254fb5531eebc67f3de89312266039dec352cacee4bbe46",
+      "resources_collection.go": "b7b7bb57d382912fd9aceda053d620c6105766e4df9da0aedcb95ba1ae8484dc"
+    },
+    "production_edits": false,
+    "source_SDK_import": false,
+    "auth_live_or_owner_operations": false,
+    "financial_acceptance": false,
+    "financial_refusal_takeover_or_retry": false,
+    "whole_SDK_approval": false,
+    "goal_approval": false,
+    "live_application": false,
+    "seven_excluded_runtime_tests_not_executed": true
+  },
+  "evidence": {
+    "independent_differential_cases": 4058,
+    "independent_kind_counts": {
+      "scalar": 1996,
+      "bank": 588,
+      "window": 325,
+      "sort": 1141,
+      "default": 8
+    },
+    "independent_mismatch_rows": 0,
+    "separate_fresh_zero_order_non_equality_pairs": 5,
+    "original_list_iter_page_positive_executions": 63,
+    "original_archive_rows_independently_recomputed": 39848,
+    "qualified_prior_auditor_Contains_flags": 38,
+    "worker_fixture_source_claims_recomputed": {
+      "sort_rows": 12662,
+      "pair_relations": 30847,
+      "strict_cycles": 228,
+      "zero_order_not_equality": 2964,
+      "sort_mismatch_rows": 0,
+      "pair_mismatches": 0,
+      "bank_rows": 3044,
+      "bank_mismatches": 0,
+      "window_rows": 1155,
+      "window_mismatches": 0,
+      "date_rows": 66,
+      "date_mismatches": 0,
+      "default_rows": 6,
+      "default_mismatches": 0
+    },
+    "native_compatibility_window_differences": 34,
+    "new_arbitrary_schedule_control_mismatch_rows": 125,
+    "worker_arbitrary_schedule_control_recounted_mismatch_rows": 326,
+    "race_and_actual_native_counts": {
+      "ordinary_tests": 13,
+      "ordinary_subtests": 1161,
+      "fuzz_seeds": 38,
+      "fuzz_suites": 4
+    },
+    "bounded_fuzz_reported_executions": 10006,
+    "historical_legacy_assertion_failure_seeds": 2,
+    "immutable_external_targets_reverified": 1471,
+    "current_gates_pass": true,
+    "retained_negative_controls_not_production_defects": true,
+    "source_runtime": "/usr/bin/python3 3.12.3",
+    "toolchain": "Go1.27.1 explicit absolute path, readonly modules, GOPROXY=off, GOSUMDB=sum.golang.org"
+  },
+  "closed_findings": [
+    {
+      "id": "DATES-C3-001",
+      "paths": [
+        "parsers.go:615 ParseSourceDate",
+        "parsers.go:800 ParseSourceDateTime",
+        "parsers.go:1011 DATE-first constructor"
+      ],
+      "detail": "Independent canonical DATE grammar and typed original Page agree, including DATE-valid/DATETIME-invalid residual bytes and independently accepted different calendar days."
+    },
+    {
+      "id": "DATES-C3-002",
+      "paths": [
+        "parsers.go:994 NewSourceTimeFilter",
+        "parsers.go:1049 stripped request-wall validation",
+        "resources_operations.go:85 Page",
+        "resources_operations.go:611 queryOptions",
+        "resources_collection.go:35 walk"
+      ],
+      "detail": "Source request-wall acceptance/rejection precedes wire-second truncation. Request bodies and coverage metadata use source wire bounds; default clocks strip timezone before civil subtraction."
+    },
+    {
+      "id": "DATES-C3-003",
+      "paths": [
+        "parsers.go:962 SourceOperationCompare",
+        "resources_operations.go:161 SortSourceOperations",
+        "resources_operations.go:149 List",
+        "resources_collection.go:76 Collect"
+      ],
+      "detail": "Truthful native instants remain separate from source relational comparison. Canonical sort schedule, including both merge directions and adaptive galloping, matches primary source and fresh permutations; actual List/Collect and entity-scoped caller tests agree."
+    },
+    {
+      "id": "DATES-C3-004",
+      "paths": [
+        "parsers.go:195 bank strptime grammar",
+        "parsers.go:201 canonical Nd zero table",
+        "parsers.go:224 domainOperationDate",
+        "parsers.go:334 ParseOperations caller"
+      ],
+      "detail": "Bank normalization matches canonical asymmetric ASCII/Nd directives, space-padded days, exact historical attachment, calendar validation and raw fallback."
+    }
+  ],
+  "parent_amendment": "parent-amendment-independent-verdict.json",
+  "qualifications": [
+    "reviewer-harness-qualification.json: full-declaration whitespace false positive corrected using actual native AST; initial report retained",
+    "worker legacy fuzz FAIL, parent initial witness setup failure, and old auditor false Contains implications remain sealed and unchanged",
+    "legacy-format counts are explicitly separated into row and From/To-field units"
+  ],
+  "owner_steering_boundary": "The parent-reported financial sibling provider content_policy_blocked outcome remains outside this review. No retry, rephrase, reconstruction, execution, financial-export acceptance, additional SDK round or provider/security-control change was attempted."
+}

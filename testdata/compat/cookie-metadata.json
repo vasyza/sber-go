@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "cookie-metadata",
+  "records": [
+    {
+      "id": "curl_response_honors_authoritative_samesite_without_losing_untouched_policy_axis_0",
+      "kind": "copied_existing_parameter_table",
+      "data": {
+        "fields": "header,value,policy",
+        "cases": [
+          [
+            null,
+            "synthetic",
+            "Strict"
+          ],
+          [
+            "fixture=rotated; Path=/; Secure",
+            "rotated",
+            null
+          ],
+          [
+            "fixture=synthetic; Path=/; Secure",
+            "synthetic",
+            null
+          ],
+          [
+            "fixture=rotated; Path=/; Secure; SameSite=Lax",
+            "rotated",
+            "Lax"
+          ],
+          [
+            "fixture=synthetic; Path=/; Secure; SameSite=LAX",
+            "synthetic",
+            "Lax"
+          ],
+          [
+            "fixture=rotated; Path=/; Secure; samesite=Lax",
+            "rotated",
+            "Lax"
+          ],
+          [
+            "fixture=synthetic; Path=/; Secure; SAMESITE=LAX",
+            "synthetic",
+            "Lax"
+          ],
+          [
+            "fixture=rotated; Path=/; Secure; SameSITE=lAx",
+            "rotated",
+            "Lax"
+          ],
+          [
+            "fixture=synthetic; Path=/; Secure; SameSite=None",
+            "synthetic",
+            "None"
+          ],
+          [
+            "fixture=gone; Path=/; Secure; Max-Age=0",
+            null,
+            null
+          ],
+          [
+            "fixture=gone; Path=/; Secure; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+            null,
+            null
+          ],
+          [
+            "unrelated=synthetic; Path=/; Secure",
+            "synthetic",
+            "Strict"
+          ],
+          [
+            "fixture=other-scope; Path=/CSAFront; Secure",
+            "synthetic",
+            "Strict"
+          ]
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_transport_cookie_metadata.py",
+          "line": 41,
+          "end_line": 55,
+          "sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"
+        }
+      ],
+      "python_test_ids": [
+        "test_curl_response_honors_authoritative_samesite_without_losing_untouched_policy"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestTransportCookieMetadataCurlResponseHonorsAuthoritativeSamesiteWithoutLosingUntouchedPolicyAxis0"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "response_samesite_case_variants_are_exported_canonically_axis_0",
+      "kind": "copied_existing_parameter_table",
+      "data": {
+        "fields": "raw,canonical",
+        "cases": [
+          [
+            "strict",
+            "Strict"
+          ],
+          [
+            "STRICT",
+            "Strict"
+          ],
+          [
+            "lax",
+            "Lax"
+          ],
+          [
+            "LAX",
+            "Lax"
+          ],
+          [
+            "none",
+            "None"
+          ],
+          [
+            "NONE",
+            "None"
+          ],
+          [
+            "lAx",
+            "Lax"
+          ]
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 61,
+          "end_line": 64,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_response_samesite_case_variants_are_exported_canonically"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataResponseSamesiteCaseVariantsAreExportedCanonicallyAxis0"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "response_samesite_case_variants_are_exported_canonically_axis_1",
+      "kind": "copied_existing_parameter_table",
+      "data": {
+        "fields": "attribute",
+        "cases": [
+          "SameSite",
+          "samesite",
+          "SAMESITE",
+          "SameSITE"
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 65,
+          "end_line": 65,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_response_samesite_case_variants_are_exported_canonically"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataResponseSamesiteCaseVariantsAreExportedCanonicallyAxis1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "response_invalid_samesite_is_not_silently_normalized_axis_0",
+      "kind": "copied_existing_parameter_table",
+      "data": {
+        "fields": "raw",
+        "cases": [
+          "invalid",
+          "unspecified",
+          "no_restriction",
+          "Strict-invalid"
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 76,
+          "end_line": 76,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_response_invalid_samesite_is_not_silently_normalized"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataResponseInvalidSamesiteIsNotSilentlyNormalizedAxis0"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "response_invalid_samesite_is_not_silently_normalized_axis_1",
+      "kind": "copied_existing_parameter_table",
+      "data": {
+        "fields": "attribute",
+        "cases": [
+          "SameSite",
+          "samesite",
+          "SAMESITE",
+          "SameSITE"
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 77,
+          "end_line": 77,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_response_invalid_samesite_is_not_silently_normalized"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataResponseInvalidSamesiteIsNotSilentlyNormalizedAxis1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "netscape_preserves_rfc_and_filters_expired",
+      "kind": "copied_existing_synthetic_cookie_text",
+      "data": {
+        "text": "# Netscape HTTP Cookie File\n#HttpOnly_.online.sberbank.ru\tTRUE\t/\tTRUE\t4102444800\tUFS-SESSION\tsecret\n.sberbank.ru\tTRUE\t/\tFALSE\t1\tOLD\texpired\n",
+        "file_mode": "0600",
+        "expected_cookie_names": [
+          "UFS-SESSION"
+        ],
+        "expected_domain_specified": true,
+        "expected_secure": true,
+        "expected_http_only": true
+      },
+      "provenance": [
+        {
+          "file": "tests/test_sber_client.py",
+          "line": 385,
+          "end_line": 399,
+          "sha256": "a920bacd4a9e3535779ab3c1f369483f675658121685a602f0a7eeada95618c2"
+        }
+      ],
+      "python_test_ids": [
+        "test_netscape_cookie_file_preserves_metadata_and_skips_expired"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestSberClientNetscapePreservesRfcAndFiltersExpired"
+      ],
+      "status": "pending"
+    }
+  ]
+}

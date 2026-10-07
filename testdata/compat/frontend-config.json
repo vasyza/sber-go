@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "frontend-config",
+  "records": [
+    {
+      "id": "pin_valid_literal",
+      "kind": "reference_derived_from_audited_factory",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"pin\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    ",
+        "expected_runtime": {
+          "base_url": "https://online.sberbank.ru/CSAFront",
+          "process_id": "process-fixture",
+          "pin_length": 5,
+          "n_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "g_hex": "2",
+          "seamless_web": true,
+          "redirect_post": true
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_pin_auth.py",
+          "line": 55,
+          "end_line": 75,
+          "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a"
+        }
+      ],
+      "python_test_ids": [
+        "test_frontend_config_parser_is_dynamic_and_fails_closed"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPinAuthPinValidLiteral"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "primary_valid_literal",
+      "kind": "reference_derived_from_audited_factory",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"start\",\n          useStoredLogin: false,\n          isStoredLoginEnabled: true,\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          srpConfig: {enabled: true, N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", g: \"2\"},\n          pinConfig: {enabled: true, hasPin: false},\n          validation: {pin: {length: 5}},\n        };\n        </script>\n    ",
+        "expected_runtime": {
+          "base_url": "https://online.sberbank.ru/CSAFront",
+          "process_id": "process-fixture",
+          "pin_length": 5,
+          "n_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "g_hex": "2",
+          "seamless_web": true,
+          "redirect_post": true
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_primary_auth.py",
+          "line": 70,
+          "end_line": 86,
+          "sha256": "124c6572e0e126e639184a32e94856347faae5940e9a5a7a4ae9122d8afb75e5"
+        }
+      ],
+      "python_test_ids": [
+        "test_primary_auth_har_flow_enrolls_pin_and_returns_ufs_session"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPrimaryAuthPrimaryValidLiteral"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "pin_duplicate_base",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\", baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"pin\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_pin_auth.py",
+          "line": 268,
+          "end_line": 281,
+          "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a"
+        }
+      ],
+      "python_test_ids": [
+        "test_frontend_config_parser_is_dynamic_and_fails_closed"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPinAuthPinDuplicateBase"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "pin_external_auth_base",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"https://example.org/CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"pin\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_pin_auth.py",
+          "line": 268,
+          "end_line": 281,
+          "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a"
+        }
+      ],
+      "python_test_ids": [
+        "test_frontend_config_parser_is_dynamic_and_fails_closed"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPinAuthPinExternalAuthBase"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "pin_wrong_auth_mode",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"password\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_pin_auth.py",
+          "line": 268,
+          "end_line": 281,
+          "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a"
+        }
+      ],
+      "python_test_ids": [
+        "test_frontend_config_parser_is_dynamic_and_fails_closed"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPinAuthPinWrongAuthMode"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "pin_undersized_srp",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"pin\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_browser_bootstrap_failures.py",
+          "line": 19,
+          "end_line": 65,
+          "sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+        }
+      ],
+      "python_test_ids": [
+        "test_failed_optional_bootstrap_keeps_original_state_and_redacts_failures"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBrowserBootstrapFailuresPinUndersizedSrp"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "pin_duplicate_assignment",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"pin\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    \n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"pin\",\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          ignored: {text: \"comma, brace } and // are data\"},\n          pinConfig: {\n            enabled: true,\n            hasPin: true,\n            length: 5,\n            srp_N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n            srp_g: \"2\",\n          },\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_browser_bootstrap_failures.py",
+          "line": 19,
+          "end_line": 65,
+          "sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+        }
+      ],
+      "python_test_ids": [
+        "test_failed_optional_bootstrap_keeps_original_state_and_redacts_failures"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBrowserBootstrapFailuresPinDuplicateAssignment"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "primary_undersized_srp",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"start\",\n          useStoredLogin: false,\n          isStoredLoginEnabled: true,\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          srpConfig: {enabled: true, N: \"ff\", g: \"2\"},\n          pinConfig: {enabled: true, hasPin: false},\n          validation: {pin: {length: 5}},\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_browser_bootstrap_failures.py",
+          "line": 19,
+          "end_line": 65,
+          "sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+        }
+      ],
+      "python_test_ids": [
+        "test_failed_optional_bootstrap_keeps_original_state_and_redacts_failures"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBrowserBootstrapFailuresPrimaryUndersizedSrp"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "primary_duplicate_assignment",
+      "kind": "reference_derived_existing_negative_case",
+      "data": {
+        "html": "\n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"start\",\n          useStoredLogin: false,\n          isStoredLoginEnabled: true,\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          srpConfig: {enabled: true, N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", g: \"2\"},\n          pinConfig: {enabled: true, hasPin: false},\n          validation: {pin: {length: 5}},\n        };\n        </script>\n    \n        <script>\n        window.config = {\n          baseApiUrl: \"CSAFront\",\n          processId: \"process-fixture\",\n          authTypeByCookie: \"start\",\n          useStoredLogin: false,\n          isStoredLoginEnabled: true,\n          isSeamlessWeb: true,\n          isUfsRedirectMethodPostEnabled: true,\n          srpConfig: {enabled: true, N: \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", g: \"2\"},\n          pinConfig: {enabled: true, hasPin: false},\n          validation: {pin: {length: 5}},\n        };\n        </script>\n    ",
+        "expected_error": "ValueError",
+        "expected_public_error_code": "invalid_frontend_config"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_browser_bootstrap_failures.py",
+          "line": 19,
+          "end_line": 65,
+          "sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
+        }
+      ],
+      "python_test_ids": [
+        "test_failed_optional_bootstrap_keeps_original_state_and_redacts_failures"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBrowserBootstrapFailuresPrimaryDuplicateAssignment"
+      ],
+      "status": "pending"
+    }
+  ]
+}

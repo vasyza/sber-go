@@ -1,0 +1,376 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "history",
+  "records": [
+    {
+      "id": "operation_amount_is_transaction_and_resource_billing_amount_is_balance_after",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "operations": [
+              {
+                "uohId": "fixture-operation",
+                "date": "15.01.2030T12:00:00",
+                "correspondent": "Fixture merchant",
+                "operationAmount": {
+                  "amount": -12.34,
+                  "currencyCode": "RUB"
+                },
+                "nationalAmount": {
+                  "amount": -12.34,
+                  "currencyCode": "RUB"
+                },
+                "billingAmount": {
+                  "id": "fixture-card",
+                  "name": "Fixture card",
+                  "amount": 98765.43,
+                  "currencyCode": "RUB"
+                },
+                "state": {
+                  "category": "executed"
+                }
+              }
+            ]
+          }
+        },
+        "expected": [
+          {
+            "id": "fixture-operation",
+            "date": "2030-01-15T12:00:00+03:00",
+            "form": "",
+            "type": "",
+            "classification_code": "",
+            "creation_channel": "",
+            "state": "executed",
+            "state_name": "",
+            "state_description": "",
+            "merchant": "Fixture merchant",
+            "description": "",
+            "amount": {
+              "amount": "-12.34",
+              "currency": "RUB"
+            },
+            "billing_amount": {
+              "amount": "98765.43",
+              "currency": "RUB"
+            },
+            "national_amount": {
+              "amount": "-12.34",
+              "currency": "RUB"
+            },
+            "commission": null,
+            "tips": null,
+            "refusal_reason": "",
+            "from_resource": null,
+            "to_resource": null,
+            "scope_card_ids": [],
+            "is_financial": null,
+            "is_hidden": false,
+            "balance_after": {
+              "amount": "98765.43",
+              "currency": "RUB"
+            },
+            "balance_after_resource_id": "fixture-card",
+            "balance_after_resource_name": "Fixture card"
+          }
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_operation_semantics.py",
+          "line": 8,
+          "end_line": 28,
+          "sha256": "94dbb605b748513ed526ee9d05a6c35095d6de064abfa0a5b6d316aecf6a9c18"
+        }
+      ],
+      "python_test_ids": [
+        "test_operation_amount_is_transaction_and_resource_billing_amount_is_balance_after"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestOperationSemanticsOperationAmountIsTransactionAndResourceBillingAmountIsBalanceAfter"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "plain_billing_amount_is_not_guessed_to_be_a_balance",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "operations": [
+              {
+                "uohId": "fixture-operation",
+                "billingAmount": {
+                  "amount": "10.50",
+                  "currencyCode": "RUB"
+                },
+                "state": {}
+              }
+            ]
+          }
+        },
+        "expected": [
+          {
+            "id": "fixture-operation",
+            "date": "",
+            "form": "",
+            "type": "",
+            "classification_code": "",
+            "creation_channel": "",
+            "state": "",
+            "state_name": "",
+            "state_description": "",
+            "merchant": "",
+            "description": "",
+            "amount": null,
+            "billing_amount": {
+              "amount": "10.50",
+              "currency": "RUB"
+            },
+            "national_amount": null,
+            "commission": null,
+            "tips": null,
+            "refusal_reason": "",
+            "from_resource": null,
+            "to_resource": null,
+            "scope_card_ids": [],
+            "is_financial": null,
+            "is_hidden": false,
+            "balance_after": null,
+            "balance_after_resource_id": null,
+            "balance_after_resource_name": null
+          }
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_operation_semantics.py",
+          "line": 41,
+          "end_line": 52,
+          "sha256": "94dbb605b748513ed526ee9d05a6c35095d6de064abfa0a5b6d316aecf6a9c18"
+        }
+      ],
+      "python_test_ids": [
+        "test_plain_billing_amount_is_not_guessed_to_be_a_balance"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestOperationSemanticsPlainBillingAmountIsNotGuessedToBeABalance"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "a5_one_malformed_optional_amount_does_not_discard_the_page",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "operations": [
+              {
+                "uohId": "op-1",
+                "operationAmount": {
+                  "amount": "-12.50",
+                  "currencyCode": "RUB"
+                },
+                "tips": {
+                  "amount": "—"
+                },
+                "commission": {
+                  "amount": "oops"
+                }
+              },
+              {
+                "uohId": "op-2",
+                "operationAmount": {
+                  "amount": "1.00",
+                  "currencyCode": "RUB"
+                }
+              }
+            ]
+          }
+        },
+        "expected": [
+          {
+            "id": "op-1",
+            "date": "",
+            "form": "",
+            "type": "",
+            "classification_code": "",
+            "creation_channel": "",
+            "state": "",
+            "state_name": "",
+            "state_description": "",
+            "merchant": "",
+            "description": "",
+            "amount": {
+              "amount": "-12.50",
+              "currency": "RUB"
+            },
+            "billing_amount": null,
+            "national_amount": null,
+            "commission": null,
+            "tips": null,
+            "refusal_reason": "",
+            "from_resource": null,
+            "to_resource": null,
+            "scope_card_ids": [],
+            "is_financial": null,
+            "is_hidden": false,
+            "balance_after": null,
+            "balance_after_resource_id": null,
+            "balance_after_resource_name": null
+          },
+          {
+            "id": "op-2",
+            "date": "",
+            "form": "",
+            "type": "",
+            "classification_code": "",
+            "creation_channel": "",
+            "state": "",
+            "state_name": "",
+            "state_description": "",
+            "merchant": "",
+            "description": "",
+            "amount": {
+              "amount": "1.00",
+              "currency": "RUB"
+            },
+            "billing_amount": null,
+            "national_amount": null,
+            "commission": null,
+            "tips": null,
+            "refusal_reason": "",
+            "from_resource": null,
+            "to_resource": null,
+            "scope_card_ids": [],
+            "is_financial": null,
+            "is_hidden": false,
+            "balance_after": null,
+            "balance_after_resource_id": null,
+            "balance_after_resource_name": null
+          }
+        ]
+      },
+      "provenance": [
+        {
+          "file": "tests/test_regressions.py",
+          "line": 25,
+          "end_line": 38,
+          "sha256": "de33522e67eada3cab75193612126a7fd78664c39156f0da70f01f926da18613"
+        }
+      ],
+      "python_test_ids": [
+        "test_a5_one_malformed_optional_amount_does_not_discard_the_page"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestRegressionsA5OneMalformedOptionalAmountDoesNotDiscardThePage"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "a5_malformed_core_amount_still_raises",
+      "kind": "reference_derived_from_copied_synthetic_literal",
+      "data": {
+        "input": {
+          "success": true,
+          "body": {
+            "operations": [
+              {
+                "uohId": "op-1",
+                "operationAmount": {
+                  "amount": "—"
+                }
+              }
+            ]
+          }
+        },
+        "expected_error": "ParseError"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_regressions.py",
+          "line": 46,
+          "end_line": 48,
+          "sha256": "de33522e67eada3cab75193612126a7fd78664c39156f0da70f01f926da18613"
+        }
+      ],
+      "python_test_ids": [
+        "test_a5_malformed_core_amount_still_raises"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestRegressionsA5MalformedCoreAmountStillRaises"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "sequential_n_plus_one_sentinel_pages",
+      "kind": "copied_existing_synthetic_pagination_case",
+      "data": {
+        "pages": [
+          {
+            "success": true,
+            "body": {
+              "operations": [
+                {
+                  "uohId": "1",
+                  "date": "01.07.2026T10:00:00",
+                  "state": {}
+                },
+                {
+                  "uohId": "sentinel",
+                  "date": "01.07.2026T09:00:00",
+                  "state": {}
+                }
+              ]
+            }
+          },
+          {
+            "success": true,
+            "body": {
+              "operations": [
+                {
+                  "uohId": "2",
+                  "date": "02.07.2026T10:00:00",
+                  "state": {}
+                }
+              ]
+            }
+          }
+        ],
+        "requested_limit": 1,
+        "expected_ordered_ids": [
+          "2",
+          "1"
+        ],
+        "expected_offsets": [
+          0,
+          1
+        ],
+        "default_from_must_remain_frozen": true
+      },
+      "provenance": [
+        {
+          "file": "tests/test_async_sdk.py",
+          "line": 512,
+          "end_line": 530,
+          "sha256": "214c6cefeba9c41d9e777db549755180b564dc4a24db27ef6a74c1cbdbd0b987"
+        }
+      ],
+      "python_test_ids": [
+        "test_async_operations_n_plus_one_pagination_is_sequential"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestAsyncSdkSequentialNPlusOneSentinelPages"
+      ],
+      "status": "pending"
+    }
+  ]
+}

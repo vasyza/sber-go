@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "mutations",
+  "records": [
+    {
+      "id": "five_request_own_resource_workflow",
+      "kind": "reference_derived_existing_synthetic_transport_fixture",
+      "data": {
+        "responses": [
+          {
+            "success": true,
+            "body": {
+              "result": "SUCCESS",
+              "pid": "fixture-workflow-pid",
+              "flow": "me2meCreate",
+              "state": "transferRequisites",
+              "output": {
+                "references": {
+                  "fromResource": {
+                    "items": [
+                      {
+                        "value": "transactionAccount:source-1",
+                        "title": "Fixture product",
+                        "properties": {
+                          "type": "payAccount",
+                          "name": "Fixture product",
+                          "currency": "RUB"
+                        }
+                      },
+                      {
+                        "value": "card:source-card",
+                        "title": "Fixture product",
+                        "properties": {
+                          "type": "card",
+                          "name": "Fixture product",
+                          "currency": "RUB"
+                        }
+                      }
+                    ]
+                  },
+                  "toResource": {
+                    "items": [
+                      {
+                        "value": "account:destination-1",
+                        "title": "Fixture product",
+                        "properties": {
+                          "type": "account",
+                          "name": "Fixture product",
+                          "currency": "RUB"
+                        }
+                      },
+                      {
+                        "value": "transactionAccount:source-1",
+                        "title": "Fixture product",
+                        "properties": {
+                          "type": "payAccount",
+                          "name": "Fixture product",
+                          "currency": "RUB"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "success": true,
+            "body": {
+              "result": "SUCCESS",
+              "pid": "fixture-workflow-pid",
+              "flow": "me2meCreate",
+              "state": "summary"
+            }
+          },
+          {
+            "success": true,
+            "body": {
+              "result": "EXTERNAL_ENTER",
+              "pid": "fixture-workflow-pid",
+              "url": "/bh-confirmation/v3/workflow2"
+            }
+          },
+          {
+            "success": true,
+            "body": {
+              "result": "EXTERNAL_RETURN",
+              "pid": "fixture-workflow-pid",
+              "url": "/me2me/v1/workflow"
+            }
+          },
+          {
+            "success": true,
+            "body": {
+              "result": "SUCCESS",
+              "pid": "fixture-workflow-pid",
+              "flow": "me2meInfo",
+              "state": "showInfo",
+              "output": {
+                "document": {
+                  "srcDocumentId": "fixture-document"
+                },
+                "screens": [
+                  {
+                    "header": [
+                      {
+                        "properties": {
+                          "level": "done"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "expected_path_and_query": [
+          [
+            "/me2me/v1/workflow",
+            {
+              "cmd": [
+                "START"
+              ],
+              "name": [
+                "me2meMain_v2"
+              ]
+            }
+          ],
+          [
+            "/me2me/v1/workflow",
+            {
+              "cmd": [
+                "EVENT"
+              ],
+              "name": [
+                "next"
+              ],
+              "pid": [
+                "fixture-workflow-pid"
+              ]
+            }
+          ],
+          [
+            "/me2me/v1/workflow",
+            {
+              "cmd": [
+                "EVENT"
+              ],
+              "name": [
+                "summaryNext"
+              ],
+              "pid": [
+                "fixture-workflow-pid"
+              ]
+            }
+          ],
+          [
+            "/bh-confirmation/v3/workflow2",
+            {
+              "cmd": [
+                "EVENT"
+              ],
+              "name": [
+                "on-enter"
+              ],
+              "pid": [
+                "fixture-workflow-pid"
+              ]
+            }
+          ],
+          [
+            "/me2me/v1/workflow",
+            {
+              "cmd": [
+                "EVENT"
+              ],
+              "name": [
+                "on-return"
+              ],
+              "pid": [
+                "fixture-workflow-pid"
+              ]
+            }
+          ]
+        ],
+        "expected_document_id": "fixture-document",
+        "expected_final_flow": "me2meInfo",
+        "expected_final_state": "showInfo"
+      },
+      "provenance": [
+        {
+          "file": "tests/test_mutations.py",
+          "line": 92,
+          "end_line": 131,
+          "sha256": "7c6721fa0a771d0ab6a2bf20f9737f54c0dfe6f8748a1afdc13fca35d4bb4e0b"
+        },
+        {
+          "file": "tests/test_mutations.py",
+          "line": 206,
+          "end_line": 280,
+          "sha256": "7c6721fa0a771d0ab6a2bf20f9737f54c0dfe6f8748a1afdc13fca35d4bb4e0b"
+        }
+      ],
+      "python_test_ids": [
+        "test_transfer_prepare_and_confirm_match_captured_five_request_workflow"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestMutationsFiveRequestOwnResourceWorkflow"
+      ],
+      "status": "pending"
+    }
+  ]
+}

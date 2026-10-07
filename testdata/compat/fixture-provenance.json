@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "files": [
+    {
+      "path": "testdata/compat/srp.json",
+      "sha256": "e4bfa550f636e8d149858528d7fa77e4dceb92b0a191a34494a7ce1bca7792ac",
+      "record_ids": [
+        "pin_sha512_frontend_known_answer"
+      ]
+    },
+    {
+      "path": "testdata/compat/rsa.json",
+      "sha256": "f8db5abb94e2fac8ad014374cec731a153dee1427c671e81cb049a06ec0d015f",
+      "record_ids": [
+        "primary_rsa_mock_payload_only",
+        "invalid_public_key_is_typed_failure"
+      ]
+    },
+    {
+      "path": "testdata/compat/frontend-config.json",
+      "sha256": "d0dd89287b29c82d0b866c5a40ac985f0b38f124f24921494a839fa6cbc51b14",
+      "record_ids": [
+        "pin_valid_literal",
+        "primary_valid_literal",
+        "pin_duplicate_base",
+        "pin_external_auth_base",
+        "pin_wrong_auth_mode",
+        "pin_undersized_srp",
+        "pin_duplicate_assignment",
+        "primary_undersized_srp",
+        "primary_duplicate_assignment"
+      ]
+    },
+    {
+      "path": "testdata/compat/resources.json",
+      "sha256": "e89cd9b4f486f314d17af81bd967dfa678b7cd51388087f899f2d7d587595497",
+      "record_ids": [
+        "op_details",
+        "card_info",
+        "pfm",
+        "all_account_kinds_ambiguous_parent"
+      ]
+    },
+    {
+      "path": "testdata/compat/history.json",
+      "sha256": "212fab86d217d296384cd82288b1ddb390dd4b95ee0a09da2861e9eba59d67c6",
+      "record_ids": [
+        "operation_amount_is_transaction_and_resource_billing_amount_is_balance_after",
+        "plain_billing_amount_is_not_guessed_to_be_a_balance",
+        "a5_one_malformed_optional_amount_does_not_discard_the_page",
+        "a5_malformed_core_amount_still_raises",
+        "sequential_n_plus_one_sentinel_pages"
+      ]
+    },
+    {
+      "path": "testdata/compat/session.json",
+      "sha256": "c6bd355ed7a3b0e57bd9163ff44eecf867096e9b2b634f2c7bef5d25819b62a4",
+      "record_ids": [
+        "schema_v1_literal",
+        "remembered_pin_preauth_profile",
+        "schema_v4_full_metadata",
+        "schema_v2_empty_profile",
+        "schema_v3_samesite_migration_strict",
+        "schema_v3_samesite_migration_lax",
+        "schema_v3_samesite_migration_none"
+      ]
+    },
+    {
+      "path": "testdata/compat/cookie-metadata.json",
+      "sha256": "c440f78cf86884478911671d856f6da68571387d7f31558fdf2259727e60a2df",
+      "record_ids": [
+        "curl_response_honors_authoritative_samesite_without_losing_untouched_policy_axis_0",
+        "response_samesite_case_variants_are_exported_canonically_axis_0",
+        "response_samesite_case_variants_are_exported_canonically_axis_1",
+        "response_invalid_samesite_is_not_silently_normalized_axis_0",
+        "response_invalid_samesite_is_not_silently_normalized_axis_1",
+        "netscape_preserves_rfc_and_filters_expired"
+      ]
+    },
+    {
+      "path": "testdata/compat/mutations.json",
+      "sha256": "a6b9f5f3c013e7acd24051383688477418fd1b5286afcefd0baefa8e74e169b8",
+      "record_ids": [
+        "five_request_own_resource_workflow"
+      ]
+    }
+  ],
+  "counts": {
+    "records": 35,
+    "by_family": {
+      "srp": 1,
+      "rsa": 2,
+      "frontend-config": 9,
+      "resources": 4,
+      "history": 5,
+      "session": 7,
+      "cookie-metadata": 6,
+      "mutations": 1
+    },
+    "parameterized_test_definitions": 30,
+    "test_definitions": 199,
+    "expanded_parameter_cases": 324
+  },
+  "origin": "Only the 30 audited synthetic test modules in docs/source-manifest.json. Test factory/parameter expressions evaluated only when deterministic and explicitly selected; mock crypto is labeled, no fresh provider payloads.",
+  "reference_checks": {
+    "srp_existing_known_answer": "passed",
+    "rsa_invalid_key": "passed",
+    "rsa_genuine_oaep_known_answer": "unavailable in audited tests; none manufactured",
+    "frontend_literal_positive_and_negative": "passed",
+    "resource_history_model_materialization": "passed"
+  },
+  "coverage_gaps": [
+    "No genuine RSA-OAEP deterministic key/seed/ciphertext test vector exists in the audited test set.",
+    "No local safe-launcher synthetic tests exist in fork/tests; explicit Go safety acceptance identifiers supplied instead."
+  ],
+  "additional_reference_assertion_checks": {
+    "actual_existing_parser_test_functions_passed": [
+      "tests/test_new_read_resources.py:test_parse_operation_details",
+      "tests/test_new_read_resources.py:test_parse_card_info_keeps_only_last4_never_full_pan",
+      "tests/test_new_read_resources.py:test_parse_pfm_amounts",
+      "tests/test_operation_semantics.py:test_operation_amount_is_transaction_and_resource_billing_amount_is_balance_after",
+      "tests/test_operation_semantics.py:test_plain_billing_amount_is_not_guessed_to_be_a_balance",
+      "tests/test_operation_semantics.py:test_legacy_operation_constructor_keeps_its_positional_contract"
+    ],
+    "full_python_pytest_suite_executed": false,
+    "pytest_availability_in_inventory_runtime": "not installed; no dependency installed",
+    "reference_only": true
+  },
+  "go_status": "all pending; fixture extraction and offline reference checks do not implement the Go port"
+}

@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "session",
+  "records": [
+    {
+      "id": "schema_v1_literal",
+      "kind": "copied_existing_schema_literal",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 1,
+          "api_base": "https://web-node2.online.sberbank.ru",
+          "web_base": "https://web2.online.sberbank.ru",
+          "captured_at": "2026-01-01T00:00:00+00:00",
+          "browser": {
+            "headers": []
+          },
+          "cookies": [
+            {
+              "name": "UFS-TOKEN",
+              "value": "fixture-v1-token",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": false,
+              "expires": 4102444800
+            }
+          ]
+        },
+        "expected_migration": {
+          "version": 4,
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookie_same_site": null
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_profile_schema.py",
+          "line": 87,
+          "end_line": 130,
+          "sha256": "f868aef6ca31c8a0b0b05498286d7a173639b2cb975d8c7635786ffccf49ef76"
+        }
+      ],
+      "python_test_ids": [
+        "test_v1_file_loads_and_is_saved_as_v3"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestProfileSchemaSchemaV1Literal"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "remembered_pin_preauth_profile",
+      "kind": "reference_derived_from_audited_factory",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 4,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": [
+              {
+                "name": "user-agent",
+                "value": "Fixture Chrome"
+              }
+            ]
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "remembered",
+              "value": "opaque-fixture",
+              "domain": "online.sberbank.ru",
+              "path": "/CSAFront",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": 4102444800,
+              "same_site": null
+            },
+            {
+              "name": "XSRF-TOKEN",
+              "value": "xsrf%20fixture",
+              "domain": "online.sberbank.ru",
+              "path": "/CSAFront",
+              "secure": true,
+              "http_only": false,
+              "host_only": true,
+              "expires": 4102444800,
+              "same_site": null
+            },
+            {
+              "name": "UFS-SESSION",
+              "value": "stale-session-fixture",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": false,
+              "expires": 4102444800,
+              "same_site": null
+            },
+            {
+              "name": "UFS-TOKEN",
+              "value": "stale-token-fixture",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": false,
+              "expires": 4102444800,
+              "same_site": null
+            }
+          ]
+        },
+        "expected_ready": true,
+        "expected_deviceprint": null
+      },
+      "provenance": [
+        {
+          "file": "tests/test_pin_auth.py",
+          "line": 78,
+          "end_line": 117,
+          "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a"
+        }
+      ],
+      "python_test_ids": [
+        "test_full_pin_login_rotates_csrf_follows_redirect_and_returns_ufs_session"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPinAuthRememberedPinPreauthProfile"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "schema_v4_full_metadata",
+      "kind": "reference_derived_from_audited_constructor",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 4,
+          "api_base": "https://web-node2.online.sberbank.ru",
+          "web_base": "https://web2.online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": "version=fixture&audio=opaque",
+          "antifraud_deviceprint": "version%3Dfixture%26audio%3Dopaque",
+          "cookies": [
+            {
+              "name": "sb_user",
+              "value": "fixture-remembered-user",
+              "domain": "online.sberbank.ru",
+              "path": "/CSAFront",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": 4102444800,
+              "same_site": null
+            },
+            {
+              "name": "UFS-SESSION",
+              "value": "fixture-session",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": false,
+              "expires": null,
+              "same_site": null
+            },
+            {
+              "name": "sb-id",
+              "value": "fixture-device-id",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": false,
+              "http_only": false,
+              "host_only": false,
+              "expires": 4102444801,
+              "same_site": null
+            }
+          ]
+        },
+        "expected": {
+          "version": 4,
+          "cookie_count": 3,
+          "deviceprint": "version=fixture&audio=opaque",
+          "antifraud_deviceprint": "version%3Dfixture%26audio%3Dopaque"
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_profile_schema.py",
+          "line": 14,
+          "end_line": 72,
+          "sha256": "f868aef6ca31c8a0b0b05498286d7a173639b2cb975d8c7635786ffccf49ef76"
+        }
+      ],
+      "python_test_ids": [
+        "test_v3_roundtrip_keeps_private_profile_and_full_cookie_metadata"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestProfileSchemaSchemaV4FullMetadata"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "schema_v2_empty_profile",
+      "kind": "reference_derived_existing_schema_downgrade",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 2,
+          "api_base": "https://web-node2.online.sberbank.ru",
+          "web_base": "https://web2.online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": "version=fixture",
+          "cookies": []
+        },
+        "expected_migration": {
+          "version": 4,
+          "deviceprint": "version=fixture",
+          "antifraud_deviceprint": null
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_profile_schema.py",
+          "line": 133,
+          "end_line": 146,
+          "sha256": "f868aef6ca31c8a0b0b05498286d7a173639b2cb975d8c7635786ffccf49ef76"
+        }
+      ],
+      "python_test_ids": [
+        "test_v2_file_loads_and_is_saved_as_v3"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestProfileSchemaSchemaV2EmptyProfile"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "schema_v3_samesite_migration_strict",
+      "kind": "reference_derived_existing_schema_downgrade",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 3,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "synthetic",
+              "value": "synthetic-value",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": null
+            }
+          ]
+        },
+        "expected_migration": {
+          "version": 4,
+          "same_site": null
+        },
+        "v4_roundtrip_input": {
+          "schema": "sber-unofficial-session",
+          "version": 4,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "synthetic",
+              "value": "synthetic-value",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": null,
+              "same_site": "Strict"
+            }
+          ]
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 16,
+          "end_line": 33,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_browser_samesite_survives_full_roundtrip_and_migrates_v3"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataSchemaV3SamesiteMigrationStrict"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "schema_v3_samesite_migration_lax",
+      "kind": "reference_derived_existing_schema_downgrade",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 3,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "synthetic",
+              "value": "synthetic-value",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": null
+            }
+          ]
+        },
+        "expected_migration": {
+          "version": 4,
+          "same_site": null
+        },
+        "v4_roundtrip_input": {
+          "schema": "sber-unofficial-session",
+          "version": 4,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "synthetic",
+              "value": "synthetic-value",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": null,
+              "same_site": "Lax"
+            }
+          ]
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 16,
+          "end_line": 33,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_browser_samesite_survives_full_roundtrip_and_migrates_v3"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataSchemaV3SamesiteMigrationLax"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "schema_v3_samesite_migration_none",
+      "kind": "reference_derived_existing_schema_downgrade",
+      "data": {
+        "input": {
+          "schema": "sber-unofficial-session",
+          "version": 3,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "synthetic",
+              "value": "synthetic-value",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": null
+            }
+          ]
+        },
+        "expected_migration": {
+          "version": 4,
+          "same_site": null
+        },
+        "v4_roundtrip_input": {
+          "schema": "sber-unofficial-session",
+          "version": 4,
+          "api_base": "https://online.sberbank.ru",
+          "web_base": "https://online.sberbank.ru",
+          "captured_at": null,
+          "browser": {
+            "headers": []
+          },
+          "deviceprint": null,
+          "antifraud_deviceprint": null,
+          "cookies": [
+            {
+              "name": "synthetic",
+              "value": "synthetic-value",
+              "domain": "online.sberbank.ru",
+              "path": "/",
+              "secure": true,
+              "http_only": true,
+              "host_only": true,
+              "expires": null,
+              "same_site": "None"
+            }
+          ]
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_bootstrap_cookie_metadata.py",
+          "line": 16,
+          "end_line": 33,
+          "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
+        }
+      ],
+      "python_test_ids": [
+        "test_browser_samesite_survives_full_roundtrip_and_migrates_v3"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestBootstrapCookieMetadataSchemaV3SamesiteMigrationNone"
+      ],
+      "status": "pending"
+    }
+  ]
+}

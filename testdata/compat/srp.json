@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "synthetic_only": true,
+  "source_boundary": "audited Python fork/tests only; no bank/owner artifacts",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 sber-mcp contributors",
+  "family": "srp",
+  "records": [
+    {
+      "id": "pin_sha512_frontend_known_answer",
+      "kind": "copied_existing_known_answer",
+      "data": {
+        "input": {
+          "n_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff43",
+          "g_hex": "2",
+          "private_a_hex": "1122334455667788",
+          "pin": "13579",
+          "salt_hex": "deadbeefcafebabe",
+          "server_b_hex": "2f1338c99116b736cba5984a87fb932ccdae361395e11ebd2992cb145da5d90a"
+        },
+        "expected": {
+          "public_a_hex": "8765227cda4b12387ec1e84f11c6aa8082172358d5fab8bb5dbd738aab39347f",
+          "m1_hex": "77195883ffd3be2e3d92c26de691b997f1bf79877b59a5f9436233358ed301287dd861149a1b4a4d3e3f1f26855bde278603be950cc33abfe1f74eaf96e50909",
+          "m2_hex": "42e99188f785607eee90fc6c64d41193f07874a72dc7801fdc4802cd9a74c422b3ff25cc34e058c21af9ee7effd7b943d3ddd5af3f379c4b7b0d6a3ebcb8724b",
+          "leading_zero_prefix_proof_valid": true,
+          "one_bit_changed_proof_valid": false
+        }
+      },
+      "provenance": [
+        {
+          "file": "tests/test_pin_auth.py",
+          "line": 248,
+          "end_line": 265,
+          "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a"
+        }
+      ],
+      "python_test_ids": [
+        "test_srp_matches_extracted_frontend_vector"
+      ],
+      "required_go_tests": [
+        "TestParity_GoldenTestsTestPinAuthPinSha512FrontendKnownAnswer"
+      ],
+      "status": "pending"
+    }
+  ]
+}
