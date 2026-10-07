@@ -146,23 +146,15 @@ The command arguments are not valid.
 Use rental-check --help for command help.
 ```
 
-## Development checks and earlier reviews
+## Development checks
 
 Run these checks with synthetic data:
 
 ```sh
-go test -race ./internal/rentalcli ./internal/command ./internal/strictjson ./rental
+go test -race ./internal/rentalcli ./internal/command ./internal/strictjson ./tests/rental
 go vet ./internal/rentalcli ./internal/command ./cmd/rental-check
 go build -o bin/rental-check ./cmd/rental-check
 ```
 
-Follow the [CLI writing rules](CLI-WRITING.md) when you change help text or messages.
-
-The [earlier acceptance record](RENTAL-CLI-ACCEPTANCE.md) applies to the source hashes listed in that record.
-The Cobra migration changes the command parser and diagnostic text.
-That earlier acceptance does not cover these new source bytes.
-The earlier guide remains in Git history.
-The original failed review and the later acceptance record remain unchanged.
-
-Read the [verification record](CLI-VERIFICATION.md) for the current SDK verification limits.
-Read [HANDOFF.md](HANDOFF.md) for the original source handoff.
+Follow the [writing policy](DEVELOPMENT.md#cli-writing-policy) when you change help text or messages.
+The [verification record](STATUS.md) gives current limits and links to earlier review records.

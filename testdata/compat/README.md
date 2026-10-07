@@ -20,10 +20,13 @@ were read or manufactured.
 - `python-test-contracts.json`: all 199 test definitions, expected assertions,
   raises and fake setup/helpers; 183 runtime tests +16 maintenance tests.
 - `fixture-provenance.json`: digests/counts and declared coverage limitations.
+- `parity.json`: frozen upstream API and test acceptance inventory.
+- `source-manifest.json`: audited public source paths and hashes.
 - `verify_inventory.py`: development-only AST/manifest/provenance checker.
 
-Every Go acceptance status stays `pending`. These are reference evidence, not
-native implementation or live bank verification. The Python verification aid is
+The frozen inventory keeps its original `pending` acceptance statuses.
+Those statuses describe the reference audit, not current native test results.
+See [the current verification record](../../docs/STATUS.md). The Python verification aid is
 never a runtime dependency of the native Go SDK/CLI/MCP, and the recorded Python
 source strings are evidence only, not an adapter to run the SDK.
 
@@ -32,13 +35,14 @@ source strings are evidence only, not an adapter to run the SDK.
 Run from the Go repository:
 
 ```sh
-python testdata/compat/verify_inventory.py
+python3 testdata/compat/verify_inventory.py --source-root /path/to/audited/fork
 ```
 
 The checker reads only manifest-listed public source/tests and these local
-catalogs. It makes no network/auth/bank call and writes no files. The audited
-Python reference path is frozen in the manifest; retain it for development
-provenance checks, not for running the Go product.
+catalogs. It makes no network/auth/bank call and writes no files. Supply the audited public Python source checkout explicitly with `--source-root`.
+The checker resolves source files relative to that checkout and retains the manifest hashes.
+It does not need the original absolute workspace path.
+The Python checkout is a development reference, not a Go runtime dependency.
 
 ## Attribution
 

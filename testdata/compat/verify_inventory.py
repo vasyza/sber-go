@@ -5,10 +5,12 @@ Development-only reference audit; never called by the native Go SDK/CLI/MCP.
 Reads the explicit public/synthetic source manifest only. No network, auth,
 private-bank directory access, fixture generation, or Go implementation.
 """
-import ast,json,pathlib,hashlib,re,collections,subprocess
-root=pathlib.Path('/home/hermes/workspace/rental-monitoring/sber-sdk/fork')
-go=pathlib.Path('/home/hermes/workspace/rental-monitoring/sber-go')
-mat=json.loads((go/'docs/parity.json').read_text());man=json.loads((go/'docs/source-manifest.json').read_text())
+import ast,json,pathlib,hashlib,re,collections,subprocess,argparse
+args=argparse.ArgumentParser(description=__doc__)
+args.add_argument("--source-root", type=pathlib.Path, required=True, help="Path to the audited Python source checkout")
+root=args.parse_args().source_root.resolve()
+go=pathlib.Path(__file__).resolve().parents[2]
+mat=json.loads((go/'testdata/compat/parity.json').read_text());man=json.loads((go/'testdata/compat/source-manifest.json').read_text())
 files={x['relative_to_python_fork']:x for x in man['files']}
 assert len(files)==len(man['files'])
 lexical=[]; scoped_public=[]; raw_public=[]; klasses=[];testdefs=[]
@@ -24,7 +26,7 @@ def visit(n,path,parent=None,kind='module'):
    visit(ch,path,q,'class' if isinstance(ch,ast.ClassDef) else 'function')
   else:visit(ch,path,parent,kind)
 for ref,f in files.items():
- data=pathlib.Path(f['path']).read_bytes()
+ data=(root/ref).read_bytes()
  assert hashlib.sha256(data).hexdigest()==f['sha256'],ref
  if not ref.endswith('.py'):continue
  tree=ast.parse(data.decode(),filename=f['path'])

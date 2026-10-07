@@ -2,8 +2,6 @@
 
 package browser
 
-// This opt-in test launches the pinned native Go Playwright binding against
-// real localhost TLS only. It uses fresh NSS profiles and synthetic trust roots.
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -12,6 +10,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	pw "github.com/mxschmitt/playwright-go"
 	"io"
 	"log"
 	"log/slog"
@@ -26,8 +25,6 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
-
-	pw "github.com/mxschmitt/playwright-go"
 )
 
 func TestNativeFirefoxRealTLSControls(t *testing.T) {

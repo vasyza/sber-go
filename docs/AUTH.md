@@ -1,6 +1,6 @@
 # Authentication and profiles
 
-The CLI operator procedures, complete options, and session restoration are in [CLI.md](CLI.md) and [CLI-REFERENCE.md](CLI-REFERENCE.md). These Go API notes retain their engineering format. The latest real verification is in [CLI-VERIFICATION.md](CLI-VERIFICATION.md).
+The CLI operator procedures, complete options, and session restoration are in [CLI.md](CLI.md) and [CLI-REFERENCE.md](CLI-REFERENCE.md). These Go API notes retain their engineering format. The latest real verification is in [STATUS.md](STATUS.md).
 
 On Linux and macOS the native owner path is `./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"`. It acquires an enrollment lock before prompts, creates missing private parents and refuses an existing profile. Login/password are hidden, requested OTP is handled once, and online-PIN enrollment asks for confirmation. Password/PIN/OTP are not profile fields. Echo-control failure stops input. CAPTCHA/WebAuthn are not automated CLI flows.
 
@@ -61,8 +61,8 @@ On 2026-10-07, native remembered PIN login and the real authenticated E2E below 
 After owner login, the separately enabled integration test checks authorization, products and one page (at most five returned operations) for the last seven days. It prints only success stages and counts. It does not initiate payments, renew through PIN/OTP, export responses or prove complete history coverage. Default tests do not compile or execute it:
 
 ```sh
-go test -tags=live -run '^TestLive(CLIReadOnly|ReadOnly)$' -count=1 -v ./integration \
+go test -tags=live -run '^TestLive(CLIReadOnly|ReadOnly)$' -count=1 -v ./tests/integration \
   -args -sber-live -sber-profile "$HOME/.local/share/sber-go/profile.json"
 ```
 
-The native CLI test additionally covers all data-read commands, offline metadata, credential metadata, and private session export. It supplies `--no-renew`, holds identifiers/results in transient memory, and removes the temporary private export. Running `go test -tags=live ./integration` without `-sber-live` compiles and skips both tests before opening a profile, building a temporary binary, or contacting the bank. Session cookies may rotate and be saved back to the explicitly selected private profile during authenticated reads.
+The native CLI test additionally covers all data-read commands, offline metadata, credential metadata, and private session export. It supplies `--no-renew`, holds identifiers/results in transient memory, and removes the temporary private export. Running `go test -tags=live ./tests/integration` without `-sber-live` compiles and skips both tests before opening a profile, building a temporary binary, or contacting the bank. Session cookies may rotate and be saved back to the explicitly selected private profile during authenticated reads.

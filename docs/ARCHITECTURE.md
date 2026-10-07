@@ -26,4 +26,24 @@ The CLI has one command registry and option parser (`commands.go`, `run.go`). Of
 
 Transport TLS establishment (`tls_establishment.go`) advertises the supported HTTP/1.1 protocol and can recover a peer closure before HTTP transmission. Its three-attempt bound shares the original request deadline and cancellation. Certificate/protocol failures stop immediately. Established business connections retain one HTTP request per connection; transmitted financial/authentication POSTs retain their no-replay policy.
 
-Tests live beside implementations. Root external tests preserve public-consumer coverage. Fixtures are repository-relative. `internal/testutil` is imported only by tests. Constructors perform no bank business request; authentication and selected-profile opening are explicit. History coverage and pagination termination remain separate facts.
+Private unit tests stay beside implementations and are grouped by behavior. Public-consumer tests live under `tests/sdk`, `tests/mcp`, and `tests/rental`; compiled CLI tests live under `tests/cli`. Explicit live tests live under `tests/integration`. Go examples remain at the root. Fixtures are repository-relative under `testdata`. [DEVELOPMENT.md](DEVELOPMENT.md) gives the layout and check commands. `internal/testutil` is imported only by tests. Constructors perform no bank business request; authentication and selected-profile opening are explicit. History coverage and pagination termination remain separate facts.
+
+## Public API compatibility
+
+The module remains `github.com/vasyza/sber-go`.
+Root aliases and function forwards preserve exported names, signatures, and source assignability.
+Reflection and diagnostics can display the implementation package.
+SDK errors share the `SDKError` marker; use `errors.Is` and `errors.As` for wrapped client outcomes.
+Explicit rejection metadata remains available after unwrapping.
+[SDK.md](SDK.md) gives constructor, getter, ownership, and export contracts.
+
+## Strict JSON boundary
+
+`internal/strictjson.Validate` checks one complete byte buffer without changing it.
+Failures return static `ErrInvalidJSON` without raw source values.
+The validator checks UTF-8, grammar, paired surrogate escapes, and unique decoded keys in each object.
+Number lexemes remain unchanged; validation does not convert them to binary floats.
+Valid U+FFFD and repeated keys in separate objects remain permitted.
+The maximum nesting depth is 10000; depth 10001 fails.
+Callers must bound complete input before validation because the package imposes no byte-size limit.
+Truncation must be an error and cannot establish complete history.

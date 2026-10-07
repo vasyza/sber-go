@@ -3,12 +3,11 @@ package mcptools
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/vasyza/sber-go/internal/strictjson"
 	"math/big"
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/vasyza/sber-go/internal/strictjson"
 )
 
 func FuzzArgumentsOriginalIntegrity(f *testing.F) {

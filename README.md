@@ -37,7 +37,7 @@ An existing profile requires a private parent directory with mode `0700` and a r
 The `login` command makes missing private directories and refuses to replace an existing profile.
 Authentication prepares public configuration before secret prompts.
 Credentials are not accepted through arguments, environment variables, or MCP.
-The [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-TERMS.md) use the [ASD-STE100 Issue 9 writing policy](docs/CLI-STYLE.md).
+The [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-REFERENCE.md#technical-terms) use the [ASD-STE100 Issue 9 writing policy](docs/DEVELOPMENT.md#cli-writing-policy).
 
 The verified Russian Trusted Root CA is part of the SDK, CLI, and MCP.
 Native bank requests require no certificate download or external CA file.
@@ -111,12 +111,12 @@ Import `github.com/vasyza/sber-go` as `sber`. Root aliases and forwards preserve
 
 MCP serves six implemented tools against the selected session: setup status, session info/close, products, operations and one operations page. Authentication remains owner-operated. See [MCP setup](docs/MCP.md). Rental reconciliation consumes an explicit ledger and keeps reminders disabled; see [rental input and output](docs/RENTAL-CLI.md).
 
-The MCP transport uses the official Go SDK v1.8.0 for MCP 2026-07-28 and legacy 2025-11-25 clients. See [MCP adapter and verification](docs/MCP-GO-SDK.md).
+The MCP transport uses the official Go SDK v1.8.0 for MCP 2026-07-28 and legacy 2025-11-25 clients. See [MCP adapter and verification](docs/MCP.md#adapter-profile).
 
 ## Architecture and verification boundary
 
-Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [migration notes](MIGRATION.md) and [current verification](docs/STATUS.md).
+Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [SDK contracts](docs/SDK.md) and [current verification](docs/STATUS.md).
 
-Local tests, race checks, vet and build cover the implemented contracts on Linux and macOS. On 2026-10-07, owner-authorized primary login, PIN restoration, interactive expiry recovery, and native CLI read E2E passed on macOS. The E2E covered all 15 read and local profile commands, including card details, limits, analytics, operation details, and private export. Authentication used ordinary public browser rendering with observed browser identity. See the [CLI verification record](docs/CLI-VERIFICATION.md) for executable checks and limits. Real financial mutations, full history coverage and independent production review remain outside this evidence. Earlier WIP/review reports remain historical evidence in `docs/`; their paused/failing status describes the original snapshot.
+Local tests, race checks, vet and build cover the implemented contracts on Linux and macOS. On 2026-10-07, owner-authorized primary login, PIN restoration, interactive expiry recovery, and native CLI read E2E passed on macOS. The E2E covered all 15 read and local profile commands, including card details, limits, analytics, operation details, and private export. Authentication used ordinary public browser rendering with observed browser identity. See the [CLI verification record](docs/STATUS.md) for executable checks and limits. Real financial mutations, full history coverage and independent production review remain outside this evidence. Earlier WIP and review reports remain in Git history; their results describe the original snapshots.
 
 MIT attribution is retained in [LICENSE](LICENSE) and [NOTICE](NOTICE). CPython notices remain in [third_party/cpython/LICENSE](third_party/cpython/LICENSE). There is no Python runtime adapter.

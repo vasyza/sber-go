@@ -159,7 +159,7 @@ func (a *OperationsAPI) List(ctx context.Context, options ...OperationsQuery) ([
 // not invoke Python, invent instants, normalize operation dates or mutate input.
 // Algorithm adapted from CPython v3.12.3 Objects/listobject.c, PSF License 2;
 // copyright (c) 2001-2023 Python Software Foundation, all rights reserved.
-// The retained license and modification summary are in DATETIME-CYCLE4.md.
+// The retained license and modification summary are in NOTICE and third_party/cpython/LICENSE.
 func SortSourceOperations(operations []Operation) []Operation {
 	out := make([]Operation, len(operations))
 	if len(operations) < 2 {

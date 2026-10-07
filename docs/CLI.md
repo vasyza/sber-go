@@ -2,7 +2,7 @@
 
 This manual uses ASD-STE100 Issue 9 as its writing standard.
 The [command reference](CLI-REFERENCE.md) gives the options for each command.
-The [term list](CLI-TERMS.md) defines the technical words in this manual.
+The [term list](CLI-REFERENCE.md#technical-terms) defines the technical words in this manual.
 
 ## Purpose and limits
 
@@ -17,7 +17,7 @@ MCP supplies six tools for data reads and local session control.
 
 A session file does not show whether the bank will accept a request.
 Local tests use synthetic data and local servers.
-The [verification record](CLI-VERIFICATION.md) gives the results for real bank requests.
+The [verification record](STATUS.md) gives the results for real bank requests.
 
 ## Install the CLI
 

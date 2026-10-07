@@ -11,4 +11,4 @@
 - CLI secrets are local owner-operated hidden terminal input only, fail closed on echo-control failure. Enrollment uses private lock + atomic no-replace publication.
 - Partial/unavailable history means UNKNOWN, not unpaid; no tenant sends until owner validation.
 - For production acceptance run go test -race ./..., go vet ./..., go build ./... and independent review. Describe live verification boundaries honestly.
-- The owner explicitly requested this private WIP source handoff before completion. Publication of this snapshot is not production acceptance; known failures are retained in docs/HANDOFF.md and the failing regression witness. Autonomous work is paused; do not resume, repair, authenticate or contact tenants without a new owner request.
+- The owner explicitly requested this private WIP source handoff before completion. Publication of this snapshot is not production acceptance; historical failures are retained in Git history and regression tests. Current verification limits are in docs/STATUS.md. Autonomous work is paused; do not resume, repair, authenticate or contact tenants without a new owner request.

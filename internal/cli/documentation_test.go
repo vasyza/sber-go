@@ -1,13 +1,12 @@
 package cli
 
 import (
+	"github.com/spf13/pflag"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
-
-	"github.com/spf13/pflag"
 )
 
 var docInline = regexp.MustCompile("`[^`]+`")
@@ -60,7 +59,7 @@ func TestCLIDocumentationCommandsOptionsAndExamplesMatchExecutable(t *testing.T)
 }
 
 func TestCLIDocumentationSentenceAndParagraphLimits(t *testing.T) {
-	for _, name := range []string{"CLI.md", "CLI-REFERENCE.md", "CLI-TERMS.md", "CLI-STYLE.md", "CLI-VERIFICATION.md", "CLI-WRITING.md", "RENTAL-CLI.md"} {
+	for _, name := range []string{"CLI.md", "CLI-REFERENCE.md", "DEVELOPMENT.md", "STATUS.md", "RENTAL-CLI.md"} {
 		raw, err := os.ReadFile(filepath.Join("..", "..", "docs", name))
 		if err != nil {
 			t.Fatal(err)

@@ -1,4 +1,4 @@
 This Go migration derives protocol contracts and synthetic fixtures from ex3lite/sber-mcp (MIT), baseline 984d45ae6ddbf37224e8146df2788e8821108c9e and the audited local Linux-bootstrap repair. Copyright (c) 2026 sber-mcp contributors. Original notice and permission retained in LICENSE.
 
-Source-compatible date scanning, bank strptime normalization, and sort comparison scheduling reference CPython v3.12.3. Modified algorithm summary: C/Python behavior is expressed as native Go value, civil/instant, slice and copy operations; Python runtime/object/refcount machinery is not part of the runtime. Applicable PSF and historical notices are preserved in third_party/cpython/LICENSE and docs/DATETIME-CYCLE4.md.
+Source-compatible date scanning, bank strptime normalization, and sort comparison scheduling reference CPython v3.12.3. Modified algorithm summary: C/Python behavior is expressed as native Go value, civil/instant, slice and copy operations; Python runtime/object/refcount machinery is not part of the runtime. Applicable PSF and historical notices are preserved in third_party/cpython/LICENSE.
 

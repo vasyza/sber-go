@@ -23,7 +23,7 @@ const MaxFrontendHTMLCharacters = 4 * 1024 * 1024
 // deliberate raw construction and never validates, normalizes or invents SRP.
 // Copies share immutable identity. Compare accessors for content equality.
 // The zero value reads empty/zero/false and remains comparable to FrontendConfig{}.
-// See docs/OPAQUE-API.md for the prerelease field-to-accessor migration.
+// See docs/SDK.md for the constructor and accessor contracts.
 type FrontendConfig struct{ data **frontendConfigData }
 
 type frontendConfigData struct {

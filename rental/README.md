@@ -72,16 +72,21 @@ Absent evidence, zero/default flags, missing evidence timestamps, inadequate cov
 
 ## Verification and boundary
 
-The evidence bundle is outside the module under `research/go-migration/rental-evidence/`: retained real RED/GREEN outputs, frozen source snapshots per run, race test events, coverage, vet/build/dependency checks, bounded mutation fuzz logs and a programmatically validated acceptance/test mapping.
-
-Re-run from the module root with the pinned compiler:
+Public contract tests are under `tests/rental`.
+They cover validation, exact allocation, ownership, determinism, evidence gates, and source package purity.
+Run these checks from the repository root with Go 1.27.1:
 
 ```sh
-GOTOOLCHAIN=local GOPROXY=off GOSUMDB=sum.golang.org /home/hermes/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.1.linux-amd64/bin/go test -race ./rental
-GOTOOLCHAIN=local GOPROXY=off GOSUMDB=sum.golang.org /home/hermes/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.1.linux-amd64/bin/go vet ./rental
-GOTOOLCHAIN=local GOPROXY=off GOSUMDB=sum.golang.org /home/hermes/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.27.1.linux-amd64/bin/go build ./rental
+go test -race ./tests/rental
+go vet ./rental ./tests/rental
+go build ./rental
 ```
 
-**Independent engine review 1: PASS.** All 15 offline APP criteria were exercised on the frozen package; the parent verified all 16 manifest entries and unchanged production hashes. Two nonblocking suggestions are now covered by test-only observation/advance-due regressions and documentation. The strengthened package passes 30 regular tests, 92 regular subtests and 21 fuzz seed cases under race; vet/build pass. Production code was not changed after approval. The separate offline CLI review failed at timestamp decoding precision; its bounded adapter repair is pending and is not included in this engine approval. Its bug does not change the approved native time.Time engine production, but the CLI cannot be accepted until its input boundary is repaired and independently reviewed.
+[STATUS.md](../docs/STATUS.md) records earlier review scope and current verification limits.
+The standalone engine and the CLI input adapter have separate contracts.
+Earlier review applies to its frozen source, not automatically to later changes.
 
-This is **local allocation software**, not proof of bank synchronization, live history completeness, actual tenant collection readiness or legal debt. Actual owner-provided mappings/contracts/reconciled complete history remain external live gates. The package performs no bank or tenant interaction; the separate native `rental-check` command only previews explicit noncredential JSON. No bank/MCP/cron/delivery integration, commits or publication are authorized by this engine review.
+This is local allocation software, not proof of bank synchronization, history completeness, tenant collection readiness, or legal debt.
+Owner mappings, contracts, and reconciled complete history remain external inputs.
+The package performs no bank or tenant interaction.
+The separate `rental-check` command previews explicit noncredential JSON.

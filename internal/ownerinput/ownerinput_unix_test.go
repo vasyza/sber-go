@@ -6,14 +6,142 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"os"
-	"reflect"
-	"testing"
-	"time"
-
+	"fmt"
 	"github.com/creack/pty"
 	"golang.org/x/sys/unix"
+	"golang.org/x/term"
+	"os"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
 )
+
+func TestSecretExplicitStringViewsAndNilSafety(t *testing.T) {
+	s := &Secret{value: []byte("synthetic-explicit-format-only")}
+	if s.String() != "[REDACTED]" || s.GoString() != "[REDACTED]" {
+		t.Fatal("explicit string view disclosed buffer")
+	}
+	s.Clear()
+	s.Clear()
+	var absent *Secret
+	absent.Clear()
+	if absent.Bytes() != nil {
+		t.Fatal("nil secret buffer not safe")
+	}
+}
+
+func TestRealPTYPostReadFailureClearsAndRestores(t *testing.T) {
+	for _, failure := range []string{"read-error", "canceled-after-read"} {
+		t.Run(failure, func(t *testing.T) {
+			master, slave := syntheticPTY(t)
+			before := ttyState(t, slave)
+			flags, e := unix.FcntlInt(slave.Fd(), unix.F_GETFL, 0)
+			if e != nil {
+				t.Fatal("synthetic flags unavailable")
+			}
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			var borrowed []byte
+			calls := terminalCalls{readPassword: func(fd int) ([]byte, error) {
+				value, e := term.ReadPassword(fd)
+				borrowed = value
+				if e != nil {
+					return value, e
+				}
+				if failure == "read-error" {
+					return value, errors.New("synthetic-do-not-report-error")
+				}
+				cancel()
+				return value, nil
+			}, restore: term.Restore}
+			type result struct {
+				s *Secret
+				e error
+			}
+			done := make(chan result, 1)
+			go func() { s, e := readSecret(ctx, slave, slave, Password, calls); done <- result{s, e} }()
+			waitHidden(t, slave)
+			master.Write([]byte("synthetic-post-read-canary\n"))
+			var got result
+			select {
+			case got = <-done:
+			case <-time.After(time.Second):
+				t.Fatal("post-read failure blocked")
+			}
+			if got.s != nil || got.e == nil || strings.Contains(got.e.Error(), "synthetic") {
+				if got.s != nil {
+					got.s.Clear()
+				}
+				t.Fatal("post-read failure returned data or leaked error")
+			}
+			if len(borrowed) == 0 || !bytes.Equal(borrowed, make([]byte, len(borrowed))) {
+				t.Fatal("post-read failure left read buffer uncleared")
+			}
+			if !reflect.DeepEqual(before, ttyState(t, slave)) {
+				t.Fatal("post-read failure did not restore termios")
+			}
+			after, e := unix.FcntlInt(slave.Fd(), unix.F_GETFL, 0)
+			// Darwin also reports FWASWRITTEN after the prompt is printed on
+			// this terminal. Compare operating flags, not kernel write history.
+			const operatingFlags = unix.O_ACCMODE | unix.O_NONBLOCK | unix.O_APPEND | unix.O_ASYNC | unix.O_SYNC | unix.O_DSYNC
+			if e != nil || (after^flags)&operatingFlags != 0 {
+				t.Fatalf("hidden input changed original stdin descriptor flags: before=%#x after=%#x", flags, after)
+			}
+			if bytes.Contains(transcript(t, master), []byte("synthetic-post-read-canary")) {
+				t.Fatal("post-read failure echoed input")
+			}
+		})
+	}
+}
+
+func TestPTYMasterNotOwnerInputFailsBeforeEchoChanges(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	before := ttyState(t, slave)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+	s, e := ReadSecret(ctx, master, slave, Password)
+	if s != nil || !errors.Is(e, ErrTerminal) {
+		if s != nil {
+			s.Clear()
+		}
+		t.Error("PTY master accepted as owner stdin")
+	}
+	if !reflect.DeepEqual(before, ttyState(t, slave)) {
+		t.Error("rejected PTY master changed slave echo")
+	}
+	if len(transcript(t, master)) != 0 {
+		t.Error("rejected PTY master wrote a prompt")
+	}
+}
+
+func TestDeadlineRestoresLivePTY(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	before := ttyState(t, slave)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Millisecond)
+	defer cancel()
+	done := make(chan error, 1)
+	go func() {
+		s, e := ReadSecret(ctx, slave, slave, Password)
+		if s != nil {
+			s.Clear()
+		}
+		done <- e
+	}()
+	waitHidden(t, slave)
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatal("deadline not propagated")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("deadline left input blocked")
+	}
+	if !reflect.DeepEqual(before, ttyState(t, slave)) {
+		t.Fatal("deadline did not restore termios")
+	}
+	transcript(t, master)
+}
 
 func syntheticPTY(t *testing.T) (*os.File, *os.File) {
 	t.Helper()
@@ -234,5 +362,192 @@ func TestReadSecretRealPTYNoEchoRestoresAndClears(t *testing.T) {
 	got.secret.Clear()
 	if !bytes.Equal(alias, make([]byte, len(alias))) || len(got.secret.Bytes()) != 0 {
 		t.Fatal("secret buffer not cleared")
+	}
+}
+
+func TestSecretFormattingNeverDisclosesBuffer(t *testing.T) {
+	s := &Secret{value: []byte("synthetic-format-canary-only")}
+	defer s.Clear()
+	for _, format := range []string{"%v", "%+v", "%#v", "%s", "%q", "%x", "%X", "%d", "%p"} {
+		if strings.Contains(fmt.Sprintf(format, s), "synthetic") || strings.Contains(fmt.Sprintf(format, *s), "synthetic") {
+			t.Error("secret formatter leaked synthetic buffer")
+		}
+	}
+}
+
+func TestFixedPromptStagesRealPTY(t *testing.T) {
+	for _, prompt := range []Prompt{Login, Password, OTP, NewPIN, ConfirmPIN, PIN, ConfirmAction} {
+		t.Run(fmt.Sprint(int(prompt)), func(t *testing.T) {
+			master, slave := syntheticPTY(t)
+			done := make(chan bool, 1)
+			go func() {
+				s, e := ReadSecret(context.Background(), slave, slave, prompt)
+				if s != nil {
+					s.Clear()
+				}
+				done <- e == nil
+			}()
+			waitHidden(t, slave)
+			master.Write([]byte("synthetic-stage-canary\n"))
+			select {
+			case ok := <-done:
+				if !ok {
+					t.Fatal("secret stage failed")
+				}
+			case <-time.After(time.Second):
+				t.Fatal("stage reader blocked")
+			}
+			output := transcript(t, master)
+			if bytes.Contains(output, []byte("synthetic-stage-canary")) || len(output) == 0 {
+				t.Fatal("unsafe or missing fixed prompt")
+			}
+		})
+	}
+}
+
+func TestConcurrentPromptRejectedWithoutReading(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() {
+		s, e := ReadSecret(ctx, slave, slave, Password)
+		if s != nil {
+			s.Clear()
+		}
+		done <- e
+	}()
+	waitHidden(t, slave)
+	second := make(chan bool, 1)
+	go func() {
+		s, e := ReadSecret(context.Background(), slave, slave, OTP)
+		if s != nil {
+			s.Clear()
+		}
+		second <- s == nil && errors.Is(e, ErrBusy)
+	}()
+	select {
+	case ok := <-second:
+		if !ok {
+			t.Error("concurrent prompt accepted")
+		}
+	case <-time.After(100 * time.Millisecond):
+		t.Error("concurrent prompt blocked")
+		master.Write([]byte{'\n'})
+	}
+	cancel()
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("first prompt not released")
+	}
+}
+
+func TestPreCancelledContextNeverConsumes(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	s, e := ReadSecret(ctx, slave, slave, Password)
+	if s != nil || !errors.Is(e, context.Canceled) {
+		t.Fatal("pre-cancelled prompt accepted")
+	}
+	if len(transcript(t, master)) != 0 {
+		t.Fatal("pre-cancelled prompt wrote output")
+	}
+}
+
+func TestInvalidPromptNeverConsumes(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	s, e := ReadSecret(context.Background(), slave, slave, Prompt(255))
+	if s != nil || !errors.Is(e, ErrPrompt) {
+		t.Fatal("invalid prompt accepted")
+	}
+	if len(transcript(t, master)) != 0 {
+		t.Fatal("invalid prompt wrote output")
+	}
+}
+
+func TestReadOwnerSecretUsesActualStandardDescriptors(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	oldIn, oldErr := os.Stdin, os.Stderr
+	os.Stdin, os.Stderr = slave, slave
+	defer func() { os.Stdin, os.Stderr = oldIn, oldErr }()
+	done := make(chan bool, 1)
+	go func() {
+		s, e := ReadOwnerSecret(context.Background(), Login)
+		if s != nil {
+			s.Clear()
+		}
+		done <- e == nil
+	}()
+	waitHidden(t, slave)
+	master.Write([]byte("synthetic-owner-wrapper-only\n"))
+	select {
+	case ok := <-done:
+		if !ok {
+			t.Fatal("owner wrapper failed")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("owner wrapper blocked")
+	}
+	if bytes.Contains(transcript(t, master), []byte("synthetic-owner-wrapper-only")) {
+		t.Fatal("owner wrapper echoed")
+	}
+}
+
+func TestRestoreFailureDiscardsSuccessfullyReadBuffer(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	original := ttyState(t, slave)
+	defer unix.IoctlSetTermios(int(slave.Fd()), writeTermiosRequest, &original)
+	var borrowed []byte
+	calls := terminalCalls{
+		readPassword: func(fd int) ([]byte, error) {
+			value, err := term.ReadPassword(fd)
+			borrowed = value
+			unix.Close(fd) // Genuine EBADF during checked outer restoration.
+			return value, err
+		},
+		restore: term.Restore,
+	}
+	done := make(chan bool, 1)
+	go func() {
+		s, err := readSecret(context.Background(), slave, slave, Password, calls)
+		if s != nil {
+			s.Clear()
+		}
+		done <- s == nil && errors.Is(err, ErrRestore)
+	}()
+	waitHidden(t, slave)
+	master.Write([]byte("synthetic-restore-failure-canary\n"))
+	select {
+	case ok := <-done:
+		if !ok {
+			t.Fatal("failed restoration returned successful secret")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("restore failure reader blocked")
+	}
+	if len(borrowed) == 0 || !bytes.Equal(borrowed, make([]byte, len(borrowed))) {
+		t.Fatal("restore failure did not clear read buffer")
+	}
+}
+
+func TestPromptWriteFailureRestoresBeforeRead(t *testing.T) {
+	master, slave := syntheticPTY(t)
+	before := ttyState(t, slave)
+	output, e := os.OpenFile(slave.Name(), os.O_RDONLY, 0)
+	if e != nil {
+		t.Fatal("synthetic terminal output open failed")
+	}
+	defer output.Close()
+	s, err := ReadSecret(context.Background(), slave, output, Password)
+	if s != nil || !errors.Is(err, ErrRead) {
+		t.Fatal("unwritable terminal accepted")
+	}
+	if !reflect.DeepEqual(before, ttyState(t, slave)) {
+		t.Fatal("write failure did not restore")
+	}
+	if len(transcript(t, master)) != 0 {
+		t.Fatal("write failure emitted data")
 	}
 }
