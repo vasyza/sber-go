@@ -12,11 +12,11 @@ import (
 func runRefresh(ctx context.Context, args *commandArguments, output, diagnostics io.Writer, dependencies *Authentication) int {
 	profile, ca, selection := args.profile, args.ca, args.browser
 	if _, err := sber.LoadSessionBundle(profile); err != nil {
-		return fail(diagnostics, 3, "cannot open private profile; no login attempted")
+		return fail(diagnostics, 3, "The command cannot open the private profile.\nThe command did not start login.")
 	}
 	options, err := selection.authOptions(ca)
 	if err != nil {
-		return fail(diagnostics, 3, "cannot prepare authentication; saved profile retained")
+		return fail(diagnostics, 3, "The command cannot prepare authentication.\nThe saved profile did not change.")
 	}
 	a := Authentication{}
 	if dependencies != nil {
@@ -37,17 +37,17 @@ func runRefresh(ctx context.Context, args *commandArguments, output, diagnostics
 		if ctx.Err() != nil {
 			return 130
 		}
-		message := strings.ReplaceAll(loginFailureMessage(err), "; profile not published", "")
-		return fail(diagnostics, 3, message+"; saved profile retained")
+		message := strings.TrimSuffix(loginFailureMessage(err), "\nThe command did not publish the profile.")
+		return fail(diagnostics, 3, message+"\nThe saved profile did not change.")
 	}
 	if ctx.Err() != nil {
 		return 130
 	}
 	if err := bundle.Save(profile); err != nil {
-		return fail(diagnostics, 3, "cannot confirm refreshed profile publication; inspect profile metadata before trying again")
+		return fail(diagnostics, 3, "The command cannot confirm publication of the restored profile.\nRead the profile metadata before you try again.")
 	}
 	if err := json.NewEncoder(output).Encode(map[string]any{"session_refreshed": true, "bank_authorization_checked": true, "mutations_enabled": false}); err != nil {
-		return fail(diagnostics, 3, "profile refreshed; output failed")
+		return fail(diagnostics, 3, "The command restored the profile.\nThe command cannot write the output.")
 	}
 	return 0
 }

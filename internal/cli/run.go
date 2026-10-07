@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
 
+	"github.com/spf13/cobra"
 	sber "github.com/vasyza/sber-go"
+	cliCommand "github.com/vasyza/sber-go/internal/command"
 	"github.com/vasyza/sber-go/internal/enrollment"
 	sdkSession "github.com/vasyza/sber-go/internal/session"
 	"github.com/vasyza/sber-go/mcp"
@@ -30,45 +31,46 @@ func Run(ctx context.Context, args []string, output, diagnostics io.Writer) int 
 
 func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.Writer, o Options) int {
 	if ctx == nil || ctx.Err() != nil || output == nil {
-		return fail(diagnostics, 2, "invalid command context")
+		return fail(diagnostics, 2, "The command context or output is not valid.")
 	}
-	if len(args) == 1 && (args[0] == "help" || args[0] == "--help" || args[0] == "-h") {
-		if _, err := io.WriteString(output, generalHelp()); err != nil {
-			return fail(diagnostics, 3, "output failed")
+	code := 0
+	root := &cobra.Command{
+		Use:   "sber COMMAND",
+		Short: "Read bank data or manage a private profile.",
+		Long: "Select one command and one private profile.\n" +
+			"Enter secret values only at hidden terminal prompts.\n" +
+			"The bank root CA is part of the application.",
+		RunE: func(*cobra.Command, []string) error { return cliCommand.ErrArguments },
+	}
+	for _, definition := range commands {
+		flags, a := commandFlags(definition.name)
+		child := &cobra.Command{
+			Use:   definition.name + " --profile PATH",
+			Short: definition.description,
+			Args: func(_ *cobra.Command, args []string) error {
+				if len(args) != 0 || !validateCommand(definition.name, a) {
+					return cliCommand.ErrArguments
+				}
+				return nil
+			},
+			Run: func(cmd *cobra.Command, _ []string) {
+				code = runValidated(cmd.Context(), definition.name, a, output, diagnostics, o)
+			},
 		}
-		return 0
+		child.Flags().AddFlagSet(flags)
+		_ = child.MarkFlagRequired("profile")
+		root.AddCommand(child)
 	}
-	if len(args) == 2 && (args[0] == "help" || args[1] == "--help" || args[1] == "-h") {
-		name := args[0]
-		if name == "help" {
-			name = args[1]
+	if err := cliCommand.Execute(ctx, root, args, output); err != nil {
+		if errors.Is(err, cliCommand.ErrOutput) {
+			return fail(diagnostics, 3, "The command cannot write the output.")
 		}
-		if _, ok := findCommand(name); !ok {
-			return fail(diagnostics, 2, "unknown command; use sber --help")
-		}
-		if err := commandHelp(name, output); err != nil {
-			return fail(diagnostics, 3, "output failed")
-		}
-		return 0
+		return fail(diagnostics, 2, "The command arguments are not valid.\nUse sber --help for command help.")
 	}
-	if len(args) == 0 {
-		return fail(diagnostics, 2, generalHelp())
-	}
-	command := args[0]
-	if _, ok := findCommand(command); !ok {
-		return fail(diagnostics, 2, "unknown command; use sber --help")
-	}
-	flags, a := commandFlags(command)
-	parseErr := flags.Parse(args[1:])
-	if errors.Is(parseErr, flag.ErrHelp) {
-		if err := commandHelp(command, output); err != nil {
-			return fail(diagnostics, 3, "output failed")
-		}
-		return 0
-	}
-	if parseErr != nil || flags.NArg() != 0 || !validateCommand(command, a) {
-		return fail(diagnostics, 2, "invalid command arguments; use sber "+command+" --help")
-	}
+	return code
+}
+
+func runValidated(ctx context.Context, command string, a *commandArguments, output, diagnostics io.Writer, o Options) int {
 	switch command {
 	case "status", "inspect-session":
 		return runOffline(command, a, output, diagnostics)
@@ -88,7 +90,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 	if o.OpenClient == nil {
 		options, provider, err := readClientOptions(command, a, o.Authentication)
 		if err != nil {
-			return fail(diagnostics, 3, "cannot prepare authentication")
+			return fail(diagnostics, 3, "The command cannot prepare authentication.")
 		}
 		open := o.OpenClientWithOptions
 		if open == nil {
@@ -104,7 +106,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 		if message := transportFailureMessage(err, "bank"); message != "" {
 			return fail(diagnostics, 3, message)
 		}
-		return fail(diagnostics, 3, "cannot open private session")
+		return fail(diagnostics, 3, "The command cannot open the private session.")
 	}
 	var result bytes.Buffer
 	stream := io.Writer(&result)
@@ -113,11 +115,11 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 	}
 	code := execute(ctx, command, client, stream, diagnostics, o, a)
 	if err := client.Close(); err != nil && code == 0 {
-		return fail(diagnostics, 3, "session cleanup failed")
+		return fail(diagnostics, 3, "The command cannot close the session.")
 	}
 	if code == 0 && command != "mcp" {
 		if n, err := output.Write(result.Bytes()); err != nil || n != result.Len() {
-			return fail(diagnostics, 3, "output failed")
+			return fail(diagnostics, 3, "The command cannot write the output.")
 		}
 	}
 	return code
@@ -127,7 +129,7 @@ func execute(ctx context.Context, command string, client mcp.Client, output, dia
 	if command == "mcp" {
 		server, err := mcp.New(mcp.Options{Client: client, ProfileExists: true})
 		if err != nil {
-			return fail(diagnostics, 3, "cannot start MCP server")
+			return fail(diagnostics, 3, "The command cannot start the MCP server.")
 		}
 		input := o.Input
 		if input == nil {
@@ -137,7 +139,7 @@ func execute(ctx context.Context, command string, client mcp.Client, output, dia
 			if ctx.Err() != nil {
 				return 130
 			}
-			return fail(diagnostics, 3, "MCP transport failed")
+			return fail(diagnostics, 3, "The MCP transport failed.")
 		}
 		return 0
 	}
@@ -220,11 +222,11 @@ func execute(ctx context.Context, command string, client mcp.Client, output, dia
 func writeResult(output, diagnostics io.Writer, value any) int {
 	raw, err := sber.ExportJSON(value)
 	if err != nil {
-		return fail(diagnostics, 3, "cannot serialize result")
+		return fail(diagnostics, 3, "The command cannot prepare the JSON result.")
 	}
 	raw = append(raw, '\n')
 	if n, err := output.Write(raw); err != nil || n != len(raw) {
-		return fail(diagnostics, 3, "output failed")
+		return fail(diagnostics, 3, "The command cannot write the output.")
 	}
 	return 0
 }
@@ -232,32 +234,32 @@ func writeResult(output, diagnostics io.Writer, value any) int {
 func requestFailure(ctx context.Context, diagnostics io.Writer, err error) int {
 	var uncertain *sber.MutationUncertain
 	if errors.As(err, &uncertain) {
-		return fail(diagnostics, 4, "operation result unknown; do not repeat; check the operation in the bank website")
+		return fail(diagnostics, 4, "The result of the operation is unknown.\nDo not repeat the operation.\nCheck the operation on the bank website.")
 	}
 	if errors.Is(err, context.Canceled) || ctx.Err() != nil {
 		return 130
 	}
 	var expired *sber.AuthenticationExpired
 	if errors.As(err, &expired) {
-		return fail(diagnostics, 3, "session expired; use sber refresh-session --profile PATH; no complete result")
+		return fail(diagnostics, 3, "The session has expired.\nUse sber refresh-session --profile PATH to restore the session.\nNo complete result is available.")
 	}
 	var rejected *sber.APIRejected
 	if errors.As(err, &rejected) {
-		return fail(diagnostics, 3, "bank rejected the request; no complete result")
+		return fail(diagnostics, 3, "The bank rejected the request.\nNo complete result is available.")
 	}
 	var parse *sber.ParseError
 	if errors.As(err, &parse) {
-		return fail(diagnostics, 3, "bank response format is not supported; no complete result")
+		return fail(diagnostics, 3, "The bank response format is not supported.\nNo complete result is available.")
 	}
 	var response *sber.APIError
 	if errors.As(err, &response) && response.StatusCode >= 100 && response.StatusCode <= 599 {
-		return fail(diagnostics, 3, fmt.Sprintf("bank returned HTTP %d; no complete result", response.StatusCode))
+		return fail(diagnostics, 3, fmt.Sprintf("The bank returned HTTP %d.\nNo complete result is available.", response.StatusCode))
 	}
 	if errors.Is(err, enrollment.ErrExists) {
-		return fail(diagnostics, 3, "destination already exists; select a new path")
+		return fail(diagnostics, 3, "The destination file already exists.\nSelect a new path.")
 	}
 	if message := transportFailureMessage(err, "bank"); message != "" {
-		return fail(diagnostics, 3, message+"; no complete result")
+		return fail(diagnostics, 3, message+"\nNo complete result is available.")
 	}
-	return fail(diagnostics, 3, "bank request failed; no complete result")
+	return fail(diagnostics, 3, "The bank request failed.\nNo complete result is available.")
 }

@@ -146,7 +146,7 @@ func TestPreviewProofCaseAliasesAndDecodedDuplicateKeysRemainRejected(t *testing
 		t.Run("duplicate/"+spell, func(t *testing.T) {
 			bad := []byte(strings.Replace(data, `"HasGaps":`, spell+`"HasGaps":`, 1))
 			var out, diagnostics bytes.Buffer
-			if code := Run(bytes.NewReader(bad), &out, &diagnostics); code != 3 || out.Len() != 0 || diagnostics.String() != "invalid preview JSON\n" {
+			if code := Run(bytes.NewReader(bad), &out, &diagnostics); code != 3 || out.Len() != 0 || diagnostics.String() != "The preview JSON is not valid.\n" {
 				t.Fatalf("decoded duplicate proof accepted: exit=%d stderr=%q", code, diagnostics.String())
 			}
 		})

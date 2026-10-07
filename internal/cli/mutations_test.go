@@ -84,7 +84,7 @@ func TestRenameHasExplicitPolicyAndNoRetry(t *testing.T) {
 		if uncertain {
 			want = 4
 		}
-		if code != want || calls != 1 || client.Closes.Load() != 1 || uncertain && (output.Len() != 0 || !strings.Contains(diagnostics.String(), "do not repeat")) || strings.Contains(diagnostics.String(), "synthetic-private-wire-error") {
+		if code != want || calls != 1 || client.Closes.Load() != 1 || uncertain && (output.Len() != 0 || !strings.Contains(diagnostics.String(), "Do not repeat the operation.")) || strings.Contains(diagnostics.String(), "synthetic-private-wire-error") {
 			t.Fatalf("rename boundary failed: status=%d calls=%d", code, calls)
 		}
 	}

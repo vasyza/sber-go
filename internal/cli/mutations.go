@@ -62,7 +62,7 @@ func confirmAction(ctx context.Context, diagnostics io.Writer, dependencies *Aut
 		if ctx.Err() != nil {
 			return 130
 		}
-		return fail(diagnostics, 3, "operation not confirmed; no further request sent")
+		return fail(diagnostics, 3, "You did not confirm the operation.\nThe command sent no further request.")
 	}
 	return 0
 }

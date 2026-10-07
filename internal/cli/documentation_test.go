@@ -1,12 +1,13 @@
 package cli
 
 import (
-	"flag"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/spf13/pflag"
 )
 
 var docInline = regexp.MustCompile("`[^`]+`")
@@ -25,7 +26,7 @@ func TestCLIDocumentationCommandsOptionsAndExamplesMatchExecutable(t *testing.T)
 			t.Errorf("missing command %s", command.name)
 		}
 		flags, _ := commandFlags(command.name)
-		flags.VisitAll(func(f *flag.Flag) {
+		flags.VisitAll(func(f *pflag.Flag) {
 			if !strings.Contains(string(reference), "`--"+f.Name) {
 				t.Errorf("missing option --%s", f.Name)
 			}
@@ -59,7 +60,7 @@ func TestCLIDocumentationCommandsOptionsAndExamplesMatchExecutable(t *testing.T)
 }
 
 func TestCLIDocumentationSentenceAndParagraphLimits(t *testing.T) {
-	for _, name := range []string{"CLI.md", "CLI-REFERENCE.md", "CLI-TERMS.md", "CLI-STYLE.md", "CLI-VERIFICATION.md"} {
+	for _, name := range []string{"CLI.md", "CLI-REFERENCE.md", "CLI-TERMS.md", "CLI-STYLE.md", "CLI-VERIFICATION.md", "CLI-WRITING.md", "RENTAL-CLI.md"} {
 		raw, err := os.ReadFile(filepath.Join("..", "..", "docs", name))
 		if err != nil {
 			t.Fatal(err)

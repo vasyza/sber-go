@@ -24,18 +24,18 @@ func runOffline(command string, args *commandArguments, output, diagnostics io.W
 	if command == "inspect-session" {
 		bundle, err := sber.LoadSessionBundle(args.profile)
 		if err != nil {
-			return fail(diagnostics, 3, "cannot inspect private profile")
+			return fail(diagnostics, 3, "The command cannot read the private profile.")
 		}
 		facts["metadata"] = bundle.Redacted()
 	} else {
 		exists, err := enrollment.SafeProfileExists(args.profile)
 		if err != nil {
-			return fail(diagnostics, 3, "unsafe profile metadata")
+			return fail(diagnostics, 3, "The profile file properties are not safe.")
 		}
 		facts["profile_exists"] = exists
 	}
 	if err := json.NewEncoder(output).Encode(facts); err != nil {
-		return fail(diagnostics, 3, "output failed")
+		return fail(diagnostics, 3, "The command cannot write the output.")
 	}
 	return 0
 }

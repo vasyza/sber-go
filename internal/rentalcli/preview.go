@@ -26,25 +26,25 @@ func fail(diagnostics io.Writer, code int, message string) int {
 // It never obtains a bank session, infers a contract or contacts a tenant.
 func Run(input io.Reader, output, diagnostics io.Writer) int {
 	if input == nil || output == nil {
-		return fail(diagnostics, 2, "invalid preview I/O")
+		return fail(diagnostics, 2, "The preview input or output is not valid.")
 	}
 	data, err := io.ReadAll(io.LimitReader(input, MaximumInputBytes+1))
 	if err != nil || len(data) > MaximumInputBytes || strictjson.Validate(data) != nil {
-		return fail(diagnostics, 3, "invalid preview JSON")
+		return fail(diagnostics, 3, "The preview JSON is not valid.")
 	}
 	var in rental.Input
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.UseNumber()
 	var shape any
 	if decoder.Decode(&shape) != nil || !exactShape(shape, reflect.TypeOf(in)) {
-		return fail(diagnostics, 3, "invalid preview schema")
+		return fail(diagnostics, 3, "The preview input format is not valid.")
 	}
 	if json.Unmarshal(data, &in) != nil {
-		return fail(diagnostics, 3, "invalid preview schema")
+		return fail(diagnostics, 3, "The preview input format is not valid.")
 	}
 	evaluation, err := rental.Evaluate(in)
 	if err != nil {
-		return fail(diagnostics, 4, "invalid rental ledger")
+		return fail(diagnostics, 4, "The rental ledger is not valid.")
 	}
 	value := map[string]any{
 		"bank_authorization_checked": false, "reminders_enabled": false,
@@ -55,11 +55,11 @@ func Run(input io.Reader, output, diagnostics io.Writer) int {
 	}
 	encoded, err := json.MarshalIndent(value, "", "  ")
 	if err != nil {
-		return fail(diagnostics, 5, "preview encoding failed")
+		return fail(diagnostics, 5, "The command cannot prepare the preview output.")
 	}
 	encoded = append(encoded, '\n')
 	if n, err := output.Write(encoded); err != nil || n != len(encoded) {
-		return fail(diagnostics, 5, "preview output failed")
+		return fail(diagnostics, 5, "The command cannot write the preview.")
 	}
 	return 0
 }

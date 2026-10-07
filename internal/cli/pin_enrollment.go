@@ -26,7 +26,7 @@ func enrollOwnerPIN(ctx context.Context, a Authentication, auth PrimaryAuthentic
 		// A validated policy rejection did not enroll this PIN. The next
 		// attempt requires a new owner prompt and confirmation, never replay.
 		if diagnostics != nil {
-			if _, err := io.WriteString(diagnostics, "Bank did not accept this new PIN. Enter a different new online-banking PIN, or press Ctrl+C.\n"); err != nil {
+			if _, err := io.WriteString(diagnostics, "The bank did not accept this new PIN.\nEnter a different new online banking PIN, or press Ctrl+C.\n"); err != nil {
 				return sber.SessionBundle{}, enrollment.ErrPrepare
 			}
 		}

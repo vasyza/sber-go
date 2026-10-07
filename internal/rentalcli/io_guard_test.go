@@ -29,7 +29,7 @@ func TestPreviewRequiredContractTimesKeepNativeMissingAndZeroErrors(t *testing.T
 				data := documentBytes(t, document)
 				before := bytes.Clone(data)
 				var out, diagnostics bytes.Buffer
-				if code := Run(bytes.NewReader(data), &out, &diagnostics); code != 4 || out.Len() != 0 || diagnostics.String() != "invalid rental ledger\n" {
+				if code := Run(bytes.NewReader(data), &out, &diagnostics); code != 4 || out.Len() != 0 || diagnostics.String() != "The rental ledger is not valid.\n" {
 					t.Fatalf("required contract time changed native zero policy: exit=%d stderr=%q", code, diagnostics.String())
 				}
 				if !bytes.Equal(data, before) {
@@ -64,7 +64,7 @@ func TestPreviewBoundedReadAndExactSizeBoundary(t *testing.T) {
 					t.Fatalf("exact-size valid document rejected: exit=%d bytes=%d", code, reader.read)
 				}
 				assertDecision(t, decodeDecisions(t, out.Bytes()), rental.Paid, 0, 1)
-			} else if code != 3 || out.Len() != 0 || diagnostics.String() != "invalid preview JSON\n" || reader.read != MaximumInputBytes+1 {
+			} else if code != 3 || out.Len() != 0 || diagnostics.String() != "The preview JSON is not valid.\n" || reader.read != MaximumInputBytes+1 {
 				t.Fatalf("size/read bound changed: exit=%d bytes=%d stderr=%q", code, reader.read, diagnostics.String())
 			}
 		})
@@ -82,16 +82,16 @@ func (r failingInput) Read(out []byte) (int, error) {
 func TestPreviewIOFailuresRemainStaticAndDecisionFree(t *testing.T) {
 	data := documentBytes(t, syntheticProofDocument(t))
 	var out, diagnostics bytes.Buffer
-	if code := Run(failingInput{data}, &out, &diagnostics); code != 3 || out.Len() != 0 || diagnostics.String() != "invalid preview JSON\n" {
+	if code := Run(failingInput{data}, &out, &diagnostics); code != 3 || out.Len() != 0 || diagnostics.String() != "The preview JSON is not valid.\n" {
 		t.Fatalf("partial read failure became success or disclosed cause: %d %q", code, diagnostics.String())
 	}
 	out.Reset()
 	diagnostics.Reset()
-	if code := Run(nil, &out, &diagnostics); code != 2 || out.Len() != 0 || diagnostics.String() != "invalid preview I/O\n" {
+	if code := Run(nil, &out, &diagnostics); code != 2 || out.Len() != 0 || diagnostics.String() != "The preview input or output is not valid.\n" {
 		t.Fatalf("nil input did not fail closed: %d", code)
 	}
 	diagnostics.Reset()
-	if code := Run(bytes.NewReader(data), nil, &diagnostics); code != 2 || diagnostics.String() != "invalid preview I/O\n" {
+	if code := Run(bytes.NewReader(data), nil, &diagnostics); code != 2 || diagnostics.String() != "The preview input or output is not valid.\n" {
 		t.Fatalf("nil output did not fail closed: %d", code)
 	}
 	if code := Run(strings.NewReader(`{"AsOf":null}`), &out, nil); code != 3 || out.Len() != 0 {
@@ -106,7 +106,7 @@ func TestPreviewNilCollectionsKeepNativeEngineSemantics(t *testing.T) {
 			document[collection] = nil
 			if collection == "Tenants" {
 				var out, diagnostics bytes.Buffer
-				if code := Run(bytes.NewReader(documentBytes(t, document)), &out, &diagnostics); code != 4 || out.Len() != 0 || diagnostics.String() != "invalid rental ledger\n" {
+				if code := Run(bytes.NewReader(documentBytes(t, document)), &out, &diagnostics); code != 4 || out.Len() != 0 || diagnostics.String() != "The rental ledger is not valid.\n" {
 					t.Fatal("nil required tenants became a ledger")
 				}
 				return

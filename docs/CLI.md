@@ -52,6 +52,23 @@ The application includes the verified Russian Trusted Root CA.
 It does not download a certificate at startup.
 TLS validates the certificate chain and the server hostname.
 
+## Command syntax
+
+Cobra v1.10.2 reads the command arguments and produces help text.
+Each operational command requires `--profile PATH`.
+Use two hyphens for option names.
+Old forms such as `-profile` are not valid.
+
+Use `sber --help` to show the command catalog.
+Use `sber help COMMAND` or `sber COMMAND --help` to show command options.
+Use `-h` as the short form of `--help`.
+A help request does not read a profile or send a bank request.
+
+The CLI writes help to standard output.
+The CLI writes fixed argument errors to standard error.
+These errors do not include argument values or private paths.
+The CLI does not supply shell completion commands.
+
 ## Make a profile
 
 The profile contains session cookies and device identity.

@@ -64,7 +64,7 @@ func TestNativePreviewRejectsUnsupportedTimestampAndMissingProofBeforeOutput(t *
 	check := func(t *testing.T, document map[string]any) {
 		t.Helper()
 		code, out, diagnostics := executeSyntheticPreview(t, binary, documentBytes(t, document))
-		if code != 3 || len(out) != 0 || diagnostics != "invalid preview schema\n" {
+		if code != 3 || len(out) != 0 || diagnostics != "The preview input format is not valid.\n" {
 			t.Fatalf("native schema failure not static/decision-free: exit=%d stdout=%s stderr=%q", code, out, diagnostics)
 		}
 	}
@@ -92,7 +92,7 @@ func TestNativePreviewRejectsUnsupportedTimestampAndMissingProofBeforeOutput(t *
 		})
 	}
 	code, out, diagnostics := executeSyntheticPreview(t, binary, nil, "SYNTHETIC-never-echo")
-	if code != 2 || len(out) != 0 || diagnostics != "usage: rental-check < explicit-ledger.json\n" {
+	if code != 2 || len(out) != 0 || diagnostics != "The command arguments are not valid.\nUse rental-check --help for command help.\n" {
 		t.Fatal("native argument rejection disclosed argument or emitted decisions")
 	}
 }

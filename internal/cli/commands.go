@@ -1,9 +1,6 @@
 package cli
 
 import (
-	"errors"
-	"flag"
-	"fmt"
 	"io"
 	"path/filepath"
 	"regexp"
@@ -11,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/pflag"
 	sber "github.com/vasyza/sber-go"
 )
 
@@ -48,34 +46,11 @@ func findCommand(name string) (commandDefinition, bool) {
 	return commandDefinition{}, false
 }
 
-func generalHelp() string {
-	var out strings.Builder
-	out.WriteString("Usage: sber COMMAND --profile PATH [options]\n\nCommands:\n")
-	for _, command := range commands {
-		fmt.Fprintf(&out, "  %-20s %s\n", command.name, command.description)
-	}
-	out.WriteString("\nUse sber help COMMAND for command options.\nThe bank root CA is part of the application.\nUse --ca-bundle PATH to select a different PEM trust bundle.\nEnter secret values only at hidden terminal prompts.\n")
-	return out.String()
-}
-
-func commandHelp(name string, out io.Writer) error {
-	command, ok := findCommand(name)
-	if !ok {
-		return errors.New("unknown command")
-	}
-	var text strings.Builder
-	fmt.Fprintf(&text, "Usage: sber %s --profile PATH [options]\n\n%s\n\nOptions:\n", name, command.description)
-	flags, _ := commandFlags(name)
-	flags.SetOutput(&text)
-	flags.PrintDefaults()
-	_, err := io.WriteString(out, text.String())
-	return err
-}
-
 type cardIDs []string
 
 func (v *cardIDs) String() string        { return strings.Join(*v, ",") }
 func (v *cardIDs) Set(text string) error { *v = append(*v, text); return nil }
+func (v *cardIDs) Type() string          { return "ID" }
 
 type commandArguments struct {
 	name, source, amount, currency, purpose                               string
@@ -90,69 +65,69 @@ type commandArguments struct {
 	timeout                                                               time.Duration
 }
 
-func commandFlags(name string) (*flag.FlagSet, *commandArguments) {
+func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
 	a := &commandArguments{limit: 30, pages: 100, incomeType: "outcome", timeout: 30 * time.Second}
-	f := flag.NewFlagSet("sber "+name, flag.ContinueOnError)
+	f := pflag.NewFlagSet("sber "+name, pflag.ContinueOnError)
 	f.SetOutput(io.Discard)
-	f.StringVar(&a.profile, "profile", "", "Private profile PATH (required).")
+	f.StringVar(&a.profile, "profile", "", "Select the private profile `PATH` (required).")
 	if name == "status" || name == "inspect-session" {
 		return f, a
 	}
-	f.StringVar(&a.ca, "ca-bundle", "", "Use a different PEM trust bundle PATH.")
+	f.StringVar(&a.ca, "ca-bundle", "", "Use a different PEM trust bundle `PATH`.")
 	if name == "login" || name == "refresh-session" {
 		if name == "login" {
-			f.StringVar(&a.remembered, "remembered-profile", "", "Use an existing profile PATH for PIN login.")
+			f.StringVar(&a.remembered, "remembered-profile", "", "Use an existing profile `PATH` for PIN login.")
 		}
-		f.StringVar(&a.browser.profile, "browser-profile", "", "Private Firefox profile PATH.")
-		f.StringVar(&a.browser.driver, "playwright-driver", "", "Installed Playwright driver PATH.")
-		f.StringVar(&a.browser.executable, "firefox-executable", "", "Installed Firefox executable PATH.")
+		f.StringVar(&a.browser.profile, "browser-profile", "", "Select the private Firefox profile `PATH`.")
+		f.StringVar(&a.browser.driver, "playwright-driver", "", "Select the installed Playwright driver `PATH`.")
+		f.StringVar(&a.browser.executable, "firefox-executable", "", "Select the installed Firefox executable `PATH`.")
 		return f, a
 	}
-	f.DurationVar(&a.timeout, "timeout", 30*time.Second, "Maximum time for each request (1s to 120s).")
+	f.DurationVar(&a.timeout, "timeout", 30*time.Second, "Set the maximum time for each request (1s to 120s).")
 	if name != "mcp" && name != "export-session" && name != "inspect-credentials" && !isMutationCommand(name) {
 		f.BoolVar(&a.noRenew, "no-renew", false, "Do not request a PIN if the session expires.")
-		f.StringVar(&a.browser.profile, "browser-profile", "", "Private Firefox profile PATH for PIN login.")
-		f.StringVar(&a.browser.driver, "playwright-driver", "", "Installed Playwright driver PATH for PIN login.")
-		f.StringVar(&a.browser.executable, "firefox-executable", "", "Installed Firefox executable PATH for PIN login.")
+		f.StringVar(&a.browser.profile, "browser-profile", "", "Select the private Firefox profile `PATH` for PIN login.")
+		f.StringVar(&a.browser.driver, "playwright-driver", "", "Select the installed Playwright driver `PATH` for PIN login.")
+		f.StringVar(&a.browser.executable, "firefox-executable", "", "Select the installed Firefox executable `PATH` for PIN login.")
 	}
 	switch name {
 	case "card-rename":
-		f.Var(&a.cards, "card-id", "Numeric card ID (required).")
-		f.StringVar(&a.name, "name", "", "New card name (required).")
+		f.Var(&a.cards, "card-id", "Select one numeric card `ID` (required).")
+		f.StringVar(&a.name, "name", "", "Set the new card name (required).")
 		f.BoolVar(&a.execute, "execute", false, "Let the CLI send this change after terminal confirmation.")
 	case "transfer-own":
-		f.StringVar(&a.source, "source", "", "Source resource ID (required).")
-		f.StringVar(&a.destination, "destination", "", "Destination resource ID (required).")
-		f.StringVar(&a.amount, "amount", "", "Positive decimal amount (required; up to two decimal places).")
-		f.StringVar(&a.currency, "currency", "RUB", "Three-letter currency code.")
-		f.StringVar(&a.purpose, "purpose", "", "Transfer purpose (up to 210 characters).")
+		f.StringVar(&a.source, "source", "", "Select the source resource `ID` (required).")
+		f.StringVar(&a.destination, "destination", "", "Select the destination resource `ID` (required).")
+		f.StringVar(&a.amount, "amount", "", "Set a positive decimal amount with up to two decimal places (required).")
+		f.StringVar(&a.currency, "currency", "RUB", "Use a currency code with three letters.")
+		f.StringVar(&a.purpose, "purpose", "", "Set the transfer purpose (up to 210 characters).")
 		f.BoolVar(&a.execute, "execute", false, "Let the CLI send this transfer after two terminal confirmations.")
 	case "products", "accounts", "cards", "portfolio":
 		f.BoolVar(&a.force, "force-update", false, "Get new product data.")
 	case "operations", "operations-page":
 		f.StringVar(&a.resource, "resource", "", "Filter history by resource ID.")
-		f.StringVar(&a.from, "from", "", "Inclusive start DATE or timestamp.")
-		f.StringVar(&a.to, "to", "", "Inclusive end DATE or timestamp.")
-		f.IntVar(&a.limit, "limit", 30, "Page size (1 to 100).")
+		f.StringVar(&a.from, "from", "", "Set the inclusive start `DATE` or timestamp.")
+		f.StringVar(&a.to, "to", "", "Set the inclusive end `DATE` or timestamp.")
+		f.IntVar(&a.limit, "limit", 30, "Set the page size (1 to 100).")
 		if name == "operations" {
-			f.IntVar(&a.pages, "max-pages", 100, "Maximum number of pages (1 to 10000).")
+			f.IntVar(&a.pages, "max-pages", 100, "Set the maximum number of pages (1 to 10000).")
 		} else {
-			f.IntVar(&a.offset, "offset", 0, "Page offset (zero or more).")
+			f.IntVar(&a.offset, "offset", 0, "Set the page offset (zero or more).")
 		}
 	case "operation-details":
-		f.StringVar(&a.operationID, "operation-id", "", "Operation ID (required).")
+		f.StringVar(&a.operationID, "operation-id", "", "Select the operation `ID` (required).")
 	case "card-info", "card-limits":
-		f.Var(&a.cards, "card-id", "Numeric card ID (required; repeat for card-info).")
+		f.Var(&a.cards, "card-id", "Select a numeric card `ID` (required; repeat for card-info).")
 	case "analytics":
-		f.StringVar(&a.from, "from", "", "Inclusive start DATE or timestamp (required).")
-		f.StringVar(&a.to, "to", "", "Inclusive end DATE or timestamp (required).")
+		f.StringVar(&a.from, "from", "", "Set the inclusive start `DATE` or timestamp (required).")
+		f.StringVar(&a.to, "to", "", "Set the inclusive end `DATE` or timestamp (required).")
 		f.StringVar(&a.incomeType, "income-type", "outcome", "Select income or outcome.")
 		f.BoolVar(&a.betweenOwn, "between-own", true, "Include transfers between your accounts.")
 		f.BoolVar(&a.openBanking, "open-banking", false, "Include external bank data.")
 		f.BoolVar(&a.showCategories, "show-categories", true, "Include category totals.")
 		f.BoolVar(&a.showProducts, "show-products", true, "Include product totals.")
 	case "export-session":
-		f.StringVar(&a.destination, "destination", "", "New private file PATH (required; absolute).")
+		f.StringVar(&a.destination, "destination", "", "Select a new absolute private file `PATH` (required).")
 	}
 	return f, a
 }

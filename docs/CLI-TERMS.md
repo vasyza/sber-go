@@ -26,8 +26,10 @@ Numbers, units, and dates use the measurement and time category.
 | card | A bank payment product with an associated account. |
 | card ID | The product identifier that the bank API accepts. |
 | card number | The payment card number; it differs from the card ID. |
-| CLI | The command line interface of the `sber` executable. |
+| CLI | The command line interface of the `sber` and `rental-check` executables. |
+| Cobra | The Go library that reads CLI arguments and produces help text. |
 | command | The selected CLI operation, such as `products`. |
+| command argument | A value that the caller supplies on the command line. |
 | cookie | A name, value, and scope in a browser session. |
 | coverage metadata | Information about the known limits of returned history. |
 | cryptographic proof | Data that shows possession of the expected authentication secret. |
@@ -72,6 +74,7 @@ Numbers, units, and dates use the measurement and time category.
 | root CA | A trusted certificate authority at the top of a certificate chain. |
 | SDK | The native Go library that the CLI uses. |
 | session | The bank access state at a specified time. |
+| shell completion | A shell function that suggests command names or options from partial input. |
 | SMS code | A temporary bank code sent by SMS. |
 | standard error | The process stream for diagnostics and confirmation plans. |
 | standard input | The process stream for terminal input or the MCP protocol. |

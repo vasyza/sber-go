@@ -49,7 +49,7 @@ func assertSchemaRejected(t testing.TB, data []byte) {
 	before := bytes.Clone(data)
 	var out, diagnostics bytes.Buffer
 	code := Run(bytes.NewReader(data), &out, &diagnostics)
-	if code != 3 || out.Len() != 0 || diagnostics.String() != "invalid preview schema\n" {
+	if code != 3 || out.Len() != 0 || diagnostics.String() != "The preview input format is not valid.\n" {
 		t.Fatalf("expected static schema failure with no decisions; exit=%d stdout=%s stderr=%q", code, out.Bytes(), diagnostics.String())
 	}
 	if !bytes.Equal(data, before) {

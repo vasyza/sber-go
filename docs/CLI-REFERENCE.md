@@ -54,13 +54,14 @@ Every operational command must have an explicit `--profile` path.
 
 | Option | Default | Commands | Meaning |
 | --- | --- | --- | --- |
+| `--help`, `-h` | `false`. | All commands. | Show command help without profile access or bank requests. |
 | `--profile PATH` | None; required. | All operational commands. | Select one private profile. |
 | `--ca-bundle PATH` | Embedded CA with available system PEM trust. | Authentication and client commands. | Replace the trust bundle for the selected client. |
 | `--timeout DURATION` | `30s`. | Client commands. | Limit each request to 1 through 120 seconds. |
 | `--no-renew` | `false`. | Data reads and `check-session`. | Disable interactive session restoration. |
 | `--force-update` | `false`. | `products`, `accounts`, `cards`, `portfolio`. | Get new product data. |
 
-Offline `status` and `inspect-session` accept only `--profile`.
+Offline `status` and `inspect-session` accept `--profile` and help options.
 Authentication commands have a fixed request timeout of 60 seconds.
 MCP, export, credential inspection, and mutations do not accept `--no-renew`.
 They do not do interactive session restoration.

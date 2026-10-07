@@ -82,7 +82,7 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 	if a.Enroll == nil {
 		a.Enroll = enrollment.Enroll
 	}
-	message := "owner login failed; profile not published"
+	message := "The owner login failed.\nThe command did not publish the profile."
 	err := a.Enroll(ctx, profile, func(ctx context.Context) (enrollment.CandidateWriter, error) {
 		var writer enrollment.CandidateWriter
 		var err error
@@ -107,20 +107,20 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 		}
 		switch {
 		case errors.Is(err, enrollment.ErrExists):
-			message = "profile already exists; select a new path"
+			message = "The profile file already exists.\nSelect a new path."
 		case errors.Is(err, enrollment.ErrBusy):
-			message = "another owner enrollment is active"
+			message = "Another owner enrollment is active."
 		case errors.Is(err, enrollment.ErrUnsupported):
-			message = "hidden terminal enrollment requires Linux or macOS"
+			message = "Hidden terminal enrollment requires Linux or macOS."
 		case errors.Is(err, enrollment.ErrUnsafe):
-			message = "unsafe private profile path"
+			message = "The private profile path is not safe."
 		case errors.Is(err, enrollment.ErrPublish), errors.Is(err, enrollment.ErrCleanup):
-			message = "profile publication could not be confirmed; inspect profile metadata before trying again"
+			message = "The command cannot confirm publication of the profile.\nRead the profile metadata before you try again."
 		}
 		return fail(diagnostics, 3, message)
 	}
 	if err := json.NewEncoder(output).Encode(map[string]any{"profile_created": true, "bank_authorization_checked": true, "mutations_enabled": false}); err != nil {
-		return fail(diagnostics, 3, "profile created; output failed")
+		return fail(diagnostics, 3, "The command created the profile.\nThe command cannot write the output.")
 	}
 	return 0
 }
@@ -133,66 +133,66 @@ func loginFailureMessage(err error) (message string) {
 		if errors.As(err, &phase) {
 			switch phase.phase {
 			case "public-configuration", "owner-input", "login-password", "sms-confirmation", "pin-enrollment", "session-validation", "cleanup":
-				message = "authentication stage=" + phase.phase + "; " + message
+				message = "Authentication stage=" + phase.phase + ".\n" + message
 			}
 		}
 	}()
 	var captcha *sber.PinCaptchaRequired
 	if errors.As(err, &captcha) {
-		return "CAPTCHA requires owner interaction; use the bank UI or the explicit SDK challenge API"
+		return "CAPTCHA requires owner interaction.\nUse the bank website or the explicit SDK challenge API.\nThe command did not publish the profile."
 	}
 	if message := transportFailureMessage(err, "bank login"); message != "" {
-		return message + "; profile not published"
+		return message + "\nThe command did not publish the profile."
 	}
 	var auth *sber.PinAuthError
 	if errors.As(err, &auth) {
 		switch auth.Code {
 		case "bootstrap_failed":
 			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
-				return fmt.Sprintf("bank login page returned HTTP %d; profile not published", auth.StatusCode)
+				return fmt.Sprintf("The bank login page returned HTTP %d.\nThe command did not publish the profile.", auth.StatusCode)
 			}
 		case "invalid_frontend_config":
-			return "bank login page configuration is not supported; profile not published"
+			return "The bank login page configuration is not supported.\nThe command did not publish the profile."
 		case "browser_check_required":
-			return "bank login page requires browser initialization; profile not published"
+			return "The bank login page requires browser initialization.\nThe command did not publish the profile."
 		case "browser_bootstrap_unavailable":
-			return "selected browser runtime is unavailable; check its explicit paths; profile not published"
+			return "The selected browser runtime is not available.\nCheck its explicit paths.\nThe command did not publish the profile."
 		case "browser_bootstrap_failed", "browser_bootstrap_timeout", "unsupported_browser_state":
-			return "selected browser initialization failed; check its private profile and verified certificate trust; profile not published"
+			return "The selected browser initialization failed.\nCheck its private profile and verified certificate trust.\nThe command did not publish the profile."
 		case "webauthn_required":
-			return "bank requires owner WebAuthn interaction; profile not published"
+			return "The bank requires owner WebAuthn interaction.\nThe command did not publish the profile."
 		case "attempts_limit_reached":
-			return "bank authentication attempt limit reached; profile not published"
+			return "The bank authentication attempt limit was reached.\nThe command did not publish the profile."
 		case "browser_limit":
-			return "bank remembered-device limit reached; use the bank website; profile not published"
+			return "The bank limit for remembered devices was reached.\nUse the bank website.\nThe command did not publish the profile."
 		case "invalid_pin_birthdate":
-			return "bank did not accept the new PIN; use a different PIN that meets the bank requirements; profile not published"
+			return "The bank did not accept the new PIN.\nUse a different PIN that meets the bank requirements.\nThe command did not publish the profile."
 		case "invalid_pin":
-			return "online-banking PIN is not accepted; check the bank PIN requirements; profile not published"
+			return "The online banking PIN is not accepted.\nCheck the bank PIN requirements.\nThe command did not publish the profile."
 		case "invalid_decode_pin":
-			return "bank could not decode the PIN; authentication protocol needs review; profile not published"
+			return "The bank could not decode the PIN.\nThe authentication protocol needs review.\nThe command did not publish the profile."
 		case "invalid_pin_public_key":
-			return "bank supplied an unsupported PIN encryption key; profile not published"
+			return "The bank supplied a PIN encryption key that is not supported.\nThe command did not publish the profile."
 		case "redirect_failed":
 			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
-				return fmt.Sprintf("bank session navigation returned HTTP %d; profile not published", auth.StatusCode)
+				return fmt.Sprintf("The bank session navigation returned HTTP %d.\nThe command did not publish the profile.", auth.StatusCode)
 			}
 		case "missing_ufs_session":
-			return "authenticated session cookies are missing; profile not published"
+			return "The authenticated session cookies are missing.\nThe command did not publish the profile."
 		case "invalid_json", "invalid_csrf", "missing_redirect", "missing_ufs_host", "missing_ufs_api_host", "invalid_primary_auth_state":
-			return "bank authentication response format is not supported; profile not published"
+			return "The bank authentication response format is not supported.\nThe command did not publish the profile."
 		case "ufs_ready_failed", "ufs_bootstrap_failed":
 			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
-				return fmt.Sprintf("bank session initialization returned HTTP %d; profile not published", auth.StatusCode)
+				return fmt.Sprintf("The bank session initialization returned HTTP %d.\nThe command did not publish the profile.", auth.StatusCode)
 			}
 		case "invalid_server_proof":
-			return "bank authentication proof is not valid; profile not published"
+			return "The bank authentication proof is not valid.\nThe command did not publish the profile."
 		}
 		if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
-			return fmt.Sprintf("bank authentication returned HTTP %d; profile not published", auth.StatusCode)
+			return fmt.Sprintf("The bank authentication returned HTTP %d.\nThe command did not publish the profile.", auth.StatusCode)
 		}
 	}
-	return "owner login failed; profile not published"
+	return "The owner login failed.\nThe command did not publish the profile."
 }
 
 func transportFailureMessage(err error, request string) string {
@@ -202,17 +202,17 @@ func transportFailureMessage(err error, request string) string {
 	}
 	switch wire.Code {
 	case "invalid_ca_bundle":
-		return "cannot load trusted PEM certificates; check --ca-bundle PATH"
+		return "The command cannot load trusted PEM certificates.\nCheck --ca-bundle PATH."
 	case "tls_untrusted":
-		return "TLS certificate is not trusted; update the application or select a verified CA using --ca-bundle PATH"
+		return "The TLS certificate is not trusted.\nUpdate the application or select a verified CA with --ca-bundle PATH."
 	case "tls_hostname":
-		return "bank TLS certificate does not match the hostname"
+		return "The bank TLS certificate does not match the hostname."
 	case "tls_expired":
-		return "bank TLS certificate has expired or is not yet valid"
+		return "The bank TLS certificate has expired or is not yet valid."
 	case "tls_invalid":
-		return "bank TLS certificate validation failed"
+		return "The bank TLS certificate validation failed."
 	case "timeout":
-		return request + " request timed out"
+		return "The " + request + " request timed out."
 	}
 	return ""
 }
@@ -306,7 +306,7 @@ func readNewPIN(ctx context.Context, a Authentication, auth PrimaryAuthenticator
 			return "", &sber.PinAuthError{Code: "invalid_frontend_config"}
 		}
 		if diagnostics != nil {
-			if _, err := fmt.Fprintf(diagnostics, "New online-banking PIN requires %d digits.\n", length); err != nil {
+			if _, err := fmt.Fprintf(diagnostics, "The new online banking PIN requires %d digits.\n", length); err != nil {
 				return "", enrollment.ErrPrepare
 			}
 		}
@@ -322,7 +322,7 @@ func readNewPIN(ctx context.Context, a Authentication, auth PrimaryAuthenticator
 		if length != 0 && !pinDigits(pin, length) {
 			pin = ""
 			if diagnostics != nil {
-				if _, err := io.WriteString(diagnostics, "PIN must contain the requested number of digits; enter it again.\n"); err != nil {
+				if _, err := io.WriteString(diagnostics, "The PIN must contain the specified number of digits.\nEnter the PIN again.\n"); err != nil {
 					return "", enrollment.ErrPrepare
 				}
 			}
@@ -341,7 +341,7 @@ func readNewPIN(ctx context.Context, a Authentication, auth PrimaryAuthenticator
 			return "", enrollment.ErrPrepare
 		}
 		if diagnostics != nil {
-			if _, err := io.WriteString(diagnostics, "PIN confirmation differs; enter and confirm the new PIN again.\n"); err != nil {
+			if _, err := io.WriteString(diagnostics, "The PIN confirmation differs.\nEnter the new PIN again.\nConfirm the new PIN again.\n"); err != nil {
 				return "", enrollment.ErrPrepare
 			}
 		}

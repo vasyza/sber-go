@@ -1,8 +1,19 @@
 # CLI verification record
 
 Date: 2026-10-07.
-This record applies to the implemented command catalog on `refactor/modular-sdk`.
+This record includes the implemented command catalog and its Cobra migration on `main`.
 The [command reference](CLI-REFERENCE.md) maps those commands to SDK methods and routes.
+
+## Cobra migration verification
+
+Cobra v1.10.2 supplies command parsing and help for `sber` and `rental-check`.
+The migration keeps all 20 operational commands and the offline rental preview.
+Argument errors use fixed text without private values.
+Help requests do not open clients or create profile files.
+
+The migration checks use synthetic data and local servers.
+This migration did not use bank credentials or send bank requests.
+The earlier real session checks below apply to the command behavior before the parser migration.
 
 ## Local verification
 

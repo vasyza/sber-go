@@ -15,7 +15,14 @@ make check
 
 ## CLI
 
-Create a profile in your local Linux or macOS terminal; login, password, OTP and any newly enrolled online-banking PIN are hidden prompts:
+Cobra v1.10.2 reads CLI arguments and produces help text.
+The CLI has 20 operational commands.
+They cover authentication, session restoration, products, cards, history, analytics, private export, and MCP.
+Use `sber help COMMAND` to show command options.
+Use `--help` or `-h` to show help without profile access or bank requests.
+
+Create a profile in your local Linux or macOS terminal.
+Enter the login, password, SMS code, and any new online banking PIN at the hidden prompts.
 
 ```sh
 ./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"
@@ -26,21 +33,54 @@ Create a profile in your local Linux or macOS terminal; login, password, OTP and
   --from 2026-01-01 --to 2026-01-31 --limit 30 --max-pages 100
 ```
 
-The CLI has 20 commands. They cover primary and PIN login, session recovery, products, accounts, cards, card details and limits, portfolio relationships, paginated history, operation details, analytics, private export, and MCP. `sber help COMMAND` shows each command's options.
+An existing profile requires a private parent directory with mode `0700` and a regular private file with mode `0600`.
+The `login` command makes missing private directories and refuses to replace an existing profile.
+Authentication prepares public configuration before secret prompts.
+Credentials are not accepted through arguments, environment variables, or MCP.
+The [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-TERMS.md) use the [ASD-STE100 Issue 9 writing policy](docs/CLI-STYLE.md).
 
-An existing profile needs a private parent directory (0700) and a regular private file (0600). `login` creates missing private directories and refuses to replace an existing profile. Authentication prepares public configuration before secret prompts. Credentials are never accepted through arguments, environment variables or MCP. The English [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-TERMS.md) follow the [ASD-STE100 Issue 9 writing policy](docs/CLI-STYLE.md).
+The verified Russian Trusted Root CA is part of the SDK, CLI, and MCP.
+Native bank requests require no certificate download or external CA file.
+Default trust includes the canonical system PEM bundle when available.
+TLS validates the certificate chain and the hostname.
+Use `--ca-bundle PATH` to replace default trust for one client.
+Read the [certificate source and update instructions](internal/transport/certificates/README.md).
 
-The verified Russian Trusted Root CA is built into the SDK, CLI and MCP. Native bank requests need no certificate download, external CA file or `--ca-bundle` argument. Default trust retains the canonical system PEM bundle when available; TLS chain and hostname verification stay enabled. `--ca-bundle PATH` optionally replaces default trust for one client. See [certificate provenance and updates](internal/transport/certificates/README.md).
+Remembered device login uses a hidden PIN.
+Use `login --remembered-profile EXISTING_PATH --profile NEW_PATH` to make a new profile from an existing identity.
+Optional public browser initialization requires matching Firefox and Playwright paths.
+It also requires a dedicated private browser profile with verified certificate trust.
+Read the [authentication instructions](docs/AUTH.md).
 
-Remembered-device login uses a hidden PIN: `login --remembered-profile EXISTING_PATH --profile NEW_PATH`. Optional public browser initialization requires explicit matching Firefox/Playwright paths and a dedicated private browser profile with verified certificate trust; see [authentication setup](docs/AUTH.md).
+The `refresh-session` command restores an existing profile through hidden PIN input and optional SMS confirmation.
+Interactive reads can restore an expired session once, save it, and repeat the read.
+Use `--no-renew` for a read without secret prompts.
+Batch commands and MCP require separate terminal restoration.
+The bank controls session lifetime.
+A session file does not promise access for a year.
 
-`refresh-session` updates the selected existing profile through hidden PIN input and optional SMS confirmation. Interactive reads can restore an expired session once, save it, and retry the read. Use `--no-renew` for a read without secret prompts. Batch commands and MCP require separate terminal restoration. The bank controls session lifetime; session files do not promise access for a year.
+To restore an existing session, use this command:
 
-To restore an existing session explicitly, run `./bin/sber refresh-session --profile "$HOME/.local/share/sber-go/profile.json"`. TLS establishment advertises HTTP/1.1 and can recover a peer closure before HTTP is sent, within a three-attempt bound and the original timeout. Certificate failures and transmitted HTTP requests do not enter this recovery path.
+```sh
+./bin/sber refresh-session --profile "$HOME/.local/share/sber-go/profile.json"
+```
 
-`card-rename` and `transfer-own` show offline plans by default. Execution requires `--execute` and hidden local `CONFIRM`; a transfer has a second confirmation after preparation. Financial requests never renew or replay automatically. These commands have synthetic validation only; real financial execution is outside the live verification scope.
+TLS setup supplies HTTP/1.1 through ALPN.
+After a network closure, setup can make up to three connection attempts before HTTP transmission.
+All attempts use the same request timeout.
+Certificate failures stop connection setup.
+The client does not repeat transmitted HTTP requests after a connection error.
 
-History retains explicit completeness metadata. A final or empty page still has `WindowCompleteness: "unknown"` without independent coverage evidence. An error or page cap produces a nonzero CLI exit without a successful partial result.
+The `card-rename` and `transfer-own` commands show offline plans by default.
+Execution requires `--execute` and hidden local `CONFIRM` input.
+A transfer requires a second confirmation after preparation.
+Financial requests do not restore sessions or repeat requests automatically.
+These commands have synthetic validation only.
+Real financial execution remains outside the live verification scope.
+
+History retains explicit coverage metadata.
+A final or empty page still has `WindowCompleteness: "unknown"` without independent coverage evidence.
+An error or page cap gives a nonzero exit code without a successful partial result.
 
 ## Go API
 
