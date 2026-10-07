@@ -40,7 +40,38 @@ Help and initial argument errors skip default profile resolution.
 Export cannot replace its default source profile.
 The macOS ARM64 command and CLI tests compiled successfully without test execution.
 
-Real bank verification remains limited to the earlier results below.
+The live follow-up below checks the default profile on macOS.
+
+## CLI authentication and live follow-up — 2026-10-08
+
+The native macOS ARM64 checks passed with Go 1.27.1.
+The checks included race tests, vet, builds, formatting, and module checksums.
+
+Primary login passed with password proof, SMS confirmation, and PIN enrollment.
+It created a separate private profile after session validation.
+PIN restoration passed for the default profile and the new profile.
+The new profile completed the read tests before its restoration check.
+The earlier login and restoration failures did not occur in this run.
+This result does not identify the cause of those earlier failures.
+
+PIN authentication failures now include the local stage.
+Known connection, cookie, response, and challenge failures have fixed diagnostic messages.
+The tests check cleanup, secret redaction, and one authentication attempt.
+
+All 15 native read and local profile commands passed on the new profile.
+The SDK session, product, and bounded history checks passed.
+The MCP stdio check passed all six tools through the official client.
+Reads stopped after the MCP session-close call.
+
+The default profile later returned an expired-session result.
+PIN restoration recovered that profile without a new password login.
+Native reads then checked authorization, products, and details and limits for each returned card.
+These commands used the default profile from a different working directory.
+The profile file and its parent retained modes 0600 and 0700.
+
+Both financial commands passed their offline plan checks.
+Those checks sent no bank request.
+Private values and response bodies remain outside this record.
 
 ## Earlier verification
 
@@ -105,10 +136,11 @@ The command does not collect secret input or start a financial operation.
 Complete history coverage remains `UNKNOWN`.
 Exact financial values were not reconciled with the bank interface.
 Real card renaming, transfers, and payment SMS confirmation were not tested.
-Real Linux account access and real MCP-to-bank calls were not tested.
+Real Linux account access was not tested.
 The recorded bank checks do not prove current session validity.
 
-Remote CI and a new independent production review are outside this record.
+Remote CI has not run for the local follow-up edits.
+A new independent production review is outside this record.
 Full upstream parity and external STE certification remain unverified.
 
 ## Historical records

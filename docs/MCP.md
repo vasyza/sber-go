@@ -32,7 +32,7 @@ The transport uses the official Go SDK v1.8.0 for `2026-07-28` stateless discove
 
 Frames/IDs are bounded. Strict JSON and schemas precede handlers. Cancellation and terminal stream failure stop active work. Private callback errors become static tool errors. Stdout is reserved for frames.
 
-Embedding: `mcp.New(mcp.Options{Client: client})`, `Serve(ctx, input, output)`, and deferred `Close()`. Serve owns streams for its lifetime; Close releases the session afterward. A bounded owner-authorized SDK read E2E passed on macOS; real MCP-to-bank calls and complete history coverage were not separately tested. See [STATUS.md](STATUS.md).
+Embedding: `mcp.New(mcp.Options{Client: client})`, `Serve(ctx, input, output)`, and deferred `Close()`. Serve owns streams for its lifetime; Close releases the session afterward. A bounded SDK read E2E passed on macOS. On 2026-10-08, the official client verified all six tools against a real bank session. Complete history coverage remains unknown. See [STATUS.md](STATUS.md).
 
 ## Adapter profile
 

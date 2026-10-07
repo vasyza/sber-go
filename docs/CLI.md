@@ -405,8 +405,8 @@ Data output can contain private financial information.
 The CLI shows known error classifications only.
 It does not show remote error text, support IDs, cookies, or secret input.
 It does not read secrets from `.env`, environment variables, command options, or MCP arguments.
-Primary login errors include the local authentication stage.
-The stage identifies public configuration, owner input, credentials, SMS confirmation, PIN enrollment, session validation, or cleanup.
+Authentication errors include the local stage.
+The stage identifies public configuration, owner input, credentials, PIN login, SMS confirmation, PIN enrollment, session validation, or cleanup.
 
 ## Select TLS trust
 

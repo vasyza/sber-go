@@ -57,6 +57,11 @@ func TestOwnerLoginReportsSafeFailureReasons(t *testing.T) {
 		{"untrusted TLS", &sber.TransportError{Code: "tls_untrusted"}, "TLS certificate is not trusted"},
 		{"invalid CA", &sber.TransportError{Code: "invalid_ca_bundle"}, "cannot load trusted PEM certificates"},
 		{"timeout", &sber.TransportError{Code: "timeout"}, "bank login request timed out"},
+		{"connection failure", &sber.TransportError{Code: "request_failed"}, "bank login request failed"},
+		{"cookie format", &sber.TransportError{Code: "unsupported_cookie_metadata"}, "bank cookie attributes are not supported"},
+		{"response encoding", &sber.TransportError{Code: "invalid_encoding"}, "bank response encoding is not supported"},
+		{"challenge", &sber.PinAuthError{Code: "invalid_srp_challenge"}, "bank authentication challenge is not supported"},
+		{"session format", sber.NewParseError("synthetic-private-field"), "authentication session format is not supported"},
 		{"HTTP error", &sber.PinAuthError{Code: "bootstrap_failed", StatusCode: 403}, "bank login page returned HTTP 403"},
 		{"session navigation", &sber.PinAuthError{Code: "redirect_failed", StatusCode: 500}, "bank session navigation returned HTTP 500"},
 		{"config", &sber.PinAuthError{Code: "invalid_frontend_config"}, "bank login page configuration is not supported"},
@@ -84,6 +89,38 @@ func TestOwnerLoginReportsSafeFailureReasons(t *testing.T) {
 			}})
 			if code != 3 || output.Len() != 0 || !strings.Contains(diagnostics.String(), tt.want) || strings.Contains(diagnostics.String(), "synthetic-private") {
 				t.Fatal("login failure lost safe diagnosis or exposed private data")
+			}
+		})
+	}
+}
+
+func TestRememberedAuthenticationFailureIdentifiesItsPhaseWithoutPrivateData(t *testing.T) {
+	for _, command := range []string{"login", "refresh-session"} {
+		t.Run(command, func(t *testing.T) {
+			profile := filepath.Join(testPrivateDir(t), "profile.json")
+			if command == "refresh-session" {
+				if err := syntheticLoginBundle().Save(profile); err != nil {
+					t.Fatal(err)
+				}
+			}
+			args := []string{command, "--profile", profile}
+			if command == "login" {
+				args = append(args, "--remembered-profile", "synthetic-private-source")
+			}
+			auth := &syntheticRemembered{failure: &sber.TransportError{Code: "request_failed"}}
+			var output, diagnostics bytes.Buffer
+			code := RunWithOptions(context.Background(), args, &output, &diagnostics, Options{Authentication: &Authentication{
+				NewPIN:     func(string, sber.AuthOptions) (PINAuthenticator, error) { return auth, nil },
+				ReadSecret: func(context.Context, ownerinput.Prompt) (string, error) { return "12345", nil },
+			}})
+			if code != 3 || output.Len() != 0 || auth.loginCalls != 1 || auth.closeCalls != 1 {
+				t.Fatal("failed authentication omitted cleanup, retried, or published success")
+			}
+			if !strings.Contains(diagnostics.String(), "stage=pin-login") || !strings.Contains(diagnostics.String(), "bank login request failed") {
+				t.Fatal("remembered authentication lost its phase or safe error classification")
+			}
+			if strings.Contains(diagnostics.String(), "synthetic-private") || strings.Contains(diagnostics.String(), "12345") {
+				t.Fatal("authentication diagnostics exposed private data")
 			}
 		})
 	}

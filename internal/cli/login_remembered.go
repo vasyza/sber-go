@@ -60,6 +60,12 @@ func prepareRememberedLogin(ctx context.Context, a Authentication, source string
 
 // Authentication and cleanup finish before callers can publish a session.
 func authenticateRemembered(ctx context.Context, read func(context.Context, ownerinput.Prompt) (string, error), create func() (PINAuthenticator, error)) (validated sber.SessionBundle, err error) {
+	phase := "public-configuration"
+	defer func() {
+		if err != nil {
+			err = &loginPhaseError{phase: phase, cause: err}
+		}
+	}()
 	auth, err := create()
 	if err != nil {
 		return validated, err
@@ -71,29 +77,35 @@ func authenticateRemembered(ctx context.Context, read func(context.Context, owne
 		if auth.Close() != nil {
 			validated = sber.SessionBundle{}
 			err = enrollment.ErrPrepare
+			phase = "cleanup"
 		}
 	}()
 	if err := prepareAuthentication(ctx, auth); err != nil {
 		return validated, err
 	}
+	phase = "owner-input"
 	pin, err := read(ctx, ownerinput.PIN)
 	if err != nil {
 		return validated, err
 	}
+	phase = "pin-login"
 	bundle, err := auth.Login(ctx, pin, sber.CaptchaAnswer{})
 	pin = ""
 	var otp *sber.PinOTPRequired
 	if errors.As(err, &otp) {
+		phase = "owner-input"
 		code, readErr := read(ctx, ownerinput.OTP)
 		if readErr != nil {
 			return validated, readErr
 		}
+		phase = "sms-confirmation"
 		bundle, err = auth.ConfirmOTP(ctx, code)
 		code = ""
 	}
 	if err != nil {
 		return validated, err
 	}
+	phase = "session-validation"
 	validated, err = bundle.Clone()
 	if err != nil {
 		return validated, err
