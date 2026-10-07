@@ -77,14 +77,18 @@ func validSchema(raw json.RawMessage, depth int) bool {
 				return false
 			}
 		case "required":
-			var names []string
+			var names []json.RawMessage
 			if json.Unmarshal(value, &names) != nil || names == nil {
 				return false
 			}
 			var properties map[string]json.RawMessage
 			_ = json.Unmarshal(fields["properties"], &properties)
 			seen := map[string]bool{}
-			for _, name := range names {
+			for _, raw := range names {
+				name, valid := stringValue(raw)
+				if !valid {
+					return false
+				}
 				if _, ok := properties[name]; !ok || seen[name] {
 					return false
 				}
@@ -96,8 +100,8 @@ func validSchema(raw json.RawMessage, depth int) bool {
 				return false
 			}
 		case "description", "title":
-			var text string
-			if json.Unmarshal(value, &text) != nil || !utf8.ValidString(text) {
+			text, valid := stringValue(value)
+			if !valid || !utf8.ValidString(text) {
 				return false
 			}
 		case "default": // Any strict JSON value is valid descriptor metadata.
@@ -118,7 +122,9 @@ func schemaType(name string) bool {
 
 func objectSchemaRoot(raw json.RawMessage) bool {
 	var fields map[string]json.RawMessage
-	if json.Unmarshal(raw,&fields)!=nil{return false}
-	typ,ok:=stringValue(fields["type"])
-	return ok&&typ=="object"
+	if json.Unmarshal(raw, &fields) != nil {
+		return false
+	}
+	typ, ok := stringValue(fields["type"])
+	return ok && typ == "object"
 }

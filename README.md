@@ -1,6 +1,6 @@
 # sber-go — WIP
 
-Native Go migration of the unofficial ex3lite Sber SDK, local CLI/MCP layers, and a pure rental ledger. **Owner-requested source handoff, not a production-ready release.** Autonomous work is paused; the owner will finish the project.
+Native Go migration of the unofficial ex3lite Sber SDK, local CLI/MCP layers, and a pure rental ledger. **Owner-requested source handoff, not a production-ready release.** The MCP transport now uses the official Go SDK; other unfinished application work remains documented below.
 
 This snapshot includes the latest combined SDK repair-cycle-4 source, regression tests and synthetic fixtures, plus the existing CLI, MCP and rental packages. See **[handoff and known blockers](docs/HANDOFF.md)** before use. Historical manifests/review reports are evidence, not a claim that every acceptance criterion passes.
 
@@ -35,7 +35,7 @@ go vet ./...
 
 - Module root: auth/session/transport, exact financial models/parsers, client/resources and transfer workflows.
 - `browser/`, `internal/ownerinput`, `internal/enrollment`: partial native/browser/bootstrap and local owner-input boundaries.
-- `internal/mcpwire`, `internal/mcptools`: native stdio engine and catalog; catalog slice accepted offline, wire conformance still blocked.
+- `internal/mcpwire`, `internal/mcptools`: official MCP Go SDK v1.8.0 adapter for MCP 2026-07-28 and the native read-only catalog; see [MCP adapter](docs/MCP-GO-SDK.md). Bank handlers and server installation remain unfinished.
 - `rental/`, `internal/rentalcli`, `cmd/rental-check`: pure ledger and independently accepted offline CLI boundary.
 - `testdata/`: synthetic fixtures/reference contracts; the Python inventory script is development-only, not a runtime dependency.
 - `docs/`: parity inventory, design notes, retained failed reviews, current handoff.

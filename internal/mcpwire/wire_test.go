@@ -4,29 +4,61 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"strings"
 	"testing"
+	"time"
 )
 
 const currentMeta = `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}`
 
 func serveText(t *testing.T, server *Server, text string) []map[string]json.RawMessage {
 	t.Helper()
-	var out bytes.Buffer
-	if err := server.Serve(context.Background(), strings.NewReader(text), &out); err != nil {
-		t.Fatal(err)
-	}
+	// A real MCP client keeps its input open until responses arrive. EOF is a
+	// transport shutdown, and the official SDK cancels unfinished requests.
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	input, writer := io.Pipe()
+	defer writer.Close()
+	defer input.Close()
+	out := &frameWriter{frames: make(chan []byte, 64)}
+	done := make(chan error, 1)
+	go func() { done <- server.Serve(ctx, input, out) }()
 	var responses []map[string]json.RawMessage
-	for _, line := range bytes.Split(bytes.TrimSpace(out.Bytes()), []byte{'\n'}) {
+	for _, line := range strings.Split(strings.TrimSuffix(text, "\n"), "\n") {
 		if len(line) == 0 {
 			continue
 		}
-		var response map[string]json.RawMessage
-		if err := json.Unmarshal(line, &response); err != nil {
-			t.Fatalf("invalid output %q: %v", line, err)
+		if _, err := io.WriteString(writer, line+"\n"); err != nil {
+			t.Fatal(err)
 		}
-		responses = append(responses, response)
+		var request map[string]json.RawMessage
+		_ = json.Unmarshal([]byte(line), &request)
+		if _, hasID := request["id"]; hasID {
+			select {
+			case raw := <-out.frames:
+				var response map[string]json.RawMessage
+				if err := json.Unmarshal(raw, &response); err != nil {
+					t.Fatal(err)
+				}
+				responses = append(responses, response)
+			case err := <-done:
+				t.Fatalf("transport ended before reply: %v", err)
+			case <-ctx.Done():
+				t.Fatal("timed out waiting for reply")
+			}
+		}
 	}
+	// Barrier ensures preceding notifications are processed before closing.
+	if _, err := io.WriteString(writer, discoverFrame(`"test-barrier"`)+"\n"); err != nil {
+		t.Fatal(err)
+	}
+	barrier := nextFrame(t, out)
+	if string(barrier["id"]) != `"test-barrier"` {
+		t.Fatal("unexpected notification response")
+	}
+	writer.Close()
+	finishServe(t, done)
 	return responses
 }
 
@@ -62,32 +94,25 @@ func TestCurrentDiscover(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var out bytes.Buffer
 	in := `{"jsonrpc":"2.0","id":"discover","method":"server/discover","params":{` + currentMeta + `}}` + "\n"
-	if err := server.Serve(context.Background(), strings.NewReader(in), &out); err != nil {
-		t.Fatal(err)
-	}
-	var response map[string]json.RawMessage
-	if err := json.Unmarshal(out.Bytes(), &response); err != nil {
-		t.Fatal(err)
-	}
+	response := serveText(t, server, in)[0]
 	var result map[string]json.RawMessage
 	if err := json.Unmarshal(response["result"], &result); err != nil {
 		t.Fatal(err)
 	}
 	if string(result["resultType"]) != `"complete"` {
-		t.Fatalf("want complete result; got %s", out.String())
+		t.Fatalf("want complete result; got %s", response["result"])
 	}
 	if string(result["supportedVersions"]) != `["2026-07-28","2025-11-25"]` {
-		t.Fatalf("want explicit versions; got %s", out.String())
+		t.Fatalf("want explicit versions; got %s", response["result"])
 	}
 	if string(result["capabilities"]) != `{"tools":{}}` {
-		t.Fatalf("want only tools capability; got %s", out.String())
+		t.Fatalf("want only tools capability; got %s", response["result"])
 	}
 	if _, present := result["serverInfo"]; present {
 		t.Fatal("serverInfo must be in result._meta")
 	}
 	if !bytes.Contains(result["_meta"], []byte(`"synthetic"`)) {
-		t.Fatalf("want server metadata; got %s", out.String())
+		t.Fatalf("want server metadata; got %s", response["result"])
 	}
 }

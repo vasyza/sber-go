@@ -1,5 +1,14 @@
 # Owner handoff — unfinished private WIP
 
+**MCP update, October 7, 2026:** A subsequent owner request migrates the MCP
+transport to the official Go SDK v1.8.0 for protocol 2026-07-28. See
+[MCP-GO-SDK.md](MCP-GO-SDK.md) for the current adapter and verification. The
+pre-SDK wire findings below are historical; other WIP blockers remain open.
+Scoped MCP/catalog/strictjson race checks, whole-project vet/build, and
+independent MCP review passed. The unfiltered whole-project race suite still
+fails on the retained client diagnostic privacy witness below; all other
+packages passed. Verification used synthetic/localhost fixtures.
+
 The owner requested source publication and will finish the project. This request supersedes autonomous continuation and the earlier prohibition on applying an unaccepted candidate **only for this explicit private WIP handoff**. It does not mark the completion contract achieved or authorize bank access. The standing goal is paused; no live child agents remain. Do not resume work without a new request.
 
 ## What was handed over
