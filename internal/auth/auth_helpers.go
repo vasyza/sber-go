@@ -116,11 +116,14 @@ func (f *authFlow) postJSON(ctx context.Context, c sdkSession.FrontendConfig, pa
 	}
 	return p, nil
 }
-func authSeamlessHeaders(target string, redirect, seamless bool) sdkTransport.RequestOptions {
+func authSeamlessHeaders(target string, redirect, seamless bool, processID string) sdkTransport.RequestOptions {
 	h := sdkTransport.HeaderOverrides{"Accept": sdkTransport.PtrString("application/json, text/plain, */*"), "Content-Type": nil, "Origin": sdkTransport.PtrString(sdkSession.AppOrigin), "Referer": sdkTransport.PtrString(sdkSession.AppOrigin + "/"), "Sec-Fetch-Dest": sdkTransport.PtrString("empty"), "Sec-Fetch-Mode": sdkTransport.PtrString("cors"), "Sec-Fetch-Site": sdkTransport.PtrString(authFetchSite(sdkSession.AppOrigin, target)), "X-Seamless-Web": nil, "X-Requested-With": nil}
 	if redirect {
 		h["Accept"] = sdkTransport.PtrString("*/*")
 		h["Content-Type"] = sdkTransport.PtrString("application/json; charset=utf-8")
+		if processID != "" {
+			h["Process-Id"] = sdkTransport.PtrString(processID)
+		}
 		if seamless {
 			h["X-Seamless-Web"] = sdkTransport.PtrString("true")
 		}
@@ -151,7 +154,7 @@ func (f *authFlow) finishRedirect(ctx context.Context, c sdkSession.FrontendConf
 	for i := 0; i < sdkSession.MaxAuthRedirects; i++ {
 		var e error
 		if post {
-			r, e = f.transport.Post(ctx, current, nil, authSeamlessHeaders(current, true, c.SeamlessWeb()))
+			r, e = f.transport.Post(ctx, current, nil, authSeamlessHeaders(current, true, c.SeamlessWeb(), c.ProcessID()))
 		} else {
 			r, e = f.transport.Get(ctx, current, authDocumentHeaders(sdkTransport.PublicBootstrapURL, current))
 		}
@@ -215,7 +218,7 @@ func (f *authFlow) finishRedirect(ctx context.Context, c sdkSession.FrontendConf
 	}
 	if c.SeamlessWeb() {
 		ready := web + "/api/front/ready"
-		r, e := f.transport.Get(ctx, ready, authSeamlessHeaders(ready, false, true))
+		r, e := f.transport.Get(ctx, ready, authSeamlessHeaders(ready, false, true, ""))
 		if err = f.check(ctx); err != nil {
 			return sdkSession.SessionBundle{}, authRequestError(err)
 		}

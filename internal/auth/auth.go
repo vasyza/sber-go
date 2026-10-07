@@ -99,7 +99,7 @@ func newAuthFlow(bundle sdkSession.SessionBundle, o AuthOptions, primary bool) (
 	o.TransportOptions.AllowUnready = true
 	if o.TransportFactory == nil {
 		o.TransportFactory = func(b sdkSession.SessionBundle, o sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
-			return sdkTransport.NewHTTPTransport(b, o)
+			return sdkTransport.NewAuthenticationTransport(b, o)
 		}
 	}
 	tr := o.Transport

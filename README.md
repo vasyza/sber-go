@@ -2,7 +2,7 @@
 
 Native Go SDK for the unofficial Sber online-banking protocol: session persistence, primary/PIN/OTP authentication, typed bank resources, exact decimal amounts, a native CLI, a local MCP server, and an independent rental reconciliation engine.
 
-Go **1.27.1**, Linux and macOS. Hidden terminal login and first-time profile enrollment currently support Linux. The SDK authentication API and existing-profile reads also work on macOS.
+Go **1.27.1**, Linux and macOS, including hidden terminal login and first-time private profile enrollment.
 
 ## Build and check
 
@@ -15,7 +15,7 @@ make check
 
 ## CLI
 
-Create a profile in a local Linux terminal; login, password, OTP and any newly enrolled online-banking PIN are hidden prompts:
+Create a profile in your local Linux or macOS terminal; login, password, OTP and any newly enrolled online-banking PIN are hidden prompts:
 
 ```sh
 ./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"
@@ -27,6 +27,8 @@ Create a profile in a local Linux terminal; login, password, OTP and any newly e
 ```
 
 An existing profile needs a private parent directory (0700) and a regular private file (0600). `login` creates missing private directories and refuses to replace an existing profile. Credentials are never accepted through arguments, environment variables or MCP. See [CLI behavior and exit codes](docs/CLI.md).
+
+Use `--ca-bundle PATH` on login and every online command when the bank CA is absent from the system PEM bundle. Remembered-device login uses a hidden PIN: `login --remembered-profile EXISTING_PATH --profile NEW_PATH`. Optional public browser initialization requires explicit matching Firefox/Playwright paths and a dedicated private browser profile with verified certificate trust; see [authentication setup](docs/AUTH.md).
 
 History retains explicit completeness metadata. A final or empty page still has `WindowCompleteness: "unknown"` without independent coverage evidence. An error or page cap produces a nonzero CLI exit without a successful partial result.
 
@@ -63,6 +65,6 @@ MCP serves six implemented tools against the selected session: setup status, ses
 
 Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [migration notes](MIGRATION.md) and [current verification](docs/STATUS.md).
 
-Local tests, race checks, vet and build cover the implemented contracts. Real bank login, current bank-protocol compatibility and authenticated history require a separate owner-operated smoke check. This is not production acceptance or complete historical parity approval. Earlier WIP/review reports remain historical evidence in `docs/`; their paused/failing status describes the original snapshot.
+Local tests, race checks, vet and build cover the implemented contracts. On 2026-10-07, owner-authorized native PIN login and an authenticated read E2E passed on macOS: session validation, products and one history page for seven days. The successful session used observed browser identity after ordinary public rendering. Cold primary login without browser initialization, full history coverage and independent production review remain outside this evidence. Earlier WIP/review reports remain historical evidence in `docs/`; their paused/failing status describes the original snapshot.
 
 MIT attribution is retained in [LICENSE](LICENSE) and [NOTICE](NOTICE). CPython notices remain in [third_party/cpython/LICENSE](third_party/cpython/LICENSE). There is no Python runtime adapter.

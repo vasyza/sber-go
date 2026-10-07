@@ -81,9 +81,9 @@ type TransportOptions struct {
 	MaxResponseBytes int64
 }
 
-// HTTPTransport uses ordinary verified TLS and HTTP/1.1. Each connection carries
-// one request: this intentionally rules out net/http's reused-connection replay
-// (including empty POSTs with an idempotency header). No fingerprint spoofing.
+// HTTPTransport uses ordinary verified TLS and HTTP/1.1. Business transports
+// use one request per connection. Authentication transports reuse connections,
+// reject replay-enabling POST headers and never provide a rewindable POST body.
 type HTTPTransport struct {
 	mu               sync.Mutex
 	closed           bool
@@ -95,9 +95,21 @@ type HTTPTransport struct {
 	headers          http.Header
 	slots            chan struct{}
 	maxResponseBytes int64
+	authConnections  bool
 }
 
 func NewHTTPTransport(b sdkSession.SessionBundle, o TransportOptions) (*HTTPTransport, error) {
+	return newHTTPTransport(b, o, false)
+}
+
+// NewAuthenticationTransport retains ordinary verified connections throughout
+// the auth handshake. POST bodies cannot rewind and replay-enabling headers are
+// rejected. The business constructor keeps its single-use connection boundary.
+func NewAuthenticationTransport(b sdkSession.SessionBundle, o TransportOptions) (*HTTPTransport, error) {
+	return newHTTPTransport(b, o, true)
+}
+
+func newHTTPTransport(b sdkSession.SessionBundle, o TransportOptions, authConnections bool) (*HTTPTransport, error) {
 	if o.Retry != 0 {
 		return nil, &sdkErrs.TransportError{Code: "retry_forbidden"}
 	}
@@ -129,13 +141,16 @@ func NewHTTPTransport(b sdkSession.SessionBundle, o TransportOptions) (*HTTPTran
 	}
 	protocols := new(http.Protocols)
 	protocols.SetHTTP1(true)
-	wire := &http.Transport{Proxy: nil, DialContext: (&net.Dialer{Timeout: 5 * time.Second}).DialContext,
-		TLSClientConfig: &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}, TLSHandshakeTimeout: 5 * time.Second,
-		DisableCompression: true, DisableKeepAlives: true, MaxConnsPerHost: o.MaxClients, ResponseHeaderTimeout: 25 * time.Second,
+	// The client deadline covers DNS, connection, verified TLS, headers and
+	// body together. Do not shorten configured budgets with hidden phase caps.
+	wire := &http.Transport{Proxy: nil, DialContext: (&net.Dialer{Timeout: o.Timeout}).DialContext,
+		TLSClientConfig: &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}, TLSHandshakeTimeout: o.Timeout,
+		DisableCompression: true, DisableKeepAlives: !authConnections, MaxConnsPerHost: o.MaxClients, ResponseHeaderTimeout: o.Timeout,
+		IdleConnTimeout:        o.Timeout,
 		MaxResponseHeaderBytes: 1 * 1024 * 1024, Protocols: protocols,
 	}
 	root, cancel := context.WithCancel(context.Background())
-	tr := &HTTPTransport{root: root, cancel: cancel, wire: wire, jar: seed.Cookies, headers: browserHeaders(seed.ObservedHeaders), slots: make(chan struct{}, o.MaxClients), maxResponseBytes: o.MaxResponseBytes}
+	tr := &HTTPTransport{root: root, cancel: cancel, wire: wire, jar: seed.Cookies, headers: browserHeaders(seed.ObservedHeaders), slots: make(chan struct{}, o.MaxClients), maxResponseBytes: o.MaxResponseBytes, authConnections: authConnections}
 	tr.client = &http.Client{Transport: wire, Timeout: o.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 	return tr, nil
 }
@@ -215,8 +230,10 @@ func (tr *HTTPTransport) Get(ctx context.Context, target string, o RequestOption
 }
 func PtrString(s string) *string { return &s }
 
-// Transport is the common native context-aware transport contract. No method
-// replays a request. CookieJar snapshots are complete and concurrent-safe.
+// Transport is the common native context-aware transport contract. SDK methods
+// do not retry; pooled authentication may recover an idle connection for a GET
+// but never replay a transmitted POST. CookieJar snapshots are complete and
+// concurrent-safe.
 type Transport interface {
 	Get(context.Context, string, RequestOptions) (*Response, error)
 	Post(context.Context, string, map[string]any, RequestOptions) (*Response, error)
@@ -307,6 +324,15 @@ func (tr *HTTPTransport) request(ctx context.Context, method, target string, bod
 			return nil, &sdkErrs.TransportError{Code: "invalid_headers"}
 		}
 		req.Header.Set(canonical, *v)
+	}
+	if tr.authConnections && method == http.MethodPost {
+		// Presence, including an empty value, enables replay in net/http. Auth
+		// callers must not attach either header to pooled POST requests.
+		for _, name := range []string{"Idempotency-Key", "X-Idempotency-Key"} {
+			if _, present := req.Header[name]; present {
+				return nil, &sdkErrs.TransportError{Code: "replay_forbidden"}
+			}
+		}
 	}
 	if cookie := tr.jar.CookieHeader(req.URL); cookie != "" {
 		req.Header.Set("Cookie", cookie)

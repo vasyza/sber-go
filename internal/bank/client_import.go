@@ -247,7 +247,9 @@ func clientImportStructured(i *clientCookieImport, value any, origin *url.URL, p
 		}
 		r := sdkSession.CookieRecord{Name: clientImportString(m, "name"), Value: clientImportString(m, "value"), Domain: domain, Path: cookiePath, Secure: clientImportBool(m, "secure", true), HTTPOnly: clientImportBool(m, "httpOnly", false), HostOnly: clientImportString(m, "domain") == "" || clientImportBool(m, "hostOnly", false)}
 		if n, ok := clientImportTimestamp(m["expires"]); ok {
-			r.Expires = &n
+			if !clientImportSessionExpiry(m["expires"]) {
+				r.Expires = &n
+			}
 		} else if _, numeric := m["expires"].(json.Number); numeric {
 			return 0, &sdkErrs.MissingSession{Message: "invalid cookie expiry"}
 		}
@@ -271,6 +273,16 @@ func clientImportStructured(i *clientCookieImport, value any, origin *url.URL, p
 			if !ok {
 				return 0, &sdkErrs.MissingSession{Message: "unsupported cookie metadata"}
 			}
+			// HAR producers may use the HTTP attribute's case-insensitive
+			// spelling. Preserve its policy in the canonical session schema.
+			switch strings.ToLower(policy) {
+			case "strict":
+				policy = "Strict"
+			case "lax":
+				policy = "Lax"
+			case "none":
+				policy = "None"
+			}
 			r.SameSite = &policy
 		}
 		if partitioned, exists := m["partitioned"]; exists && partitioned != false && partitioned != nil {
@@ -282,6 +294,18 @@ func clientImportStructured(i *clientCookieImport, value any, origin *url.URL, p
 		accepted++
 	}
 	return accepted, nil
+}
+
+// DevTools' HAR writer exports an unset session expiry as the exact datetime
+// 1969-12-31T23:59:59Z. Numeric HAR expiries retain their ordinary deletion
+// semantics; explicit Max-Age and response Set-Cookie still take priority.
+func clientImportSessionExpiry(value any) bool {
+	v, ok := value.(string)
+	if !ok {
+		return false
+	}
+	t, err := time.Parse(time.RFC3339Nano, v)
+	return err == nil && t.Equal(time.Unix(-1, 0))
 }
 
 var clientImportWebHost = regexp.MustCompile(`^web[0-9]+\.online\.sberbank\.ru$`)
@@ -327,9 +351,9 @@ func clientBundleFromHAR(doc map[string]any) (sdkSession.SessionBundle, error) {
 				}
 			}
 		}
-		if origin.Path == "/main" {
-			if clientImportWebHost.MatchString(origin.Hostname()) {
-				b.WebBase = origin.Scheme + "://" + origin.Host
+		if main := clientImportMainURL(origin, response); main != nil {
+			if clientImportWebHost.MatchString(main.Hostname()) {
+				b.WebBase = main.Scheme + "://" + main.Host
 			}
 			content, _ := response["content"].(map[string]any)
 			if api, ok := sdkSession.APIBaseFromMainHTML(clientImportString(content, "text")); ok {
@@ -384,6 +408,41 @@ func clientBundleFromHAR(doc map[string]any) (sdkSession.SessionBundle, error) {
 	b.CapturedAt = &now
 	return b, nil
 }
+
+// Seamless fetch responses can contain the main document under the login URL.
+// Only a successful response's single, exact, observed main URL can supply the
+// effective web origin; the API origin still comes from validated runtime HTML.
+func clientImportMainURL(request *url.URL, response map[string]any) *url.URL {
+	if request.Path == "/main" {
+		return request
+	}
+	status, ok := clientImportInteger(response["status"])
+	if !ok || status != 200 {
+		return nil
+	}
+	var target string
+	seen := false
+	items, _ := response["headers"].([]any)
+	for _, item := range items {
+		h, _ := item.(map[string]any)
+		if strings.EqualFold(clientImportString(h, "name"), "x-response-url") {
+			if seen {
+				return nil
+			}
+			seen = true
+			target = clientImportString(h, "value")
+		}
+	}
+	if !sdkSession.IsOnlineURL(target) {
+		return nil
+	}
+	main, err := url.Parse(target)
+	if err != nil || main.Path != "/main" || main.RawPath != "" || main.RawQuery != "" || main.ForceQuery || main.Fragment != "" || main.User != nil || !clientImportWebHost.MatchString(main.Hostname()) {
+		return nil
+	}
+	return main
+}
+
 func clientNetscapeCookies(raw []byte) ([]sdkSession.CookieRecord, error) {
 	if !utf8.Valid(raw) {
 		return nil, &sdkErrs.MissingSession{Message: "invalid cookie source text"}

@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package enrollment
 
@@ -47,7 +47,7 @@ func Enroll(ctx context.Context, profile string, prepare Prepare) (err error) {
 	if checkBoundary(profile, parent, lockName, lock) != nil {
 		return ErrUnsafe
 	}
-	temporary, e := newCandidateDirectory(parent, name)
+	temporary, e := newCandidateDirectory(profile, parent, name)
 	if e != nil {
 		return e
 	}
@@ -56,7 +56,10 @@ func Enroll(ctx context.Context, profile string, prepare Prepare) (err error) {
 			err = errors.Join(err, e)
 		}
 	}()
-	if e := writeCandidate(ctx, fdPath(temporary.fd)+"/profile.json", writer); e != nil {
+	if e := writeCandidate(ctx, temporary.path(profile), writer); e != nil {
+		if checkBoundary(profile, parent, lockName, lock) != nil {
+			return ErrUnsafe
+		}
 		return e
 	}
 	candidate, e := temporary.privateFile()
@@ -70,5 +73,5 @@ func Enroll(ctx context.Context, profile string, prepare Prepare) (err error) {
 	if e := ctx.Err(); e != nil {
 		return e
 	}
-	return publishCandidate(parent, name, candidate)
+	return temporary.publish(parent, name, candidate)
 }

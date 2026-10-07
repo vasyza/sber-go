@@ -15,7 +15,7 @@ var (
 	ErrWrite       = errors.New("owner enrollment candidate write failed")
 	ErrPublish     = errors.New("owner enrollment publication failed")
 	ErrCleanup     = errors.New("owner enrollment temporary cleanup failed")
-	ErrUnsupported = errors.New("owner enrollment is supported only on Linux")
+	ErrUnsupported = errors.New("owner enrollment requires Linux or macOS")
 )
 
 // CandidateWriter writes a private 0600 regular file to the supplied candidate

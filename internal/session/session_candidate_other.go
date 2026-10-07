@@ -2,8 +2,8 @@
 
 package session
 
-// Non-Linux enrollment is unavailable. Ordinary private paths remain useful
-// for synthetic application tests and use the existing safe writer.
+// macOS enrollment supplies a fresh private staging directory. The ordinary
+// safe writer fills it; enrollment owns final atomic no-replace publication.
 func WriteEnrollmentCandidate(path string, bundle SessionBundle) error {
 	return bundle.Save(path)
 }

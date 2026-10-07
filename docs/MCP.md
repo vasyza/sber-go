@@ -13,6 +13,8 @@ Build with `make build`, create a profile through owner login or the SDK, then c
 }
 ```
 
+When the bank CA is absent from the system PEM bundle, add `"--ca-bundle", "/absolute/trusted/bank-ca.pem"` to the same process arguments. Native chain and hostname verification remain enabled.
+
 One explicitly selected SDK client belongs to the process. Tool arguments cannot select filesystem paths or provide credentials. Nullable `session_id` defaults to that client; `"current"` is the only explicit selector. Nullable setup `profile` refers to the selected profile; `"default"` is the only named selector.
 
 | Tool | Result |
@@ -30,4 +32,4 @@ The wire supports `2026-07-28` stateless discovery/tool requests and the `2025-1
 
 Frames/IDs are bounded. Strict JSON and schemas precede handlers. Cancellation and terminal stream failure stop active work. Private callback errors become static tool errors. Stdout is reserved for frames.
 
-Embedding: `mcp.New(mcp.Options{Client: client})`, `Serve(ctx, input, output)`, and deferred `Close()`. Serve owns streams for its lifetime; Close releases the session afterward. Current bank authorization and history coverage need owner smoke checks; synthetic checks are in [STATUS.md](STATUS.md).
+Embedding: `mcp.New(mcp.Options{Client: client})`, `Serve(ctx, input, output)`, and deferred `Close()`. Serve owns streams for its lifetime; Close releases the session afterward. A bounded owner-authorized SDK read E2E passed on macOS; real MCP-to-bank calls and complete history coverage were not separately tested. See [STATUS.md](STATUS.md).

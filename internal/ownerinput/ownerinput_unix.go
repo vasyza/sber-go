@@ -1,11 +1,10 @@
-//go:build linux
+//go:build linux || darwin
 
 package ownerinput
 
 import (
 	"context"
 	"os"
-	"strconv"
 	"sync"
 
 	"golang.org/x/sys/unix"
@@ -46,12 +45,7 @@ func readSecret(ctx context.Context, input, output *os.File, prompt Prompt, call
 	}
 	defer promptMutex.Unlock()
 	originalFD := int(input.Fd())
-	// Reopening a PTY master opens a different terminal. An owner's stdin is
-	// a slave/console; reject master endpoints before any echo changes/read.
-	if _, e := unix.IoctlGetInt(originalFD, unix.TIOCGPTN); e == nil {
-		return nil, ErrTerminal
-	}
-	fd, e := unix.Open("/proc/self/fd/"+strconv.Itoa(originalFD), unix.O_RDONLY|unix.O_NONBLOCK|unix.O_NOCTTY|unix.O_CLOEXEC, 0)
+	fd, e := openOwnerTerminal(originalFD)
 	if e != nil {
 		return nil, ErrTerminal
 	}
@@ -67,7 +61,7 @@ func readSecret(ctx context.Context, input, output *os.File, prompt Prompt, call
 	acquired := false
 	defer func() {
 		if acquired && err != nil {
-			unix.IoctlSetInt(fd, unix.TCFLSH, unix.TCIFLUSH)
+			flushOwnerInput(fd)
 		}
 		if acquired && calls.restore(fd, state) != nil {
 			secret.Clear()
@@ -77,14 +71,14 @@ func readSecret(ctx context.Context, input, output *os.File, prompt Prompt, call
 	}()
 	// Only the cancellation wait needs this canonical no-echo guard. The line
 	// reader remains x/term.ReadPassword; there is no fallback or bespoke getpass.
-	settings, e := unix.IoctlGetTermios(fd, unix.TCGETS)
+	settings, e := unix.IoctlGetTermios(fd, readTermiosRequest)
 	if e != nil {
 		return nil, ErrTerminal
 	}
 	settings.Lflag &^= unix.ECHO | unix.ECHONL
 	settings.Lflag |= unix.ICANON | unix.ISIG
 	settings.Iflag |= unix.ICRNL
-	if unix.IoctlSetTermios(fd, unix.TCSETS, settings) != nil {
+	if unix.IoctlSetTermios(fd, writeTermiosRequest, settings) != nil {
 		return nil, ErrTerminal
 	}
 	acquired = true

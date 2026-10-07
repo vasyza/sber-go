@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package enrollment
 
@@ -64,7 +64,7 @@ func TestConcurrentForeignPublicationPreservesExactBytes(t *testing.T) {
 }
 
 func TestLockPathSwapAfterOpenBeforeFlockRejected(t *testing.T) {
-	directory := t.TempDir()
+	directory := testPrivateDir(t)
 	parent, e := unix.Open(directory, unix.O_RDONLY|unix.O_DIRECTORY|unix.O_CLOEXEC, 0)
 	if e != nil {
 		t.Fatal("synthetic parent open failed")
@@ -92,7 +92,7 @@ func TestLockPathSwapAfterOpenBeforeFlockRejected(t *testing.T) {
 }
 
 func TestForeignUIDMetadataRejectedWithoutPrivilege(t *testing.T) {
-	directory := t.TempDir()
+	directory := testPrivateDir(t)
 	if err := os.Chmod(directory, 0700); err != nil {
 		t.Fatal("synthetic private directory unavailable")
 	}

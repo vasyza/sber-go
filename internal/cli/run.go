@@ -14,7 +14,7 @@ import (
 const usage = `Usage: sber COMMAND --profile PATH [options]
 
 Commands:
-  login             Create a private profile using hidden owner input (Linux)
+  login             Create a private profile using hidden owner input (Linux/macOS)
   status            Inspect private profile metadata without reading it
   inspect-session   Read redacted profile metadata offline
   products          Read accounts and cards
@@ -25,8 +25,12 @@ Commands:
   check-session     Check the selected session with one warm-up request
   mcp               Serve read APIs over MCP stdio
 
-Options: --force-update, --resource ID, --from DATE, --to DATE,
+Options: --ca-bundle PATH (explicit trusted PEM bundle),
+         --force-update, --resource ID, --from DATE, --to DATE,
          --limit 30, --max-pages 100, --offset 0
+Login:   --remembered-profile PATH (PIN login into a new profile),
+         --browser-profile PATH --playwright-driver PATH --firefox-executable PATH
+         (explicit public browser initialization; all paths absolute)
 Secret values are never accepted as command arguments or environment variables.
 `
 
@@ -70,6 +74,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 	flags := flag.NewFlagSet("sber", flag.ContinueOnError)
 	flags.SetOutput(io.Discard)
 	profile := flags.String("profile", "", "explicit private session path")
+	caBundle := flags.String("ca-bundle", "", "explicit trusted PEM certificate bundle")
 	force := flags.Bool("force-update", false, "force products refresh")
 	resource := flags.String("resource", "", "history resource")
 	from := flags.String("from", "", "inclusive start")
@@ -85,7 +90,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 	}
 	if o.OpenClient == nil {
 		o.OpenClient = func(path string) (mcp.Client, error) {
-			return sber.NewSberClientFromSessionFile(path, sber.ClientOptions{})
+			return sber.NewSberClientFromSessionFile(path, sber.ClientOptions{TransportOptions: sber.TransportOptions{CABundle: *caBundle}})
 		}
 	}
 	client, err := o.OpenClient(*profile)
@@ -141,6 +146,9 @@ func execute(ctx context.Context, command string, client mcp.Client, output, dia
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			return 130
+		}
+		if message := transportFailureMessage(err, "bank"); message != "" {
+			return fail(diagnostics, 3, message+"; no complete result")
 		}
 		return fail(diagnostics, 3, "bank request failed; no complete result")
 	}

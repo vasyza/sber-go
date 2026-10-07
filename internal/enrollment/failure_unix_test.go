@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package enrollment
 
@@ -21,7 +21,7 @@ func TestFailuresReleaseStableLockCleanAndRedact(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			canary := "synthetic-error-panic-never-report-canary"
-			target := filepath.Join(t.TempDir(), "foreign")
+			target := filepath.Join(testPrivateDir(t), "foreign")
 			os.WriteFile(target, []byte("synthetic-foreign-cleanup-preserve"), 0600)
 			var first unix.Stat_t
 			var escaped bool

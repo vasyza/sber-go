@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package ownerinput
 
@@ -80,8 +80,11 @@ func TestRealPTYPostReadFailureClearsAndRestores(t *testing.T) {
 				t.Fatal("post-read failure did not restore termios")
 			}
 			after, e := unix.FcntlInt(slave.Fd(), unix.F_GETFL, 0)
-			if e != nil || after != flags {
-				t.Fatal("hidden input changed original stdin descriptor flags")
+			// Darwin also reports FWASWRITTEN after the prompt is printed on
+			// this terminal. Compare operating flags, not kernel write history.
+			const operatingFlags = unix.O_ACCMODE | unix.O_NONBLOCK | unix.O_APPEND | unix.O_ASYNC | unix.O_SYNC | unix.O_DSYNC
+			if e != nil || (after^flags)&operatingFlags != 0 {
+				t.Fatalf("hidden input changed original stdin descriptor flags: before=%#x after=%#x", flags, after)
 			}
 			if bytes.Contains(transcript(t, master), []byte("synthetic-post-read-canary")) {
 				t.Fatal("post-read failure echoed input")

@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package enrollment
 
@@ -79,7 +79,7 @@ func TestUnsafeStateRejectedBeforeCallback(t *testing.T) {
 	kinds := []string{"lock-mode", "lock-hardlink", "lock-symlink", "lock-dangling", "lock-fifo", "lock-directory", "parent-mode", "parent-symlink", "ancestor-symlink", "parent-owner", "lock-owner"}
 	for _, kind := range kinds {
 		t.Run(kind, func(t *testing.T) {
-			base := t.TempDir()
+			base := testPrivateDir(t)
 			state := filepath.Join(base, "private")
 			os.Mkdir(state, 0700)
 			profile := filepath.Join(state, "profile.json")

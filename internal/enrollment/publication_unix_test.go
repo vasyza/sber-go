@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package enrollment
 
@@ -18,7 +18,7 @@ func TestForeignProfileCreatedLatePreserved(t *testing.T) {
 		for _, kind := range []string{"file", "symlink", "dangling-symlink"} {
 			t.Run(window+"-"+kind, func(t *testing.T) {
 				profile := syntheticProfile(t)
-				target := filepath.Join(t.TempDir(), "foreign")
+				target := filepath.Join(testPrivateDir(t), "foreign")
 				canary := []byte("synthetic-established-final-bytes")
 				if kind != "dangling-symlink" {
 					os.WriteFile(target, canary, 0600)
@@ -144,7 +144,7 @@ func TestUnsafeCandidateCannotPublish(t *testing.T) {
 	for _, kind := range []string{"mode", "hardlink", "symlink", "dangling-symlink", "fifo", "directory", "missing", "temporary-mode"} {
 		t.Run(kind, func(t *testing.T) {
 			profile := syntheticProfile(t)
-			target := filepath.Join(t.TempDir(), "foreign")
+			target := filepath.Join(testPrivateDir(t), "foreign")
 			canary := []byte("synthetic-candidate-foreign-preserve")
 			os.WriteFile(target, canary, 0600)
 			err := Enroll(context.Background(), profile, func(context.Context) (CandidateWriter, error) {

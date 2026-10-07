@@ -16,7 +16,7 @@ var (
 	ErrRestore     = errors.New("owner terminal state could not be restored")
 	ErrBusy        = errors.New("another owner terminal prompt is active")
 	ErrPrompt      = errors.New("invalid owner terminal prompt")
-	ErrUnsupported = errors.New("owner terminal input is supported only on Linux")
+	ErrUnsupported = errors.New("owner terminal input requires Linux or macOS")
 )
 
 type Prompt uint8
@@ -27,6 +27,7 @@ const (
 	OTP
 	NewPIN
 	ConfirmPIN
+	PIN
 )
 
 func promptLabel(prompt Prompt) (string, bool) {
@@ -41,6 +42,8 @@ func promptLabel(prompt Prompt) (string, bool) {
 		return "New online-banking PIN (not card PIN, hidden): ", true
 	case ConfirmPIN:
 		return "Confirm new PIN (hidden): ", true
+	case PIN:
+		return "Online-banking PIN (not card PIN, hidden): ", true
 	}
 	return "", false
 }

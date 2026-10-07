@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package enrollment
 
@@ -13,7 +13,19 @@ import (
 
 func syntheticProfile(t *testing.T) string {
 	t.Helper()
-	return filepath.Join(t.TempDir(), "private", "profile.json")
+	return filepath.Join(testPrivateDir(t), "private", "profile.json")
+}
+
+func testPrivateDir(t *testing.T) string {
+	t.Helper()
+	dir, err := filepath.EvalSymlinks(t.TempDir())
+	if err != nil {
+		t.Fatal("cannot canonicalize synthetic directory")
+	}
+	if os.Chmod(dir, 0700) != nil {
+		t.Fatal("cannot make synthetic directory private")
+	}
+	return dir
 }
 func syntheticWriter(ctx context.Context, path string) error {
 	return os.WriteFile(path, []byte("synthetic-enrollment-opaque-profile-only"), 0600)
@@ -65,7 +77,7 @@ func TestExistingProfileRefusedBeforeCallback(t *testing.T) {
 		t.Run(kind, func(t *testing.T) {
 			profile := syntheticProfile(t)
 			os.MkdirAll(filepath.Dir(profile), 0700)
-			target := filepath.Join(t.TempDir(), "foreign")
+			target := filepath.Join(testPrivateDir(t), "foreign")
 			if kind != "dangling-symlink" {
 				os.WriteFile(target, []byte("synthetic-established-profile-preserve"), 0600)
 			}

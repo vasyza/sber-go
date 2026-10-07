@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux || darwin
 
 package ownerinput
 
@@ -27,7 +27,7 @@ func syntheticPTY(t *testing.T) (*os.File, *os.File) {
 
 func ttyState(t *testing.T, f *os.File) unix.Termios {
 	t.Helper()
-	state, err := unix.IoctlGetTermios(int(f.Fd()), unix.TCGETS)
+	state, err := unix.IoctlGetTermios(int(f.Fd()), readTermiosRequest)
 	if err != nil {
 		t.Fatal("cannot inspect synthetic terminal metadata")
 	}
@@ -74,7 +74,7 @@ func TestRequiresBothTerminalDescriptorsBeforeConsuming(t *testing.T) {
 			master, slave := syntheticPTY(t)
 			state := ttyState(t, slave)
 			state.Lflag &^= unix.ECHO | unix.ECHONL
-			if err := unix.IoctlSetTermios(int(slave.Fd()), unix.TCSETS, &state); err != nil {
+			if err := unix.IoctlSetTermios(int(slave.Fd()), writeTermiosRequest, &state); err != nil {
 				t.Fatal("synthetic setup failed")
 			}
 			read, write, e := os.Pipe()
@@ -139,7 +139,7 @@ func TestCancelledReadRestoresTermiosAndDiscardsPartialInput(t *testing.T) {
 	master, slave := syntheticPTY(t)
 	original := ttyState(t, slave)
 	original.Lflag |= unix.ECHONL
-	if err := unix.IoctlSetTermios(int(slave.Fd()), unix.TCSETS, &original); err != nil {
+	if err := unix.IoctlSetTermios(int(slave.Fd()), writeTermiosRequest, &original); err != nil {
 		t.Fatal("synthetic setup failed")
 	}
 	ctx, cancel := context.WithCancel(context.Background())

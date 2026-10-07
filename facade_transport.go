@@ -15,6 +15,10 @@ func NewHTTPTransport(b SessionBundle, o TransportOptions) (*HTTPTransport, erro
 	return sdkTransport.NewHTTPTransport(b, o)
 }
 
+func NewAuthenticationTransport(b SessionBundle, o TransportOptions) (*HTTPTransport, error) {
+	return sdkTransport.NewAuthenticationTransport(b, o)
+}
+
 type Transport = sdkTransport.Transport
 
 const PublicBootstrapURL = sdkTransport.PublicBootstrapURL
