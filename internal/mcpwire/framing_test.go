@@ -26,13 +26,22 @@ func TestFramingAcceptsOneMiBAndFragmentedReads(t *testing.T) {
 	}
 	frame := discoverFrame(`"boundary"`)
 	frame += strings.Repeat(" ", frameLimitTest-len(frame))
-	var out bytes.Buffer
-	if err := server.Serve(context.Background(), fragmentReader{strings.NewReader(frame + "\n" + discoverFrame(`"after"`) + "\n")}, &out); err != nil {
-		t.Fatalf("want 1MiB boundary accepted; got %v", err)
+	input, writer := io.Pipe()
+	defer input.Close()
+	defer writer.Close()
+	out := &frameWriter{frames: make(chan []byte, 8)}
+	done := make(chan error, 1)
+	go func() { done <- server.Serve(context.Background(), fragmentReader{input}, out) }()
+	if _, err := io.WriteString(writer, frame+"\n"); err != nil {
+		t.Fatal(err)
 	}
-	if bytes.Count(out.Bytes(), []byte{'\n'}) != 2 {
-		t.Fatalf("want two replies; got %d", bytes.Count(out.Bytes(), []byte{'\n'}))
+	resultFields(t, nextFrame(t, out))
+	if _, err := io.WriteString(writer, discoverFrame(`"after"`)+"\n"); err != nil {
+		t.Fatal(err)
 	}
+	resultFields(t, nextFrame(t, out))
+	writer.Close()
+	finishServe(t, done)
 }
 
 func TestFramingRejectsUnterminatedAndOversizeInput(t *testing.T) {
@@ -60,7 +69,7 @@ func TestWriterShortWriteIsTerminal(t *testing.T) {
 		t.Fatal(err)
 	}
 	w := &partialWriter{}
-	if err := server.Serve(context.Background(), strings.NewReader(discoverFrame(`1`)+"\n"+discoverFrame(`2`)+"\n"), w); err == nil {
+	if err := serveUntilWriteFailure(t, server, discoverFrame(`1`)+"\n", w); err == nil {
 		t.Fatal("want short write error, not false success")
 	}
 	if w.calls != 1 {

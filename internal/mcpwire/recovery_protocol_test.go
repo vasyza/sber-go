@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
 // All protocol fixtures and handlers in this package are synthetic, not live.
-func TestPerRequestMetadataNeverFallsBackOrReflectsPrivateVersion(t *testing.T) {
+func TestPerRequestMetadataNeverFallsBackToLegacyState(t *testing.T) {
 	var calls int
 	tool := syntheticTool("local")
 	tool.Handle = func(context.Context, json.RawMessage) (ToolResult, error) { calls++; return ToolResult{}, nil }
@@ -21,7 +22,7 @@ func TestPerRequestMetadataNeverFallsBackOrReflectsPrivateVersion(t *testing.T) 
 		code       int
 	}{
 		{"unsupported-date", `"_meta":{"io.modelcontextprotocol/protocolVersion":"1900-01-01","io.modelcontextprotocol/clientCapabilities":{}}`, -32022},
-		{"private-version", `"_meta":{"io.modelcontextprotocol/protocolVersion":"SYNTHETIC-PRIVATE-MARKER","io.modelcontextprotocol/clientCapabilities":{}}`, -32602},
+		{"private-version", `"_meta":{"io.modelcontextprotocol/protocolVersion":"SYNTHETIC-PRIVATE-MARKER","io.modelcontextprotocol/clientCapabilities":{}}`, -32022},
 		{"missing-version", `"_meta":{"io.modelcontextprotocol/clientCapabilities":{}}`, -32602},
 		{"missing-capabilities", `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}`, -32602},
 		{"null-capabilities", `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":null}`, -32602},
@@ -35,9 +36,12 @@ func TestPerRequestMetadataNeverFallsBackOrReflectsPrivateVersion(t *testing.T) 
 				t.Fatalf("want initialize and rejection; got %d", len(responses))
 			}
 			requireCode(t, responses[1], tc.code)
-			if bytes.Contains(responses[1]["error"], []byte("SYNTHETIC-PRIVATE-MARKER")) {
-				t.Fatal("private version reflected")
+			var failure struct{ Message string }
+			if json.Unmarshal(responses[1]["error"], &failure) != nil || bytes.Contains([]byte(failure.Message), []byte("SYNTHETIC-PRIVATE-MARKER")) {
+				t.Fatal("version leaked into diagnostic message")
 			}
+			// MCP 2026-07-28 requires error.data.requested to echo the protocol
+			// version. It is protocol negotiation data, never a credential field.
 		})
 	}
 	if calls != 0 {
@@ -68,9 +72,10 @@ func TestInvalidNotificationsNeverReplyOrInvokeHandlers(t *testing.T) {
 		`{"jsonrpc":"2.0","method":"notifications/cancelled","params":{"requestId":null}}`,
 	}
 	for _, frame := range notifications {
-		replies := serveText(t, server, frame+"\n")
-		if len(replies) != 0 {
-			t.Fatalf("want silent invalid notification; got %d", len(replies))
+		var output bytes.Buffer
+		_ = server.Serve(context.Background(), strings.NewReader(frame+"\n"), &output)
+		if output.Len() != 0 {
+			t.Fatal("invalid notification emitted output")
 		}
 	}
 	if calls != 0 {
@@ -110,7 +115,11 @@ func TestLegacyPingAndUnknownMethodsHaveExplicitRoutes(t *testing.T) {
 	}
 	for _, prefix := range []string{"", legacyInitialize + legacyInitialized} {
 		replies := serveText(t, server, prefix+`{"jsonrpc":"2.0","id":"unknown","method":"arbitrary"}`+"\n")
-		requireCode(t, replies[len(replies)-1], -32601)
+		code := -32601
+		if prefix == "" {
+			code = -32603
+		} // SDK rejects calls before initialization.
+		requireCode(t, replies[len(replies)-1], code)
 	}
 	replies := serveText(t, server, `{"jsonrpc":"2.0","id":"ping","method":"ping"}`+"\n")
 	if string(replies[0]["result"]) != "{}" {

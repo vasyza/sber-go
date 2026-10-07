@@ -2,6 +2,12 @@
 
 > Historical report for snapshot `104c8d86ca63f9b5d0c6e6b8dafd3d53d635eb28`. The owner's 2026-10-07 request resumed development. Current architecture, repairs and checks are in [../README.md](../README.md), [../MIGRATION.md](../MIGRATION.md) and [STATUS.md](STATUS.md). Original verdicts below are historical evidence, not current test results.
 
+**MCP update, October 8, 2026:** The transport now uses the official Go SDK
+v1.8.0 for MCP 2026-07-28, preserving the application's six implemented
+handlers and local session-close control. See [MCP-GO-SDK.md](MCP-GO-SDK.md)
+for the adapter and current verification. The pre-SDK wire findings below
+remain historical evidence.
+
 The owner requested source publication and will finish the project. This request supersedes autonomous continuation and the earlier prohibition on applying an unaccepted candidate **only for this explicit private WIP handoff**. It does not mark the completion contract achieved or authorize bank access. The standing goal is paused; no live child agents remain. Do not resume work without a new request.
 
 ## What was handed over

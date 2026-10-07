@@ -56,3 +56,20 @@ The owner-operated primary login succeeded through native password proof, SMS co
 Intermittent checks stopped during TLS establishment before HTTP transmission; a public TLS-only probe reproduced peer connection resets. The transport now advertises HTTP/1.1 through ALPN and allows at most three connection attempts after a transient peer closure before sending HTTP. All attempts share the request deadline and cancellation; certificate/protocol errors stop immediately. Synthetic TLS tests verify exact POST counts, bounded failures, trust rejection, request cancellation and close. Transmitted HTTP requests are not automatically replayed. The final CLI and SDK live suites passed after this change.
 
 The final local macOS and Linux checks include the new CLI/authentication/transport changes. Real card renaming and transfers remain untested; default CLI plans do no bank I/O and execution requires explicit local confirmation. Complete history coverage remains UNKNOWN. No remote CI, new independent production review, live Linux bank account access, or real MCP client is claimed. The earlier verification and historical review records above retain their original scope.
+
+## MCP Go SDK migration follow-up — 2026-10-08
+
+The transport now uses the official MCP Go SDK v1.8.0 for protocol 2026-07-28
+and legacy 2025-11-25. Integration preserves all six application handlers,
+including local session close with `readOnlyHint: false`; financial handlers
+remain excluded. The official SDK client and wire regressions use synthetic
+handlers, in-memory pipes, and an injected synthetic bank client. See
+[the adapter profile](MCP-GO-SDK.md) for protocol and application limits.
+
+Linux `make check` passed after merge integration: formatting, full vet/race
+suite, all packages, both command binaries, and module verification. The
+first full race run encountered a terminal-input test's transcript poll
+error; ten focused repetitions and the subsequent full check passed.
+Independent MCP review covers the adapter and application integration only.
+No bank calls, owner authentication, live MCP verification, or whole-SDK
+production acceptance were performed in this follow-up.

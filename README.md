@@ -71,6 +71,8 @@ Import `github.com/vasyza/sber-go` as `sber`. Root aliases and forwards preserve
 
 MCP serves six implemented tools against the selected session: setup status, session info/close, products, operations and one operations page. Authentication remains owner-operated. See [MCP setup](docs/MCP.md). Rental reconciliation consumes an explicit ledger and keeps reminders disabled; see [rental input and output](docs/RENTAL-CLI.md).
 
+The MCP transport uses the official Go SDK v1.8.0 for MCP 2026-07-28 and legacy 2025-11-25 clients. See [MCP adapter and verification](docs/MCP-GO-SDK.md).
+
 ## Architecture and verification boundary
 
 Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [migration notes](MIGRATION.md) and [current verification](docs/STATUS.md).

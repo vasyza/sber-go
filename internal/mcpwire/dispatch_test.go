@@ -41,7 +41,8 @@ func TestDispatchExactArgumentsOnce(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	responses := serveText(t, server, toolCall(`"current"`, "local", arguments, true)+legacyInitialize+legacyInitialized+toolCall(`"legacy"`, "local", arguments, false))
+	responses := serveText(t, server, toolCall(`"current"`, "local", arguments, true))
+	responses = append(responses, serveText(t, server, legacyInitialize+legacyInitialized+toolCall(`"legacy"`, "local", arguments, false))...)
 	if len(responses) != 3 {
 		t.Fatalf("want three responses; got %d", len(responses))
 	}

@@ -5,66 +5,81 @@ import (
 	"encoding/json"
 	"unicode/utf8"
 
+	"github.com/modelcontextprotocol/go-sdk/jsonrpc"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/vasyza/sber-go/internal/strictjson"
 )
 
-func (server *Server) call(ctx context.Context, params map[string]json.RawMessage) (fields map[string]any, code int) {
+func protocolError(code int64) error {
+	return &jsonrpc.Error{Code: code, Message: staticMessage(code)}
+}
+
+func failedTool() *mcp.CallToolResult {
+	return &mcp.CallToolResult{Content: []mcp.Content{&mcp.TextContent{Text: "Tool execution failed"}}, IsError: true}
+}
+
+func callTool(ctx context.Context, tool Tool, arguments json.RawMessage) (result *mcp.CallToolResult, err error) {
 	defer func() {
 		if recover() != nil {
-			fields, code = nil, -32603
+			result, err = nil, protocolError(-32603)
 		}
 	}()
-	if !allowedFields(params, "_meta", "name", "arguments") {
-		return nil, -32602
-	}
-	var name string
-	if json.Unmarshal(params["name"], &name) != nil {
-		return nil, -32602
-	}
-	arguments := params["arguments"]
 	if arguments == nil {
 		arguments = json.RawMessage(`{}`)
 	}
-	if !object(arguments) {
-		return nil, -32602
+	if len(arguments) > MaxFrameBytes || strictjson.Validate(arguments) != nil || !object(arguments) {
+		return nil, protocolError(-32602)
 	}
-	for _, tool := range server.tools {
-		if tool.Name != name {
-			continue
-		}
-		if tool.Validate(ctx, append(json.RawMessage(nil), arguments...)) != nil {
-			return nil, -32602
-		}
-		if tool.RawHandle != nil {
-			raw, err := tool.RawHandle(ctx, append(json.RawMessage(nil), arguments...))
-			if err != nil {
-				return map[string]any{"content": []any{map[string]any{"type": "text", "text": "Tool execution failed"}}, "isError": true}, 0
-			}
-			fields, ok := toolResultFields(raw)
-			if !ok {
-				return nil, -32603
-			}
-			return fields, 0
-		}
-		result, err := tool.Handle(ctx, append(json.RawMessage(nil), arguments...))
+	if tool.Validate(ctx, append(json.RawMessage(nil), arguments...)) != nil {
+		return nil, protocolError(-32602)
+	}
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	if tool.RawHandle != nil {
+		raw, err := tool.RawHandle(ctx, append(json.RawMessage(nil), arguments...))
 		if err != nil {
-			result = ToolResult{Content: []TextContent{{Text: "Tool execution failed"}}, IsError: true}
+			return failedTool(), nil
 		}
-		content := make([]any, 0, len(result.Content))
-		for _, item := range result.Content {
-			if !utf8.ValidString(item.Text) {
-				return nil, -32603
-			}
-			content = append(content, map[string]any{"type": "text", "text": item.Text})
+		if len(raw) > MaxFrameBytes {
+			return nil, protocolError(-32603)
 		}
-		fields := map[string]any{"content": content, "isError": result.IsError}
-		if len(result.StructuredContent) != 0 {
-			if strictjson.Validate(result.StructuredContent) != nil || !object(result.StructuredContent) {
-				return nil, -32603
-			}
-			fields["structuredContent"] = result.StructuredContent
+		if _, ok := toolResultFields(raw); !ok {
+			return nil, protocolError(-32603)
 		}
-		return fields, 0
+		var decoded struct {
+			Content           []*mcp.TextContent `json:"content"`
+			StructuredContent json.RawMessage    `json:"structuredContent"`
+			IsError           bool               `json:"isError"`
+		}
+		if json.Unmarshal(raw, &decoded) != nil {
+			return nil, protocolError(-32603)
+		}
+		result = &mcp.CallToolResult{Content: make([]mcp.Content, 0, len(decoded.Content)), IsError: decoded.IsError}
+		for _, text := range decoded.Content {
+			result.Content = append(result.Content, text)
+		}
+		if len(decoded.StructuredContent) != 0 {
+			result.StructuredContent = append(json.RawMessage(nil), decoded.StructuredContent...)
+		}
+		return result, nil
 	}
-	return nil, -32602
+	typed, err := tool.Handle(ctx, append(json.RawMessage(nil), arguments...))
+	if err != nil {
+		return failedTool(), nil
+	}
+	result = &mcp.CallToolResult{Content: make([]mcp.Content, 0, len(typed.Content)), IsError: typed.IsError}
+	for _, text := range typed.Content {
+		if !utf8.ValidString(text.Text) {
+			return nil, protocolError(-32603)
+		}
+		result.Content = append(result.Content, &mcp.TextContent{Text: text.Text})
+	}
+	if len(typed.StructuredContent) != 0 {
+		if len(typed.StructuredContent) > MaxFrameBytes || strictjson.Validate(typed.StructuredContent) != nil || !object(typed.StructuredContent) {
+			return nil, protocolError(-32603)
+		}
+		result.StructuredContent = append(json.RawMessage(nil), typed.StructuredContent...)
+	}
+	return result, nil
 }
