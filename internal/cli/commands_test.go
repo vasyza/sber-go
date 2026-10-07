@@ -69,8 +69,8 @@ func TestCLIFlagValuesDoNotPersistAcrossRuns(t *testing.T) {
 	for range 4 {
 		t.Run("run", func(t *testing.T) {
 			t.Parallel()
-			profile := filepath.Join(t.TempDir(), "absent", "profile.json")
-			defaultProfile := filepath.Join(t.TempDir(), "default", "profile.json")
+			profile := filepath.Join(testPrivateDir(t), "absent", "profile.json")
+			defaultProfile := filepath.Join(testPrivateDir(t), "default", "profile.json")
 			lookups := 0
 			options := Options{DefaultProfilePath: func() (string, error) {
 				lookups++
