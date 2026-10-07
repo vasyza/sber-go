@@ -52,7 +52,7 @@ func TestLiveCLIReadOnly(t *testing.T) {
 			if errors.As(err, &exit) {
 				// Only fixed public CLI diagnostics can enter test output.
 				message := strings.TrimSpace(string(exit.Stderr))
-				for _, prefix := range []string{"session expired;", "bank rejected the request;", "bank returned HTTP ", "bank request timed out;", "cannot open private session", "session cleanup failed", "bank response format is not supported;", "bank request failed;", "destination already exists;", "cannot serialize result", "output failed"} {
+				for _, prefix := range []string{"The session has expired.", "The bank rejected the request.", "The bank returned HTTP ", "The bank request timed out.", "The command cannot open the private session.", "The command cannot close the session.", "The bank response format is not supported.", "The bank request failed.", "The destination file already exists.", "The command cannot prepare the JSON result.", "The command cannot write the output.", "The TLS certificate is not trusted.", "The bank TLS certificate", "The bank cookie attributes are not supported.", "The bank response encoding is not supported."} {
 					if strings.HasPrefix(message, prefix) {
 						t.Fatalf("native %s failed: exit=%d classification=%s", name, exit.ExitCode(), strings.TrimSuffix(prefix, ";"))
 					}

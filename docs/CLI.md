@@ -488,8 +488,9 @@ The CLI shows known error classifications only.
 It does not show remote error text, support IDs, cookies, or secret input.
 It does not read bank secrets from `.env`, environment variables, command options, or MCP arguments.
 Proxy login values use the explicit proxy address syntax.
-Primary login errors include the local authentication stage.
-The stage identifies public configuration, owner input, credentials, SMS confirmation, PIN enrollment, session validation, or cleanup.
+
+Authentication errors include the local stage.
+The stage identifies public configuration, owner input, credentials, PIN login, SMS confirmation, PIN enrollment, session validation, or cleanup.
 
 ## Select TLS trust
 
@@ -499,7 +500,7 @@ For an invalid explicit bundle, the CLI stops without fallback to default trust.
 The application does not modify the system certificate store.
 
 Native connections use verified TLS and HTTP/1.1.
-TLS setup can make up to three connection attempts after a network closure.
+Direct TLS setup can make up to three connection attempts after a network closure.
 All attempts use the same request timeout.
 The client sends application data only after successful TLS validation.
 A certificate error stops connection setup.

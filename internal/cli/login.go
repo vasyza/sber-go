@@ -135,7 +135,7 @@ func loginFailureMessage(err error) (message string) {
 		var phase *loginPhaseError
 		if errors.As(err, &phase) {
 			switch phase.phase {
-			case "public-configuration", "owner-input", "login-password", "sms-confirmation", "pin-enrollment", "session-validation", "cleanup":
+			case "public-configuration", "owner-input", "login-password", "pin-login", "sms-confirmation", "pin-enrollment", "session-validation", "cleanup":
 				message = "Authentication stage=" + phase.phase + ".\n" + message
 			}
 		}
@@ -147,9 +147,15 @@ func loginFailureMessage(err error) (message string) {
 	if message := transportFailureMessage(err, "bank login"); message != "" {
 		return message + "\nThe command did not publish the profile."
 	}
+	var parse *sber.ParseError
+	if errors.As(err, &parse) {
+		return "The authentication session format is not supported.\nThe command did not publish the profile."
+	}
 	var auth *sber.PinAuthError
 	if errors.As(err, &auth) {
 		switch auth.Code {
+		case "invalid_srp_challenge":
+			return "The bank authentication challenge is not supported.\nThe command did not publish the profile."
 		case "bootstrap_failed":
 			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
 				return fmt.Sprintf("The bank login page returned HTTP %d.\nThe command did not publish the profile.", auth.StatusCode)
@@ -182,7 +188,7 @@ func loginFailureMessage(err error) (message string) {
 			}
 		case "missing_ufs_session":
 			return "The authenticated session cookies are missing.\nThe command did not publish the profile."
-		case "invalid_json", "invalid_csrf", "missing_redirect", "missing_ufs_host", "missing_ufs_api_host", "invalid_primary_auth_state":
+		case "invalid_json", "invalid_csrf", "missing_redirect", "missing_ufs_host", "missing_ufs_api_host", "invalid_primary_auth_state", "invalid_auth_token", "missing_auth_token", "invalid_otp_challenge", "pin_create_not_ready", "redirect_loop":
 			return "The bank authentication response format is not supported.\nThe command did not publish the profile."
 		case "ufs_ready_failed", "ufs_bootstrap_failed":
 			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
@@ -222,6 +228,14 @@ func transportFailureMessage(err error, request string) string {
 		return "The TLS certificate validation failed."
 	case "timeout":
 		return "The " + request + " request timed out."
+	case "request_failed":
+		return "The " + request + " request failed.\nNo complete result is available."
+	case "close_failed":
+		return "The command cannot close the authentication session."
+	case "unsupported_cookie_metadata":
+		return "The bank cookie attributes are not supported."
+	case "invalid_encoding", "unsupported_encoding":
+		return "The bank response encoding is not supported."
 	}
 	return ""
 }
