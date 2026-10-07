@@ -16,11 +16,6 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
-    env:
-      PLAYWRIGHT_DRIVER_PATH: ${{ runner.temp }}/sber-firefox/driver
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/sber-firefox/browsers
-      SBER_GO_FIREFOX_DRIVER: ${{ runner.temp }}/sber-firefox/driver
-      SBER_GO_BROWSER_PROBE_ROOT: ${{ runner.temp }}/sber-firefox/profiles
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -41,6 +36,14 @@ jobs:
         run: make build
       - name: CLI smoke
         run: ./bin/sber --help
+      - name: Set Firefox test paths
+        shell: bash
+        run: |
+          sber_firefox_root="$RUNNER_TEMP/sber-firefox"
+          printf 'PLAYWRIGHT_DRIVER_PATH=%s/driver\n' "$sber_firefox_root" >> "$GITHUB_ENV"
+          printf 'PLAYWRIGHT_BROWSERS_PATH=%s/browsers\n' "$sber_firefox_root" >> "$GITHUB_ENV"
+          printf 'SBER_GO_FIREFOX_DRIVER=%s/driver\n' "$sber_firefox_root" >> "$GITHUB_ENV"
+          printf 'SBER_GO_BROWSER_PROBE_ROOT=%s/profiles\n' "$sber_firefox_root" >> "$GITHUB_ENV"
       - name: Install Firefox test runtime on Linux
         if: runner.os == 'Linux'
         run: |
