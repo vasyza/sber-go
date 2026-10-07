@@ -13,7 +13,7 @@ Build with `make build`, create a profile through owner login or the SDK, then c
 }
 ```
 
-When the bank CA is absent from the system PEM bundle, add `"--ca-bundle", "/absolute/trusted/bank-ca.pem"` to the same process arguments. Native chain and hostname verification remain enabled.
+The verified bank root CA is embedded in the build; no external certificate file or additional arguments are required. An optional `"--ca-bundle", "/absolute/trusted/bank-ca.pem"` replaces default trust for this client. Native chain and hostname verification remain enabled. See [certificate provenance and rotation](../internal/transport/certificates/README.md).
 
 One explicitly selected SDK client belongs to the process. Tool arguments cannot select filesystem paths or provide credentials. Nullable `session_id` defaults to that client; `"current"` is the only explicit selector. Nullable setup `profile` refers to the selected profile; `"default"` is the only named selector.
 

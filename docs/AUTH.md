@@ -4,7 +4,9 @@ On Linux and macOS the native owner path is `./bin/sber login --profile "$HOME/.
 
 macOS uses the terminal device path returned by the kernel, verified against the original input descriptor, and native exclusive rename for first publication. Linux uses its pinned procfs descriptor capabilities. Both restore terminal settings after success, failure or cancellation and preserve an existing profile. Profile paths must have literal, symlink-free components; use your home directory rather than macOS `/tmp` or `/var` aliases.
 
-When the bank's certificate authority is absent from the SDK's default system PEM bundle, pass an explicit trusted PEM file with `--ca-bundle PATH` to login and every subsequent online CLI/MCP command. Embedded callers use `AuthOptions.TransportOptions.CABundle` and `ClientOptions.TransportOptions.CABundle`. This selects application-scoped certificate trust and keeps chain and hostname verification enabled; it neither installs a system CA nor disables TLS checks. The CLI reports safe failure classifications without emitting raw bank messages, credentials or response bodies. An invalid CA file fails before credential input.
+Native SDK, CLI and MCP requests use a verified Russian Trusted Root CA embedded in the build. Bank certificate trust needs no external file or runtime download, including when a system PEM bundle is unavailable. Default trust also retains a canonical system PEM bundle when present; `SSL_CERT_FILE` and `SSL_CERT_DIR` do not select alternative trust. TLS chain, validity and hostname verification remain enabled, and system trust stores are not changed. See [certificate provenance and rotation](../internal/transport/certificates/README.md).
+
+An optional `--ca-bundle PATH` replaces default trust for that client. Embedded callers use `AuthOptions.TransportOptions.CABundle` or `ClientOptions.TransportOptions.CABundle`. An invalid explicit CA file fails before credential input and does not fall back to the embedded root. The CLI reports safe failure classifications without emitting raw bank messages, credentials or response bodies.
 
 PIN enrollment announces the length from the validated live configuration. Invalid local digit input or a confirmation mismatch can be corrected within the same authentication process, without repeating login/OTP or submitting another PIN creation request. The final seamless navigation retains the originating `Process-Id`, matching the bank's public `r-97.0.0` login client contract.
 
@@ -28,8 +30,7 @@ The CLI also supports remembered-device login without changing the existing PIN:
 
 ```sh
 ./bin/sber login --remembered-profile "$HOME/.config/sber-sdk/profile.json" \
-  --profile "$HOME/.config/sber-sdk/profile-next.json" \
-  --ca-bundle "$HOME/Downloads/Russian_Trusted_CA.pem"
+  --profile "$HOME/.config/sber-sdk/profile-next.json"
 ```
 
 It asks for the existing online-banking PIN and one OTP only if required. It does not ask for primary credentials or create another PIN. The source profile is read without replacement; the new destination must be absent. Missing source, cleanup failure and rejected authentication prevent publication. Existing-profile CLI reads do not prompt for renewal. MCP remains separate from terminal input.
@@ -38,13 +39,12 @@ When an observed browser identity/cookie initialization is required, select ordi
 
 ```sh
 ./bin/sber login --profile /absolute/private/new-profile.json \
-  --ca-bundle /absolute/trusted/bank-ca.pem \
   --browser-profile /absolute/private/dedicated-firefox-profile \
   --playwright-driver /absolute/installed/matching-playwright-driver \
   --firefox-executable /absolute/installed/matching-firefox
 ```
 
-These three browser paths must all be absolute. They can also accompany `--remembered-profile`. Provision the matching official Playwright runtime separately; the command never installs or discovers a browser implicitly. The dedicated browser directory must already be private (0700), owned by the caller and contain verified NSS certificate trust. `--ca-bundle` configures native Go requests; it does not provision Firefox NSS. The browser provider keeps certificate/hostname verification and the sandbox enabled, renders the public login document only, and never receives login/password/PIN/OTP. The auth state machine atomically adopts validated rendered configuration, cookies and observed browser identity before native credential requests. Embedded callers select `AuthOptions.BrowserFirst` and `BrowserBootstrap` explicitly.
+These three browser paths must all be absolute. They can also accompany `--remembered-profile`. Provision the matching official Playwright runtime separately; the command never installs or discovers a browser implicitly. The dedicated browser directory must already be private (0700), owned by the caller and contain verified NSS certificate trust. Native Go trust, whether embedded or explicitly overridden with `--ca-bundle`, does not provision Firefox NSS. The browser provider keeps certificate/hostname verification and the sandbox enabled, renders the public login document only, and never receives login/password/PIN/OTP. The auth state machine atomically adopts validated rendered configuration, cookies and observed browser identity before native credential requests. Embedded callers select `AuthOptions.BrowserFirst` and `BrowserBootstrap` explicitly.
 
 The matching runtime installation is documented in the official [Playwright Go project](https://github.com/mxschmitt/playwright-go). The provider expects the driver/browser version matching the dependency in `go.mod`.
 
@@ -56,8 +56,7 @@ After owner login, the separately enabled integration test checks authorization,
 
 ```sh
 go test -tags=live -run '^TestLiveReadOnly$' -count=1 -v ./integration \
-  -args -sber-live -sber-profile "$HOME/.local/share/sber-go/profile.json" \
-  -sber-ca-bundle "$HOME/Downloads/Russian_Trusted_CA.pem"
+  -args -sber-live -sber-profile "$HOME/.local/share/sber-go/profile.json"
 ```
 
 Running `go test -tags=live ./integration` without `-sber-live` compiles and skips the test without opening a profile or contacting the bank. Session cookies may rotate and be saved back to the explicitly selected private profile during authenticated reads.

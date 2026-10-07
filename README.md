@@ -28,7 +28,9 @@ Create a profile in your local Linux or macOS terminal; login, password, OTP and
 
 An existing profile needs a private parent directory (0700) and a regular private file (0600). `login` creates missing private directories and refuses to replace an existing profile. Credentials are never accepted through arguments, environment variables or MCP. See [CLI behavior and exit codes](docs/CLI.md).
 
-Use `--ca-bundle PATH` on login and every online command when the bank CA is absent from the system PEM bundle. Remembered-device login uses a hidden PIN: `login --remembered-profile EXISTING_PATH --profile NEW_PATH`. Optional public browser initialization requires explicit matching Firefox/Playwright paths and a dedicated private browser profile with verified certificate trust; see [authentication setup](docs/AUTH.md).
+The verified Russian Trusted Root CA is built into the SDK, CLI and MCP. Native bank requests need no certificate download, external CA file or `--ca-bundle` argument. Default trust retains the canonical system PEM bundle when available; TLS chain and hostname verification stay enabled. `--ca-bundle PATH` optionally replaces default trust for one client. See [certificate provenance and updates](internal/transport/certificates/README.md).
+
+Remembered-device login uses a hidden PIN: `login --remembered-profile EXISTING_PATH --profile NEW_PATH`. Optional public browser initialization requires explicit matching Firefox/Playwright paths and a dedicated private browser profile with verified certificate trust; see [authentication setup](docs/AUTH.md).
 
 History retains explicit completeness metadata. A final or empty page still has `WindowCompleteness: "unknown"` without independent coverage evidence. An error or page cap produces a nonzero CLI exit without a successful partial result.
 

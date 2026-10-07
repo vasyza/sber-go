@@ -190,7 +190,7 @@ func transportFailureMessage(err error, request string) string {
 	case "invalid_ca_bundle":
 		return "cannot load trusted PEM certificates; check --ca-bundle PATH"
 	case "tls_untrusted":
-		return "TLS certificate is not trusted; supply the bank CA using --ca-bundle PATH"
+		return "TLS certificate is not trusted; update the application or select a verified CA using --ca-bundle PATH"
 	case "tls_hostname":
 		return "bank TLS certificate does not match the hostname"
 	case "tls_expired":

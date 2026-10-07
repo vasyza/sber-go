@@ -14,7 +14,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"regexp"
 	"strings"
 	"sync"
@@ -69,8 +68,9 @@ func (r Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]any{"status_code": r.StatusCode, "body": "<redacted>"})
 }
 
-// TransportOptions has no insecure-TLS/proxy knobs. The explicit CA file
-// replaces the canonical system bundle for this instance, never global trust.
+// TransportOptions has no insecure-TLS/proxy knobs. Default trust combines the
+// bundled bank root with a canonical system PEM bundle, when available. An
+// explicit CA file replaces that trust for this instance, never global trust.
 // Retry must be zero. Timeout and capacity apply to all requests.
 type TransportOptions struct {
 	CABundle         string
@@ -153,34 +153,6 @@ func newHTTPTransport(b sdkSession.SessionBundle, o TransportOptions, authConnec
 	tr := &HTTPTransport{root: root, cancel: cancel, wire: wire, jar: seed.Cookies, headers: browserHeaders(seed.ObservedHeaders), slots: make(chan struct{}, o.MaxClients), maxResponseBytes: o.MaxResponseBytes, authConnections: authConnections}
 	tr.client = &http.Client{Transport: wire, Timeout: o.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 	return tr, nil
-}
-func applicationRoots(explicit string) (*x509.CertPool, error) {
-	paths := []string{explicit}
-	if explicit == "" {
-		paths = []string{"/etc/ssl/certs/ca-certificates.crt", "/etc/pki/tls/certs/ca-bundle.crt", "/etc/ssl/ca-bundle.pem", "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem", "/etc/ssl/cert.pem"}
-	}
-	// Do not consult SSL_CERT_FILE/SSL_CERT_DIR (SystemCertPool does on Unix).
-	for _, path := range paths {
-		f, err := os.Open(path)
-		if err != nil {
-			continue
-		}
-		info, err := f.Stat()
-		if err != nil || !info.Mode().IsRegular() || info.Size() > 16*1024*1024 {
-			f.Close()
-			continue
-		}
-		data, err := io.ReadAll(io.LimitReader(f, 16*1024*1024+1))
-		f.Close()
-		if err != nil || len(data) > 16*1024*1024 {
-			continue
-		}
-		pool := x509.NewCertPool()
-		if pool.AppendCertsFromPEM(data) {
-			return pool, nil
-		}
-	}
-	return nil, &sdkErrs.TransportError{Code: "invalid_ca_bundle"}
 }
 func browserHeaders(observed map[string]string) http.Header {
 	h := http.Header{}

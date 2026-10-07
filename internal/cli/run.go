@@ -25,6 +25,7 @@ Commands:
   check-session     Check the selected session with one warm-up request
   mcp               Serve read APIs over MCP stdio
 
+TLS:     Bank root CA is built in; --ca-bundle PATH overrides default trust.
 Options: --ca-bundle PATH (explicit trusted PEM bundle),
          --force-update, --resource ID, --from DATE, --to DATE,
          --limit 30, --max-pages 100, --offset 0
