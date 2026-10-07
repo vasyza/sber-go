@@ -181,14 +181,20 @@ func transcript(t *testing.T, f *os.File) []byte {
 	for {
 		polls := []unix.PollFd{{Fd: int32(f.Fd()), Events: unix.POLLIN}}
 		n, err := unix.Poll(polls, 30)
+		if err == unix.EINTR {
+			continue
+		}
 		if err != nil {
-			t.Fatal("synthetic transcript poll failed")
+			t.Fatalf("synthetic transcript poll failed: %v", err)
 		}
 		if n == 0 || polls[0].Revents&unix.POLLIN == 0 {
 			return output
 		}
 		buf := make([]byte, 512)
 		n, err = unix.Read(int(f.Fd()), buf)
+		if err == unix.EINTR {
+			continue
+		}
 		if err != nil {
 			t.Fatal("synthetic transcript read failed")
 		}
