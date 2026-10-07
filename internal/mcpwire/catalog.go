@@ -3,9 +3,12 @@ package mcpwire
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"log/slog"
 	"sort"
-	"strings"
 	"unicode/utf8"
+
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 type TextContent struct{ Text string }
@@ -18,10 +21,8 @@ type ToolResult struct {
 // Validator must reject invalid tool arguments before a handler can run.
 type Validator func(context.Context, json.RawMessage) error
 
-// Handler returns a strict, complete tool-result object; not a JSON-RPC envelope.
+// Handler returns a strict tool-result object, not a JSON-RPC envelope.
 type Handler func(context.Context, json.RawMessage) (json.RawMessage, error)
-
-// TypedHandler is the recovered text/structured convenience contract.
 type TypedHandler func(context.Context, json.RawMessage) (ToolResult, error)
 type Tool struct {
 	Name        string
@@ -76,19 +77,66 @@ func New(options Options) (*Server, error) {
 		server.tools = append(server.tools, tool)
 	}
 	sort.Slice(server.tools, func(i, j int) bool { return server.tools[i].Name < server.tools[j].Name })
-	listing := map[string]any{"jsonrpc": "2.0", "result": server.modernCacheResult(map[string]any{"tools": server.toolList()})}
-	frame, err := marshalResponse(listing, json.RawMessage(strings.Repeat("9", MaxIDBytes)))
-	if err != nil || len(frame) > MaxFrameBytes {
+	// Reserve space for the SDK's result metadata and a bounded correlation ID.
+	listing, err := json.Marshal(server.toolList())
+	if err != nil || len(listing) > MaxFrameBytes-4096 {
+		return nil, ErrConfiguration
+	}
+	// Preflight the actual SDK registration, which may reject schema metadata
+	// (for example an overflowing numeric default) that is otherwise strict JSON.
+	if _, err := server.sdkServer(); err != nil {
 		return nil, ErrConfiguration
 	}
 	return server, nil
 }
 
-func (server *Server) toolList() []any {
-	tools := make([]any, 0, len(server.tools))
+func (server *Server) toolList() []*mcp.Tool {
+	tools := make([]*mcp.Tool, 0, len(server.tools))
 	for _, tool := range server.tools {
-		tools = append(tools, map[string]any{"name": tool.Name, "description": tool.Description, "inputSchema": tool.InputSchema,
-			"annotations": map[string]any{"readOnlyHint": tool.ReadOnly, "destructiveHint": false}})
+		tools = append(tools, &mcp.Tool{
+			Name: tool.Name, Description: tool.Description,
+			InputSchema: append(json.RawMessage(nil), tool.InputSchema...),
+			Annotations: &mcp.ToolAnnotations{ReadOnlyHint: tool.ReadOnly, DestructiveHint: boolPtr(false)},
+		})
 	}
 	return tools
+}
+
+func boolPtr(value bool) *bool { return &value }
+
+// Each Serve call owns a fresh SDK server and independent concurrency budget.
+// The low-level AddTool API retains original argument bytes and exact numbers;
+// the application's concrete validators remain responsible for semantics.
+func (server *Server) sdkServer() (sdk *mcp.Server, err error) {
+	defer func() {
+		if recover() != nil {
+			sdk, err = nil, ErrConfiguration
+		}
+	}()
+	sdk = mcp.NewServer(&mcp.Implementation{Name: server.info.Name, Version: server.info.Version}, &mcp.ServerOptions{
+		Logger:                    slog.New(slog.NewTextHandler(io.Discard, nil)),
+		Capabilities:              &mcp.ServerCapabilities{Tools: &mcp.ToolCapabilities{}},
+		SupportedProtocolVersions: []string{CurrentVersion, LegacyVersion},
+		PageSize:                  64,
+		SetCacheable: func(_ context.Context, _ mcp.Request, cache *mcp.Cacheable) {
+			cache.TTLMs, cache.CacheScope = 0, "private"
+		},
+	})
+	sdk.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
+		return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
+			switch method {
+			case "server/discover", "tools/list", "tools/call", "initialize", "ping", "notifications/initialized", "notifications/cancelled":
+				return next(ctx, method, req)
+			default:
+				return nil, protocolError(-32601)
+			}
+		}
+	})
+	for i, descriptor := range server.toolList() {
+		tool := server.tools[i]
+		sdk.AddTool(descriptor, func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			return callTool(ctx, tool, req.Params.Arguments)
+		})
+	}
+	return sdk, nil
 }

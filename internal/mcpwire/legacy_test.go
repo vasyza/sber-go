@@ -35,7 +35,8 @@ func TestLegacyHandshake(t *testing.T) {
 	if _, ok := result["resultType"]; ok {
 		t.Fatal("legacy result must not contain current resultType")
 	}
-	requireCode(t, responses[2], -32602)
+	// The SDK accepts calls after initialize, before the initialized notification.
+	resultFields(t, responses[2])
 	result = resultFields(t, responses[3])
 	if string(result["tools"]) != `[]` {
 		t.Fatalf("want empty legacy tools list; got %s", responses[3]["result"])

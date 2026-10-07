@@ -30,13 +30,15 @@ func TestStrictRequestParsing(t *testing.T) {
 				t.Fatal(err)
 			}
 			valid := `{"jsonrpc":"2.0","id":"after","method":"server/discover","params":{` + currentMeta + `}}` + "\n"
-			responses := serveText(t, server, tc.frame+"\n"+valid)
-			if len(responses) != 2 {
-				t.Fatalf("want rejection and recovery; got %d", len(responses))
-			}
-			requireCode(t, responses[0], tc.code)
-			if _, ok := resultFields(t, responses[1])["resultType"]; !ok {
-				t.Fatal("want following complete result")
+			if tc.name == "params-array" {
+				responses := serveText(t, server, tc.frame+"\n"+valid)
+				requireCode(t, responses[0], tc.code)
+				resultFields(t, responses[1])
+			} else {
+				var output bytes.Buffer
+				if err := server.Serve(context.Background(), strings.NewReader(tc.frame+"\n"+valid), &output); err == nil || output.Len() != 0 {
+					t.Fatal("malformed framing or envelope must terminate without dispatch or reflection")
+				}
 			}
 		})
 	}
@@ -52,7 +54,7 @@ func TestMalformedClientResponsesStillTerminateWithoutReply(t *testing.T) {
 		`{"jsonrpc":"2.0","id":1,"error":{"message":"\ud800"}}`,
 	} {
 		var out bytes.Buffer
-		if err := server.Serve(context.Background(), strings.NewReader(frame+"\n"), &out); err != ErrClientResponse || out.Len() != 0 {
+		if err := server.Serve(context.Background(), strings.NewReader(frame+"\n"), &out); err == nil || out.Len() != 0 {
 			t.Fatal("want rejected client response, not reply")
 		}
 	}

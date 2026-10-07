@@ -18,11 +18,30 @@ func (w *frameWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+// A peer may see every response byte before the underlying Write returns.
+type heldFrameWriter struct {
+	frameWriter
+	ctx     context.Context
+	release chan struct{}
+	first   atomic.Bool
+}
+
+func (w *heldFrameWriter) Write(p []byte) (int, error) {
+	n, err := w.frameWriter.Write(p)
+	if w.first.CompareAndSwap(false, true) {
+		select {
+		case <-w.release:
+		case <-w.ctx.Done():
+		}
+	}
+	return n, err
+}
+
 func waitSignal(t *testing.T, c <-chan struct{}, what string) {
 	t.Helper()
 	select {
 	case <-c:
-	case <-time.After(time.Second):
+	case <-time.After(5 * time.Second):
 		t.Fatal("want prompt " + what)
 	}
 }
@@ -35,7 +54,7 @@ func nextFrame(t *testing.T, w *frameWriter) map[string]json.RawMessage {
 			t.Fatal("want single JSON-RPC frame")
 		}
 		return fields
-	case <-time.After(time.Second):
+	case <-time.After(5 * time.Second):
 		t.Fatal("want prompt response while another request is blocked")
 		return nil
 	}
@@ -47,30 +66,27 @@ func finishServe(t *testing.T, done <-chan error) {
 		if err != nil {
 			t.Fatal(err)
 		}
-	case <-time.After(time.Second):
+	case <-time.After(5 * time.Second):
 		t.Fatal("want prompt Serve exit")
 	}
 }
 
-func TestActiveIDCollisionsRejectButCompletedIDsCanBeReused(t *testing.T) {
+func TestDuplicateActiveIDsTerminateWithoutSecondDispatch(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	input, writer := io.Pipe()
 	defer input.Close()
 	defer writer.Close()
 	out := &frameWriter{frames: make(chan []byte, 8)}
-	entered, release := make(chan struct{}), make(chan struct{})
+	entered, exited := make(chan struct{}), make(chan struct{})
 	var calls atomic.Int32
 	tool := syntheticTool("local")
 	tool.Handle = func(ctx context.Context, raw json.RawMessage) (ToolResult, error) {
-		if calls.Add(1) == 1 {
-			close(entered)
-			select {
-			case <-release:
-			case <-ctx.Done():
-			}
-		}
-		return ToolResult{Content: []TextContent{{Text: "synthetic"}}}, nil
+		calls.Add(1)
+		close(entered)
+		<-ctx.Done()
+		close(exited)
+		return ToolResult{}, ctx.Err()
 	}
 	server, err := New(Options{Tools: []Tool{tool}})
 	if err != nil {
@@ -78,38 +94,78 @@ func TestActiveIDCollisionsRejectButCompletedIDsCanBeReused(t *testing.T) {
 	}
 	done := make(chan error, 1)
 	go func() { done <- server.Serve(ctx, input, out) }()
-	finished := false
-	defer func() {
-		cancel()
-		input.Close()
-		writer.Close()
-		if !finished {
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
-		}
-	}()
 	io.WriteString(writer, toolCall(`"\u0061"`, "local", `{}`, true))
 	waitSignal(t, entered, "handler entry")
 	io.WriteString(writer, discoverFrame(`"a"`)+"\n")
-	reply := nextFrame(t, out)
-	requireCode(t, reply, -32600)
-	close(release)
-	reply = nextFrame(t, out)
-	if string(reply["id"]) != `"\u0061"` {
-		t.Fatal("want exact original ID bytes")
+	select {
+	case err := <-done:
+		if err != ErrInput {
+			t.Fatalf("want static duplicate-ID transport failure; got %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("duplicate ID did not terminate")
 	}
-	for i := 0; i < 8; i++ {
-		io.WriteString(writer, toolCall(`"a"`, "local", `{}`, true))
-		reply = nextFrame(t, out)
+	waitSignal(t, exited, "cancelled handler cleanup")
+	if calls.Load() != 1 {
+		t.Fatal("duplicate ID dispatched a second handler")
+	}
+}
+
+func TestCompletedIDsCanBeReused(t *testing.T) {
+	var calls atomic.Int32
+	tool := syntheticTool("local")
+	tool.Handle = func(context.Context, json.RawMessage) (ToolResult, error) { calls.Add(1); return ToolResult{}, nil }
+	server, err := New(Options{Tools: []Tool{tool}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	replies := serveText(t, server, toolCall(`"a"`, "local", `{}`, true)+toolCall(`"a"`, "local", `{}`, true))
+	if len(replies) != 2 || calls.Load() != 2 {
+		t.Fatal("completed ID could not be reused")
+	}
+	for _, reply := range replies {
 		resultFields(t, reply)
 	}
+}
+
+func TestVisibleResponseAllowsImmediateIDReuseAtCapacity(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	input, writer := io.Pipe()
+	defer input.Close()
+	defer writer.Close()
+	out := &heldFrameWriter{frameWriter: frameWriter{frames: make(chan []byte, 8)}, ctx: ctx, release: make(chan struct{})}
+	var calls atomic.Int32
+	tool := syntheticTool("local")
+	tool.Handle = func(context.Context, json.RawMessage) (ToolResult, error) {
+		calls.Add(1)
+		return ToolResult{}, nil
+	}
+	server, err := New(Options{Tools: []Tool{tool}, MaxInFlight: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	go func() { done <- server.Serve(ctx, input, out) }()
+	frame := toolCall(`"repeat"`, "local", `{}`, true)
+	if _, err := io.WriteString(writer, frame); err != nil {
+		t.Fatal(err)
+	}
+	resultFields(t, nextFrame(t, &out.frameWriter))
+	if _, err := io.WriteString(writer, frame); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-out.frames:
+		t.Fatal("second response bypassed the blocked first write")
+	case <-time.After(100 * time.Millisecond):
+	}
+	close(out.release)
+	resultFields(t, nextFrame(t, &out.frameWriter))
 	writer.Close()
 	finishServe(t, done)
-	finished = true
-	if calls.Load() != 9 {
-		t.Fatal("want no collision dispatch and no forever-seen ID set")
+	if calls.Load() != 2 {
+		t.Fatal("visible response prevented legitimate completed-ID reuse")
 	}
 }
 

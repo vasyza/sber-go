@@ -1,5 +1,10 @@
 # Generic MCP stdio wire engine
 
+**Historical pre-SDK implementation notes.** The October 7, 2026 MCP migration
+replaces this engine with the official Go SDK. Current behavior and verification
+are documented in [MCP-GO-SDK.md](MCP-GO-SDK.md). The original findings and
+recovery qualifications below are retained as historical evidence.
+
 `internal/mcpwire` is an application-injected, local JSON-RPC transport engine. It has **no default tools, bank handlers, SDK integration, authentication, credential loading, network transport, or mutation-handler integration**. The recovery leaves its existing production and test bytes unchanged.
 
 **Status: restricted dual-era implementation, not full MCP conformance or an independent approval.** Successful package tests do not override the protocol gaps below. Parent/fresh review is still required before acceptance or integration.

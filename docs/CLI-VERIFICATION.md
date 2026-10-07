@@ -11,6 +11,12 @@ The migration keeps all 20 operational commands and the offline rental preview.
 Argument errors use fixed text without private values.
 Help requests do not open clients or create profile files.
 
+| Check | Result | Boundary |
+| --- | --- | --- |
+| Linux AMD64, Go 1.27.1. | PASS. | Full race suite, vet, package builds, formatting, and module checks. |
+| Command parsing and help. | PASS. | Command help, argument privacy, required profiles, repeated card IDs, and native command execution. |
+| Operator documentation. | PASS. | Command names, options, parsed examples, sentence limits, paragraph limits, and contractions. |
+
 The migration checks use synthetic data and local servers.
 This migration did not use bank credentials or send bank requests.
 The earlier real session checks below apply to the command behavior before the parser migration.

@@ -20,6 +20,28 @@ type panicReader struct{}
 
 func (panicReader) Read([]byte) (int, error) { panic("SYNTHETIC-PRIVATE-READER-PANIC") }
 
+// Keep input open until the failed output terminates the SDK session.
+func serveUntilWriteFailure(t *testing.T, server *Server, frame string, output io.Writer) error {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	input, writer := io.Pipe()
+	defer input.Close()
+	defer writer.Close()
+	done := make(chan error, 1)
+	go func() { done <- server.Serve(ctx, input, output) }()
+	if _, err := io.WriteString(writer, frame); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-done:
+		return err
+	case <-ctx.Done():
+		t.Fatal("output failure did not terminate")
+		return nil
+	}
+}
+
 func TestWriterPanicIsStaticTerminalAndNeverRetriesHandler(t *testing.T) {
 	var calls atomic.Int32
 	tool := syntheticTool("local")
@@ -35,7 +57,7 @@ func TestWriterPanicIsStaticTerminalAndNeverRetriesHandler(t *testing.T) {
 				panicked = true
 			}
 		}()
-		err = server.Serve(context.Background(), strings.NewReader(toolCall(`1`, "local", `{}`, true)), panicWriter{})
+		err = serveUntilWriteFailure(t, server, toolCall(`1`, "local", `{}`, true), panicWriter{})
 	}()
 	if panicked || err != ErrOutput || calls.Load() != 1 {
 		t.Fatal("want static writer failure and one handler attempt")
@@ -67,7 +89,7 @@ func TestFullWriteWithErrorStillFailsWithoutRetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	out := &failingWriter{}
-	err = server.Serve(context.Background(), strings.NewReader(toolCall(`1`, "local", `{}`, true)), out)
+	err = serveUntilWriteFailure(t, server, toolCall(`1`, "local", `{}`, true), out)
 	if err != ErrOutput || calls.Load() != 1 || out.calls.Load() != 1 {
 		t.Fatal("want full+error terminal, no handler/write retry")
 	}
@@ -164,9 +186,8 @@ func TestEOFPromptlyCancelsAndJoinsActiveHandler(t *testing.T) {
 	if calls.Load() != 1 {
 		t.Fatal("must not replay handler on EOF")
 	}
-	reply := nextFrame(t, out)
-	if string(resultFields(t, reply)["isError"]) != "true" {
-		t.Fatal("context error must not become successful zero result")
+	if len(out.frames) != 0 {
+		t.Fatal("EOF must not emit a successful unfinished tool result")
 	}
 }
 
@@ -194,8 +215,14 @@ func TestContextCancellationUnblocksOwnedWriter(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	input, inputWriter := io.Pipe()
+	defer input.Close()
+	defer inputWriter.Close()
 	done := make(chan error, 1)
-	go func() { done <- server.Serve(ctx, strings.NewReader(discoverFrame(`1`)+"\n"), out) }()
+	go func() { done <- server.Serve(ctx, input, out) }()
+	if _, err := io.WriteString(inputWriter, discoverFrame(`1`)+"\n"); err != nil {
+		t.Fatal(err)
+	}
 	waitSignal(t, out.writing, "blocking write")
 	cancel()
 	select {
