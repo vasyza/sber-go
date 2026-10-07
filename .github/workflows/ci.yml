@@ -60,7 +60,12 @@ jobs:
         run: |
           mkdir -p "$SBER_GO_BROWSER_PROBE_ROOT"
           chmod 0700 "$SBER_GO_BROWSER_PROBE_ROOT"
-          sber_firefox_executable=$(rg --files --hidden --no-ignore "$PLAYWRIGHT_BROWSERS_PATH" | rg '/firefox$')
+          if command -v rg >/dev/null 2>&1; then
+            sber_firefox_executable=$(rg --files --hidden --no-ignore "$PLAYWRIGHT_BROWSERS_PATH" | rg '/firefox$')
+          else
+            sber_firefox_executable=$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f -name firefox)
+          fi
+          test -x "$sber_firefox_executable"
           sber_certutil=$(command -v certutil || true)
           if [ -z "$sber_certutil" ]; then
             sber_certutil="$(brew --prefix nss)/bin/certutil"

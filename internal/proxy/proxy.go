@@ -36,7 +36,7 @@ func Parse(input string) (Options, error) {
 		return Options{}, invalid()
 	}
 	scheme, authority := "http", input
-	if prefix, rest, ok := strings.Cut(input, "://"); ok {
+	if prefix, rest, ok := strings.Cut(input, "://"); ok && !strings.Contains(prefix, ":") {
 		scheme, authority = strings.ToLower(prefix), rest
 	}
 	var host, rest string

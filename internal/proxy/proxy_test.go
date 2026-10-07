@@ -11,6 +11,7 @@ func TestParseProxyFormats(t *testing.T) {
 	for _, tc := range []struct{ input, address, username, password string }{
 		{"127.0.0.1:3128", "http://127.0.0.1:3128", "", ""},
 		{"localhost:3128:synthetic-user:synthetic-password", "http://localhost:3128", "synthetic-user", "synthetic-password"},
+		{"localhost:3128:u:p://with:colons", "http://localhost:3128", "u", "p://with:colons"},
 		{"http://127.0.0.1:3128:u:p", "http://127.0.0.1:3128", "u", "p"},
 		{"https://localhost:443:u:p:with:colons", "https://localhost:443", "u", "p:with:colons"},
 		{"socks5://127.0.0.1:1080:u:p@/?#%", "socks5://127.0.0.1:1080", "u", "p@/?#%"},

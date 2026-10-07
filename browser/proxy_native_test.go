@@ -66,8 +66,9 @@ func TestNativeFirefoxProxyConnectionsAndTLS(t *testing.T) {
 		auth, rejectLogin, rejectOriginTLS, rejectProxyTLS bool
 	}{
 		{"http", "http", false, false, false, false}, {"http-auth", "http", true, false, false, false},
-		{"https-auth", "https", true, false, false, false}, {"socks5", "socks5", false, false, false, false},
+		{"https", "https", false, false, false, false}, {"https-auth", "https", true, false, false, false}, {"socks5", "socks5", false, false, false, false},
 		{"socks5-auth", "socks5", true, false, false, false}, {"rejected-login", "http", true, true, false, false},
+		{"rejected-socks5-login", "socks5", true, true, false, false},
 		{"untrusted-origin", "socks5", true, false, true, false}, {"untrusted-https-proxy", "https", true, false, false, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -162,7 +163,11 @@ func TestNativeFirefoxProxyConnectionsAndTLS(t *testing.T) {
 				return
 			}
 			if err != nil || response == nil || response.Status() != 200 || hits.Load() != 1 || stats.Authorized.Load() < 1 {
-				t.Fatal("native browser proxy connection failed")
+				status := 0
+				if response != nil {
+					status = response.Status()
+				}
+				t.Fatalf("native browser proxy connection failed: navigation_error=%t status=%d origin=%d authorized=%d", err != nil, status, hits.Load(), stats.Authorized.Load())
 			}
 		})
 	}
