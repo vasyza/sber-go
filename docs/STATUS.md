@@ -42,6 +42,27 @@ The macOS ARM64 command and CLI tests compiled successfully without test executi
 
 Real bank verification remains limited to the earlier results below.
 
+## Proxy settings — 2026-10-08
+
+The CLI supports explicit HTTP, HTTPS, and SOCKS5 proxies with optional authentication.
+`config set proxy ADDRESS` saves one setting for network commands.
+The `--proxy` and `--no-proxy` options select a connection for one command.
+Proxy login values are removed from output and errors.
+The private settings file is separate from bank profiles.
+
+Linux `make check` passed with Go 1.27.1.
+Synthetic tests covered authenticated proxy connections, TLS rejection, cancellation, and absence of direct fallback.
+They covered private atomic settings, file locks, unsafe paths, and configuration precedence.
+Compiled CLI tests used synthetic home directories.
+SDK renewal tests retained the selected proxy after session restoration.
+
+Firefox option and SOCKS5 adapter tests passed with race checks.
+The native Firefox tests compiled locally.
+The environment network policy prevented the local Firefox download.
+GitHub Actions installs a scoped runtime for native TLS and proxy tests on Ubuntu and macOS.
+These tests use local servers and synthetic login values.
+No proxy test uses a bank connection or an owner profile.
+
 ## Earlier verification
 
 Before this cleanup, local Linux and macOS checks passed with Go 1.27.1.

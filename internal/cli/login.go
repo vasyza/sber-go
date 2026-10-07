@@ -64,7 +64,7 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 	}
 	if a.NewPrimary == nil {
 		a.NewPrimary = func() (PrimaryAuthenticator, error) {
-			options, err := selection.authOptions(caBundle)
+			options, err := selection.authOptions(caBundle, args.selectedProxy)
 			if err != nil {
 				return nil, err
 			}
@@ -87,7 +87,7 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 		var writer enrollment.CandidateWriter
 		var err error
 		if remembered != "" {
-			options, optionsErr := selection.authOptions(caBundle)
+			options, optionsErr := selection.authOptions(caBundle, args.selectedProxy)
 			if optionsErr != nil {
 				err = optionsErr
 			} else {
@@ -204,16 +204,22 @@ func transportFailureMessage(err error, request string) string {
 		return ""
 	}
 	switch wire.Code {
+	case "invalid_proxy":
+		return "The proxy address is not valid."
+	case "proxy_authentication":
+		return "The proxy rejected its login values."
+	case "proxy_connect", "proxy_failed":
+		return "The command cannot connect through the proxy."
 	case "invalid_ca_bundle":
 		return "The command cannot load trusted PEM certificates.\nCheck --ca-bundle PATH."
 	case "tls_untrusted":
 		return "The TLS certificate is not trusted.\nUpdate the application or select a verified CA with --ca-bundle PATH."
 	case "tls_hostname":
-		return "The bank TLS certificate does not match the hostname."
+		return "The TLS certificate does not match the hostname."
 	case "tls_expired":
-		return "The bank TLS certificate has expired or is not yet valid."
+		return "The TLS certificate has expired or is not yet valid."
 	case "tls_invalid":
-		return "The bank TLS certificate validation failed."
+		return "The TLS certificate validation failed."
 	case "timeout":
 		return "The " + request + " request timed out."
 	}

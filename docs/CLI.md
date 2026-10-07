@@ -92,6 +92,88 @@ If no default profile exists, data commands stop with a login instruction.
 The CLI does not start authentication during those commands.
 Use `sber login` to make the default profile.
 
+## Proxy settings
+
+The CLI supports HTTP, HTTPS, and SOCKS5 proxies.
+Each type supports connections with or without proxy authentication.
+The saved setting applies to login, session restoration, network reads, Firefox initialization, and MCP.
+
+1. Save the proxy address and its login values:
+
+   ```sh
+   ./bin/sber config set proxy 127.0.0.1:3128:user:password
+   ```
+
+2. Read the saved address:
+
+   ```sh
+   ./bin/sber config get proxy
+   ```
+
+3. Read all saved settings:
+
+   ```sh
+   ./bin/sber config list
+   ```
+
+Without a scheme, the CLI uses HTTP.
+Use one of these alternative settings to select a scheme:
+
+```sh
+./bin/sber config set proxy http://127.0.0.1:3128:user:password
+./bin/sber config set proxy https://127.0.0.1:3128:user:password
+./bin/sber config set proxy socks5://127.0.0.1:1080:user:password
+```
+
+The syntax is `[scheme://]host:port[:username:password]`.
+Replace the example address and login values with your proxy values.
+Omit `:username:password` for a proxy without authentication.
+
+Put brackets around an IPv6 address, as in `[::1]:1080`.
+The password can contain colons.
+If a value contains shell special characters, quote the complete value.
+The CLI does not accept the `username:password@host` form.
+
+`get` and `list` remove login values from their output.
+A new setting replaces the previous address and login values.
+The command writes no secret values to its output or errors.
+The shell can retain command values in its history.
+Other local processes can read process arguments.
+
+The settings file is separate from the bank profile.
+It is `config.json` in the same default user configuration directory.
+The directory must have mode `0700`; the file must have mode `0600`.
+The file contains proxy login values when authentication is selected.
+Writes use a private lock and atomic replacement.
+Help and offline metadata commands do not read this file.
+
+To select a proxy for one command, use `--proxy`:
+
+```sh
+./bin/sber products --proxy socks5://127.0.0.1:1080:user:password
+```
+
+This option replaces both the saved address and its login values.
+An explicit proxy does not read the saved settings.
+To connect directly for one command, use `--no-proxy`:
+
+```sh
+./bin/sber products --no-proxy
+```
+
+The two options cannot be used together.
+Without a saved or explicit proxy, network commands connect directly.
+Environment proxy variables do not select a connection.
+If a proxy fails, the request stops without a direct connection.
+TLS validates both the destination and any HTTPS proxy.
+Firefox retains its own verified NSS trust.
+
+To remove the saved proxy and its login values:
+
+```sh
+./bin/sber config unset proxy
+```
+
 ## Make a profile
 
 The profile contains session cookies and device identity.
@@ -404,7 +486,8 @@ Data output can contain private financial information.
 
 The CLI shows known error classifications only.
 It does not show remote error text, support IDs, cookies, or secret input.
-It does not read secrets from `.env`, environment variables, command options, or MCP arguments.
+It does not read bank secrets from `.env`, environment variables, command options, or MCP arguments.
+Proxy login values use the explicit proxy address syntax.
 Primary login errors include the local authentication stage.
 The stage identifies public configuration, owner input, credentials, SMS confirmation, PIN enrollment, session validation, or cleanup.
 

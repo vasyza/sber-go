@@ -13,6 +13,43 @@ The root package exposes the public API through aliases and function forwards.
 Getters retain the original native values and types.
 `Deviceprint` retains its `Value()` API.
 
+## Proxy options
+
+Set `TransportOptions.Proxy` to use an explicit HTTP, HTTPS, or SOCKS5 proxy.
+The zero value selects a direct connection.
+Environment proxy variables do not select a connection.
+
+```go
+proxy := sber.ProxyOptions{
+    URL: "socks5://127.0.0.1:1080",
+    Username: proxyUsername,
+    Password: proxyPassword,
+}
+options := sber.ClientOptions{
+    TransportOptions: sber.TransportOptions{Proxy: proxy},
+}
+client, err := sber.NewSberClientFromSessionFile(profilePath, options)
+```
+
+`URL` must include a supported scheme, a host, and a port.
+Supply login values through `Username` and `Password`, outside the URL.
+Omit both fields for a proxy without authentication.
+The native transport verifies destination TLS and HTTPS proxy TLS.
+An explicit `CABundle` replaces trust for both connections.
+Proxy failures stop requests without a direct connection or POST replay.
+Request deadlines and cancellation also cover proxy establishment.
+Direct TLS recovery keeps its existing three-attempt limit.
+
+PIN-profile renewal copies these proxy options to authentication and the replacement transport.
+For standalone authentication, set `AuthOptions.TransportOptions.Proxy`.
+For explicit Firefox initialization, also set `browser.FirefoxOptions.Proxy` to the same value.
+Firefox uses NSS trust and keeps TLS verification enabled.
+Authenticated SOCKS5 uses a bounded loopback CONNECT adapter that closes with the browser.
+
+Proxy options and transport options redact ordinary `%v`, `%+v`, `%#v`, and JSON output.
+Explicit field access returns the raw login values.
+The CLI stores its settings separately; the SDK does not read that settings file.
+
 ## Diagnostic representation
 
 

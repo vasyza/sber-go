@@ -17,6 +17,15 @@ The verified bank root CA is embedded in the build; no external certificate file
 
 The CLI opens the default user profile after owner login. Add `"--profile", "/absolute/private/path/profile.json"` to select another file. One selected SDK client belongs to the process. Tool arguments cannot select filesystem paths or provide credentials. Nullable `session_id` defaults to that client; `"current"` is the only explicit selector. Nullable setup `profile` refers to the selected profile; `"default"` is the only named selector.
 
+The process uses the proxy saved through `sber config set proxy ADDRESS`.
+The MCP process must run as the same operating system user with the same configuration directory.
+Add `"--proxy", "socks5://127.0.0.1:1080"` to replace the saved setting for that process.
+Add `"--no-proxy"` to select a direct connection.
+Both options configure native bank connections; MCP still uses standard input and output.
+Tool arguments cannot change the proxy or supply proxy login values.
+Proxy failures stop requests without a direct connection.
+See the [proxy procedure](CLI.md#proxy-settings).
+
 | Tool | Result |
 | --- | --- |
 | `sber_setup_status` | Local status; authorization has not been checked |

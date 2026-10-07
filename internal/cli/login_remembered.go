@@ -30,12 +30,12 @@ func (b loginBrowserSelection) valid() bool {
 	return filepath.IsAbs(b.profile) && filepath.IsAbs(b.driver) && filepath.IsAbs(b.executable)
 }
 
-func (b loginBrowserSelection) authOptions(ca string) (sber.AuthOptions, error) {
-	o := sber.AuthOptions{TransportOptions: sber.TransportOptions{CABundle: ca, Timeout: 60 * time.Second}}
+func (b loginBrowserSelection) authOptions(ca string, proxy sber.ProxyOptions) (sber.AuthOptions, error) {
+	o := sber.AuthOptions{TransportOptions: sber.TransportOptions{CABundle: ca, Timeout: 60 * time.Second, Proxy: proxy}}
 	if b.profile == "" {
 		return o, nil
 	}
-	provider, err := browser.NewFirefoxBootstrap(browser.FirefoxOptions{ProfileDir: b.profile, DriverDir: b.driver, FirefoxExecutable: b.executable, Timeout: 60 * time.Second})
+	provider, err := browser.NewFirefoxBootstrap(browser.FirefoxOptions{ProfileDir: b.profile, DriverDir: b.driver, FirefoxExecutable: b.executable, Timeout: 60 * time.Second, Proxy: proxy})
 	if err != nil {
 		return sber.AuthOptions{}, err
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/pflag"
 	sber "github.com/vasyza/sber-go"
+	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
 )
 
 type commandDefinition struct{ name, description string }
@@ -64,6 +65,9 @@ type commandArguments struct {
 	limit, pages, offset                                                  int
 	cards                                                                 cardIDs
 	timeout                                                               time.Duration
+	proxy                                                                 string
+	noProxy                                                               bool
+	selectedProxy                                                         sber.ProxyOptions
 }
 
 func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
@@ -74,6 +78,8 @@ func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
 	if name == "status" || name == "inspect-session" {
 		return f, a
 	}
+	f.StringVar(&a.proxy, "proxy", "", "Use proxy `ADDRESS` for this command, with optional login values.")
+	f.BoolVar(&a.noProxy, "no-proxy", false, "Use a direct connection for this command.")
 	f.StringVar(&a.ca, "ca-bundle", "", "Use a different PEM trust bundle `PATH`.")
 	if name == "login" || name == "refresh-session" {
 		if name == "login" {
@@ -138,6 +144,11 @@ var cardIDPattern = regexp.MustCompile(`^[0-9]{1,16}$`)
 var historyResourcePattern = regexp.MustCompile(`^(?:card|ct-account|account):[A-Za-z0-9_-]{1,128}$`)
 
 func validateCommand(name string, a *commandArguments) bool {
+	if a.proxy != "" {
+		if _, err := sdkProxy.Parse(a.proxy); err != nil || a.noProxy {
+			return false
+		}
+	}
 	if !a.browser.valid() || a.timeout < time.Second || a.timeout > 120*time.Second || a.limit < 1 || a.limit > 100 || a.pages < 1 || a.pages > 10000 || a.offset < 0 {
 		return false
 	}

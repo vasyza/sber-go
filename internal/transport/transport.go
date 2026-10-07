@@ -23,6 +23,7 @@ import (
 	"github.com/andybalholm/brotli"
 	"github.com/klauspost/compress/zstd"
 	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
 	sdkSession "github.com/vasyza/sber-go/internal/session"
 )
 
@@ -68,7 +69,9 @@ func (r Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]any{"status_code": r.StatusCode, "body": "<redacted>"})
 }
 
-// TransportOptions has no insecure-TLS/proxy knobs. Default trust combines the
+type ProxyOptions = sdkProxy.Options
+
+// TransportOptions uses verified TLS. Default trust combines the
 // bundled bank root with a canonical system PEM bundle, when available. An
 // explicit CA file replaces that trust for this instance, never global trust.
 // Retry must be zero. Timeout and capacity apply to all requests.
@@ -79,7 +82,12 @@ type TransportOptions struct {
 	Retry            int
 	Timeout          time.Duration
 	MaxResponseBytes int64
+	Proxy            ProxyOptions
 }
+
+func (o TransportOptions) String() string               { return "TransportOptions(<redacted>)" }
+func (o TransportOptions) Format(f fmt.State, _ rune)   { sdkErrs.FormatError(f, o.String()) }
+func (o TransportOptions) MarshalJSON() ([]byte, error) { return json.Marshal("<redacted>") }
 
 // HTTPTransport uses ordinary verified TLS and HTTP/1.1. Business transports
 // use one request per connection. Authentication transports reuse connections,
@@ -96,6 +104,7 @@ type HTTPTransport struct {
 	slots            chan struct{}
 	maxResponseBytes int64
 	authConnections  bool
+	proxyEnabled     bool
 }
 
 func NewHTTPTransport(b sdkSession.SessionBundle, o TransportOptions) (*HTTPTransport, error) {
@@ -131,6 +140,10 @@ func newHTTPTransport(b sdkSession.SessionBundle, o TransportOptions, authConnec
 	if o.MaxResponseBytes < 1 || o.MaxResponseBytes > 64*1024*1024 {
 		return nil, &sdkErrs.TransportError{Code: "invalid_options"}
 	}
+	proxyURL, err := o.Proxy.Endpoint()
+	if err != nil {
+		return nil, err
+	}
 	seed, err := b.ToSeed(!o.AllowUnready)
 	if err != nil {
 		return nil, err
@@ -150,8 +163,23 @@ func newHTTPTransport(b sdkSession.SessionBundle, o TransportOptions, authConnec
 		MaxResponseHeaderBytes: 1 * 1024 * 1024, Protocols: protocols,
 	}
 	wire.DialTLSContext = verifiedTLSDialer(wire.TLSClientConfig, o.Timeout)
+	if proxyURL != nil {
+		wire.Proxy = http.ProxyURL(proxyURL)
+		// net/http verifies both HTTPS proxy TLS and destination TLS. It also
+		// owns the CONNECT/SOCKS handshake within the request deadline.
+		wire.DialTLSContext = nil
+		wire.OnProxyConnectResponse = func(_ context.Context, _ *url.URL, _ *http.Request, response *http.Response) error {
+			if response.StatusCode == http.StatusProxyAuthRequired {
+				return &sdkErrs.TransportError{Code: "proxy_authentication"}
+			}
+			if response.StatusCode != http.StatusOK {
+				return &sdkErrs.TransportError{Code: "proxy_connect"}
+			}
+			return nil
+		}
+	}
 	root, cancel := context.WithCancel(context.Background())
-	tr := &HTTPTransport{root: root, cancel: cancel, wire: wire, jar: seed.Cookies, headers: browserHeaders(seed.ObservedHeaders), slots: make(chan struct{}, o.MaxClients), maxResponseBytes: o.MaxResponseBytes, authConnections: authConnections}
+	tr := &HTTPTransport{root: root, cancel: cancel, wire: wire, jar: seed.Cookies, headers: browserHeaders(seed.ObservedHeaders), slots: make(chan struct{}, o.MaxClients), maxResponseBytes: o.MaxResponseBytes, authConnections: authConnections, proxyEnabled: proxyURL != nil}
 	tr.client = &http.Client{Transport: wire, Timeout: o.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 	return tr, nil
 }
@@ -315,7 +343,11 @@ func (tr *HTTPTransport) request(ctx context.Context, method, target string, bod
 	}
 	res, err := tr.client.Do(req)
 	if err != nil {
-		return nil, TransportFailure(err)
+		failure := TransportFailure(err)
+		if tr.proxyEnabled && failure.Code == "request_failed" {
+			failure.Code = "proxy_failed"
+		}
+		return nil, failure
 	}
 	defer res.Body.Close()
 	tr.mu.Lock()
@@ -378,6 +410,10 @@ func TransportFailure(err error) *sdkErrs.TransportError {
 	}
 	if errors.Is(err, context.DeadlineExceeded) {
 		return sdkErrs.NewTransportError("timeout", context.DeadlineExceeded)
+	}
+	var proxyError *sdkErrs.TransportError
+	if errors.As(err, &proxyError) && (proxyError.Code == "proxy_authentication" || proxyError.Code == "proxy_connect") {
+		return &sdkErrs.TransportError{Code: proxyError.Code}
 	}
 	var hostname x509.HostnameError
 	if errors.As(err, &hostname) {

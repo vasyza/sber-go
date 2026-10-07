@@ -112,6 +112,7 @@ The updated executable is `bin/sber` in that checkout.
 
 Cobra v1.10.2 reads CLI arguments and produces help text.
 The CLI has 20 operational commands.
+The `config` command manages saved CLI settings.
 They cover authentication, session restoration, products, cards, history, analytics, private export, and MCP.
 Use `sber help COMMAND` to show command options.
 Use `--help` or `-h` to show help without profile access or bank requests.
@@ -136,8 +137,47 @@ Use `--profile PATH` to select a different profile for one command.
 An existing profile requires a private parent directory with mode `0700` and a regular private file with mode `0600`.
 The `login` command makes missing private directories and refuses to replace an existing profile.
 Authentication prepares public configuration before secret prompts.
-Credentials are not accepted through arguments, environment variables, or MCP.
+Bank credentials are not accepted through arguments, environment variables, or MCP.
 The [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-REFERENCE.md#technical-terms) use the [ASD-STE100 Issue 9 writing policy](docs/DEVELOPMENT.md#cli-writing-policy).
+
+### Proxy settings
+
+Save a proxy once for all network commands, including login, Firefox initialization, and MCP:
+
+```sh
+sber config set proxy 127.0.0.1:3128:user:password
+sber config set proxy http://127.0.0.1:3128:user:password
+sber config set proxy https://127.0.0.1:3128:user:password
+sber config set proxy socks5://127.0.0.1:1080:user:password
+```
+
+These examples show alternative settings.
+Replace the address and login values with your proxy values.
+Without a scheme, the CLI uses HTTP.
+Without `:user:password`, it connects without proxy authentication.
+Each new setting replaces the previous address and login values.
+
+```sh
+sber config get proxy
+sber config list
+sber config unset proxy
+sber products --proxy socks5://127.0.0.1:1080:user:password
+sber products --no-proxy
+```
+
+`get` and `list` show the address without login values.
+`--proxy` replaces the saved setting for one command.
+`--no-proxy` selects a direct connection for one command.
+These two options cannot be used together.
+
+The CLI saves settings in `config.json` beside the default profile.
+The directory has mode `0700`; the file has mode `0600`.
+Proxy passwords in commands can remain in shell history and process arguments.
+The CLI removes them from its output and errors.
+Environment proxy variables do not select a connection.
+If a proxy fails, the request stops without a direct connection.
+TLS verification remains enabled.
+Read the [proxy procedure](docs/CLI.md#proxy-settings) and [SDK options](docs/SDK.md#proxy-options).
 
 The verified Russian Trusted Root CA is part of the SDK, CLI, and MCP.
 Native bank requests require no certificate download or external CA file.

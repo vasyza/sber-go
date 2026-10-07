@@ -98,6 +98,49 @@ func TestNativeCommandOfflineStatus(t *testing.T) {
 			t.Fatal("native inspection did not use a redacted default profile")
 		}
 	})
+	t.Run("saved proxy", func(t *testing.T) {
+		configuration := filepath.Join(dir, "proxy-user")
+		if err := os.MkdirAll(configuration, 0700); err != nil {
+			t.Fatal(err)
+		}
+		run := func(args ...string) (string, int) {
+			t.Helper()
+			command := exec.CommandContext(context.Background(), binary, args...)
+			command.Env = []string{"HOME=" + configuration, "XDG_CONFIG_HOME=" + configuration}
+			command.Dir = t.TempDir()
+			output, err := command.CombinedOutput()
+			code := 0
+			if err != nil {
+				exit, ok := err.(*exec.ExitError)
+				if !ok {
+					t.Fatal(err)
+				}
+				code = exit.ExitCode()
+			}
+			if strings.Contains(string(output), "synthetic-native-proxy-secret") {
+				t.Fatal("native proxy output disclosed credentials")
+			}
+			return string(output), code
+		}
+		if output, code := run("config", "set", "proxy", "socks5://127.0.0.1:1080:synthetic-native-proxy-secret-user:synthetic-native-proxy-secret-password"); code != 0 || output != "" {
+			t.Fatal("native proxy setting failed")
+		}
+		if output, code := run("config", "get", "proxy"); code != 0 || output != "socks5://127.0.0.1:1080\n" {
+			t.Fatal("native proxy persistence failed")
+		}
+		if output, code := run("config", "list"); code != 0 || output != "proxy=socks5://127.0.0.1:1080\n" {
+			t.Fatal("native proxy list failed")
+		}
+		if output, code := run("config", "set", "proxy", "invalid:synthetic-native-proxy-secret"); code != 2 || !strings.Contains(output, "arguments are not valid") {
+			t.Fatal("native proxy argument rejection failed")
+		}
+		if output, code := run("config", "unset", "proxy"); code != 0 || output != "" {
+			t.Fatal("native proxy unset failed")
+		}
+		if output, code := run("config", "list"); code != 0 || output != "" {
+			t.Fatal("native proxy unset retained settings")
+		}
+	})
 	canary := "SYNTHETIC-private-native-argument"
 	for _, test := range []struct {
 		args []string

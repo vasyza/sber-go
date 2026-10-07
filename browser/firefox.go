@@ -21,12 +21,13 @@ import (
 
 	pw "github.com/mxschmitt/playwright-go"
 	sber "github.com/vasyza/sber-go"
+	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
 )
 
 // FirefoxOptions requires a dedicated private profile. Its NSS trust must be
 // provisioned/verified by the caller. DriverDir + FirefoxExecutable explicitly
 // select a matching preinstalled Playwright driver/browser; no implicit install,
-// global cache discovery, owner profile lookup, credentials or TLS bypass.
+// global cache discovery, owner profile lookup, or TLS bypass.
 type FirefoxOptions struct {
 	ProfileDir        string
 	DriverDir         string
@@ -34,7 +35,13 @@ type FirefoxOptions struct {
 	Headed            bool
 	Timeout           time.Duration
 	MaxRequests       int
+	Proxy             sber.ProxyOptions
 }
+
+func (o FirefoxOptions) String() string               { return "FirefoxOptions(<redacted>)" }
+func (o FirefoxOptions) Format(f fmt.State, _ rune)   { _, _ = f.Write([]byte(o.String())) }
+func (o FirefoxOptions) MarshalJSON() ([]byte, error) { return json.Marshal("<redacted>") }
+
 type FirefoxBootstrap struct {
 	options FirefoxOptions
 	launch  func(pw.BrowserTypeLaunchPersistentContextOptions) (pw.BrowserContext, func(), error)
@@ -47,6 +54,11 @@ var _ sber.BrowserBootstrapProvider = (*FirefoxBootstrap)(nil)
 var driverGate = make(chan struct{}, 1)
 
 func NewFirefoxBootstrap(o FirefoxOptions) (*FirefoxBootstrap, error) {
+	proxy, err := o.Proxy.Normalize()
+	if err != nil {
+		return nil, browserError("unsupported_browser_state")
+	}
+	o.Proxy = proxy
 	if o.Timeout == 0 {
 		o.Timeout = 30 * time.Second
 	}
@@ -128,10 +140,35 @@ func (p *FirefoxBootstrap) launchOptions() pw.BrowserTypeLaunchPersistentContext
 		JavaScriptEnabled: pw.Bool(true), IgnoreHttpsErrors: pw.Bool(false), AcceptDownloads: pw.Bool(false), ServiceWorkers: pw.ServiceWorkerPolicyBlock,
 		Env: safeBrowserEnvironment(os.Environ()), FirefoxUserPrefs: map[string]any{"network.proxy.type": 0, "network.http.redirection-limit": 0},
 	}
+	if p.options.Proxy.URL != "" {
+		delete(options.FirefoxUserPrefs, "network.proxy.type")
+		options.Proxy = playwrightProxy(p.options.Proxy)
+	}
 	if p.options.FirefoxExecutable != "" {
 		options.ExecutablePath = pw.String(p.options.FirefoxExecutable)
 	}
 	return options
+}
+
+func playwrightProxy(o sber.ProxyOptions) *pw.Proxy {
+	proxy := &pw.Proxy{Server: o.URL}
+	if o.Username != "" {
+		proxy.Username, proxy.Password = pw.String(o.Username), pw.String(o.Password)
+	}
+	return proxy
+}
+
+func (p *FirefoxBootstrap) browserLaunchOptions(ctx context.Context) (pw.BrowserTypeLaunchPersistentContextOptions, func(), error) {
+	options := p.launchOptions()
+	if strings.HasPrefix(p.options.Proxy.URL, "socks5://") && p.options.Proxy.Username != "" {
+		bridge, err := sdkProxy.StartBridge(ctx, p.options.Proxy, p.options.Timeout, 32)
+		if err != nil {
+			return options, nil, browserError("browser_bootstrap_failed")
+		}
+		options.Proxy = playwrightProxy(bridge.Options())
+		return options, bridge.Close, nil
+	}
+	return options, func() {}, nil
 }
 func (p *FirefoxBootstrap) Bootstrap(ctx context.Context, bundle sber.SessionBundle, target string) (sber.BrowserBootstrapResult, error) {
 	if target != sber.PublicBootstrapURL {
@@ -279,7 +316,12 @@ func (p *FirefoxBootstrap) render(ctx context.Context, bundle sber.SessionBundle
 	if ctx.Err() != nil {
 		return sber.BrowserBootstrapResult{}, ctx.Err()
 	}
-	browser, cleanup, err := p.launch(p.launchOptions())
+	options, closeProxy, err := p.browserLaunchOptions(ctx)
+	if err != nil {
+		return sber.BrowserBootstrapResult{}, err
+	}
+	defer closeProxy()
+	browser, cleanup, err := p.launch(options)
 	if err != nil {
 		return sber.BrowserBootstrapResult{}, err
 	}

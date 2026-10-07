@@ -160,6 +160,8 @@ func clientSafeStatus(status int) int {
 }
 func clientSafeTransportCode(code string) string {
 	switch code {
+	case "invalid_proxy", "proxy_authentication", "proxy_connect", "proxy_failed":
+		return code
 	case "canceled", "close_failed", "endpoint_not_allowed", "invalid_ca_bundle", "invalid_client_options", "invalid_context", "invalid_encoding", "invalid_headers", "invalid_json_body", "invalid_mutation_sequence", "invalid_options", "mutation_disabled", "mutation_sequence_closed", "request_failed", "response_too_large", "retry_forbidden", "reused_transport", "timeout", "tls_expired", "tls_hostname", "tls_invalid", "tls_untrusted", "unsafe_page_id", "unsafe_request", "unsupported_cookie_metadata", "unsupported_encoding":
 		return code
 	}

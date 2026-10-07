@@ -24,7 +24,7 @@ func openReadClient(ctx context.Context, path string, options sber.ClientOptions
 }
 
 func readClientOptions(command string, args *commandArguments, dependencies *Authentication) (sber.ClientOptions, sber.PINProvider, error) {
-	options := sber.ClientOptions{TransportOptions: sber.TransportOptions{CABundle: args.ca, Timeout: args.timeout}}
+	options := sber.ClientOptions{TransportOptions: sber.TransportOptions{CABundle: args.ca, Timeout: args.timeout, Proxy: args.selectedProxy}}
 	if isMutationCommand(command) {
 		options.AllowMutations = args.execute
 		return options, nil, nil
@@ -48,7 +48,7 @@ func readClientOptions(command string, args *commandArguments, dependencies *Aut
 			return sber.NewPINAuth(bundle, options)
 		}
 	}
-	authOptions, err := args.browser.authOptions(args.ca)
+	authOptions, err := args.browser.authOptions(args.ca, args.selectedProxy)
 	if err != nil {
 		return options, nil, err
 	}

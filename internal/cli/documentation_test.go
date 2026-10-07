@@ -31,6 +31,11 @@ func TestCLIDocumentationCommandsOptionsAndExamplesMatchExecutable(t *testing.T)
 			}
 		})
 	}
+	for _, name := range []string{"set", "get", "list", "unset"} {
+		if !strings.Contains(string(reference), "| `config "+name+"` |") {
+			t.Errorf("missing config command %s", name)
+		}
+	}
 	manual, err := os.ReadFile(filepath.Join("..", "..", "docs", "CLI.md"))
 	if err != nil {
 		t.Fatal(err)
@@ -43,6 +48,12 @@ func TestCLIDocumentationCommandsOptionsAndExamplesMatchExecutable(t *testing.T)
 			words[i] = strings.ReplaceAll(strings.Trim(words[i], `"`), "$HOME", "/synthetic/private")
 		}
 		if words[0] == "--help" || words[0] == "help" {
+			continue
+		}
+		if words[0] == "config" {
+			if len(words) < 2 || !validateConfigCommand(words[1], words[2:]) {
+				t.Fatal("invalid documented config example")
+			}
 			continue
 		}
 		if _, ok := findCommand(words[0]); !ok {

@@ -35,6 +35,11 @@ The checks examine formatting, run vet and race tests, build the commands, and v
 The default suite uses synthetic data and local servers.
 It needs no bank account or installed browser.
 
+GitHub Actions also installs a scoped Firefox runtime on Ubuntu and macOS.
+It runs the `browser_integration` tests against synthetic local TLS servers and proxies.
+The tests cover HTTP, HTTPS, SOCKS5, proxy authentication, and rejected certificates.
+They do not contact the bank.
+
 Use a package path to select a smaller test group:
 
 ```sh

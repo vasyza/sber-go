@@ -14,7 +14,17 @@ PIN enrollment announces the length from the validated live configuration. Inval
 
 Native authentication retains verified HTTP/1.1 connections across its steps. It rejects replay-enabling POST headers and never repeats a transmitted POST after an uncertain response, including the empty seamless-navigation POST. Business transports keep one request per connection. `TransportOptions.Timeout` bounds the complete request, including connection establishment, TLS verification and response reading; transport phases do not silently shorten this budget.
 
-TLS establishment advertises HTTP/1.1 through ALPN. A peer closure before TLS completion can cause at most three connection attempts within the original request budget. Certificate/protocol failures and cancellation stop establishment; recovery never replays a transmitted HTTP request. Synthetic TLS tests cover exact POST counts, the connection-attempt cap, trust failures, cancellation, and close during recovery. The final real primary-profile CLI and SDK E2E passed with this policy.
+Direct TLS establishment advertises HTTP/1.1 through ALPN. A peer closure before TLS completion can cause at most three connection attempts within the original request budget. Certificate/protocol failures and cancellation stop establishment; recovery never replays a transmitted HTTP request. Synthetic TLS tests cover exact POST counts, the connection-attempt cap, trust failures, cancellation, and close during recovery. The final real primary-profile CLI and SDK E2E passed with this policy.
+
+The CLI uses its saved proxy for native authentication and optional Firefox initialization.
+`--proxy ADDRESS` replaces that setting; `--no-proxy` selects a direct connection.
+HTTP, HTTPS, and SOCKS5 support optional proxy authentication.
+Proxy errors stop requests without a direct connection.
+TLS verification stays enabled, including for HTTPS proxies.
+Firefox retains its own NSS trust.
+Authenticated SOCKS5 uses a temporary local CONNECT adapter with a separate random local token.
+Cancellation and browser cleanup close its listener and active tunnels.
+See the [proxy procedure](CLI.md#proxy-settings) and [SDK options](SDK.md#proxy-options).
 
 For an embedded application, call `GenerateDeviceprint` once and retain the identity explicitly. Pass its value in `AuthOptions.Deviceprint`; `GenerateAntifraudDeviceprint(device.Value())` derives the separate wire form. These are protocol identities, not observed browser-compatibility evidence. An existing observed bundle can use `NewPrimaryAuthFromBundle`.
 

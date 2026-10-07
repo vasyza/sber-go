@@ -9,6 +9,7 @@ type HeaderOverrides = sdkTransport.HeaderOverrides
 type RequestOptions = sdkTransport.RequestOptions
 type Response = sdkTransport.Response
 type TransportOptions = sdkTransport.TransportOptions
+type ProxyOptions = sdkTransport.ProxyOptions
 type HTTPTransport = sdkTransport.HTTPTransport
 
 func NewHTTPTransport(b SessionBundle, o TransportOptions) (*HTTPTransport, error) {

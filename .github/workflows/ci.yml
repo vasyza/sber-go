@@ -16,6 +16,11 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_DRIVER_PATH: ${{ runner.temp }}/sber-firefox/driver
+      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/sber-firefox/browsers
+      SBER_GO_FIREFOX_DRIVER: ${{ runner.temp }}/sber-firefox/driver
+      SBER_GO_BROWSER_PROBE_ROOT: ${{ runner.temp }}/sber-firefox/profiles
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -36,3 +41,26 @@ jobs:
         run: make build
       - name: CLI smoke
         run: ./bin/sber --help
+      - name: Install Firefox test runtime on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3-tools
+          go run github.com/mxschmitt/playwright-go/cmd/playwright install --with-deps firefox
+      - name: Install Firefox test runtime on macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install nss
+          go run github.com/mxschmitt/playwright-go/cmd/playwright install firefox
+      - name: Native Firefox TLS and proxy tests
+        shell: bash
+        run: |
+          mkdir -p "$SBER_GO_BROWSER_PROBE_ROOT"
+          chmod 0700 "$SBER_GO_BROWSER_PROBE_ROOT"
+          sber_firefox_executable=$(rg --files --hidden --no-ignore "$PLAYWRIGHT_BROWSERS_PATH" | rg '/firefox$')
+          sber_certutil=$(command -v certutil || true)
+          if [ -z "$sber_certutil" ]; then
+            sber_certutil="$(brew --prefix nss)/bin/certutil"
+          fi
+          SBER_GO_FIREFOX_EXECUTABLE="$sber_firefox_executable" SBER_GO_CERTUTIL="$sber_certutil" \
+            go test -race -tags=browser_integration ./browser

@@ -22,7 +22,10 @@ type Options struct {
 	Input io.Reader
 	// DefaultProfilePath resolves the user profile only when --profile is absent.
 	// Initial argument validation and help never call it.
-	DefaultProfilePath    func() (string, error)
+	DefaultProfilePath func() (string, error)
+	// DefaultConfigPath is resolved only for config commands or a live command
+	// without an explicit proxy override. Help never reads settings.
+	DefaultConfigPath     func() (string, error)
 	OpenClient            func(string) (mcp.Client, error)
 	OpenClientWithOptions func(context.Context, string, sber.ClientOptions, sber.PINProvider) (mcp.Client, error)
 	Authentication        *Authentication
@@ -42,7 +45,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 		Short: "Read bank data or manage a private profile.",
 		Long: "Use the saved profile for the current user.\n" +
 			"Use --profile PATH to select a different profile.\n" +
-			"Enter secret values only at hidden terminal prompts.\n" +
+			"Enter bank login values only at hidden terminal prompts.\n" +
 			"The bank root CA is part of the application.",
 		RunE: func(*cobra.Command, []string) error { return cliCommand.ErrArguments },
 	}
@@ -52,7 +55,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 			Use:   definition.name + " [options]",
 			Short: definition.description,
 			Args: func(cmd *cobra.Command, args []string) error {
-				if len(args) != 0 || cmd.Flags().Changed("profile") && a.profile == "" || !validateCommand(definition.name, a) {
+				if len(args) != 0 || cmd.Flags().Changed("profile") && a.profile == "" || cmd.Flags().Changed("proxy") && a.proxy == "" || !validateCommand(definition.name, a) {
 					return cliCommand.ErrArguments
 				}
 				return nil
@@ -73,6 +76,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 		child.Flags().AddFlagSet(flags)
 		root.AddCommand(child)
 	}
+	root.AddCommand(configCommand(output, diagnostics, o, &code))
 	if err := cliCommand.Execute(ctx, root, args, output); err != nil {
 		if errors.Is(err, cliCommand.ErrOutput) {
 			return fail(diagnostics, 3, "The command cannot write the output.")
@@ -90,6 +94,11 @@ func runValidated(ctx context.Context, command string, a *commandArguments, outp
 		}
 		if !exists {
 			return fail(diagnostics, 3, "The CLI has no saved profile.\nUse sber login to make a profile.")
+		}
+	}
+	if command != "status" && command != "inspect-session" && !(isMutationCommand(command) && !a.execute) {
+		if err := selectProxy(a, o.DefaultConfigPath); err != nil {
+			return fail(diagnostics, 3, "The command cannot read the CLI settings.\nUse --proxy ADDRESS or --no-proxy to select a connection.")
 		}
 	}
 	switch command {

@@ -8,6 +8,7 @@ For unknown options or extra positional arguments, the CLI stops before it opens
 
 ```text
 sber COMMAND [options]
+sber config COMMAND [arguments]
 sber help COMMAND
 sber COMMAND --help
 sber --help
@@ -50,6 +51,33 @@ The [profile locations](CLI.md#default-profile) follow the operating system conf
 | `card-rename` | Show a plan; use `--execute` for one name change. | None for a plan; one mutation for execution. |
 | `transfer-own` | Show a plan; use `--execute` for one transfer workflow. | None for a plan; a workflow for execution. |
 | `mcp` | Start the local MCP server. | Explicit MCP data requests. |
+| `config` | Read or change saved CLI settings. | None. |
+
+## Configuration commands
+
+| Command | Arguments | Result or action |
+| --- | --- | --- |
+| `config set` | `proxy ADDRESS` | Replace the saved proxy address and its optional login values. |
+| `config get` | `proxy` | Show the saved address without login values. |
+| `config list` | None. | Show saved settings without login values. |
+| `config unset` | `proxy` | Remove the saved proxy and its login values. |
+
+The address syntax is `[scheme://]host:port[:username:password]`.
+Supported schemes are `http`, `https`, and `socks5`.
+Without a scheme, the CLI uses HTTP.
+
+The port must be 1 through 65535.
+Bracket IPv6 hosts; passwords can contain colons.
+An authenticated SOCKS5 proxy requires a username and password of 1 through 255 bytes each.
+HTTP and HTTPS login values can contain up to 1024 bytes each.
+The CLI does not accept `username:password@host` addresses or control characters.
+Only the `proxy` setting is supported.
+
+`config get proxy` returns exit code `1` when the setting is absent.
+`config list` produces empty output when no setting exists.
+Successful `set` and `unset` commands produce no output.
+These commands do not select or open a bank profile.
+See the [proxy procedure](CLI.md#proxy-settings) for storage and command history limits.
 
 ## Common options
 
@@ -57,6 +85,8 @@ The [profile locations](CLI.md#default-profile) follow the operating system conf
 | --- | --- | --- | --- |
 | `--help`, `-h` | `false`. | All commands. | Show command help without profile access or bank requests. |
 | `--profile PATH` | Default user profile. | All operational commands. | Select a different private profile for one command. |
+| `--proxy ADDRESS` | Saved proxy, or direct connection. | Authentication and client commands. | Replace the proxy and login values for one command. |
+| `--no-proxy` | `false`. | Authentication and client commands. | Select a direct connection without reading saved settings. |
 | `--ca-bundle PATH` | Embedded CA with available system PEM trust. | Authentication and client commands. | Replace the trust bundle for the selected client. |
 | `--timeout DURATION` | `30s`. | Client commands. | Limit each request to 1 through 120 seconds. |
 | `--no-renew` | `false`. | Data reads and `check-session`. | Disable interactive session restoration. |
@@ -66,6 +96,11 @@ Offline `status` and `inspect-session` accept `--profile` and help options.
 Authentication commands have a fixed request timeout of 60 seconds.
 MCP, export, credential inspection, and mutations do not accept `--no-renew`.
 They do not do interactive session restoration.
+
+The proxy options cannot be used together.
+An explicit `--proxy` does not read the saved settings.
+Proxy failures stop requests without a direct connection.
+Environment proxy variables do not select a connection.
 
 ## Authentication options
 
@@ -230,7 +265,9 @@ Numbers, units, and dates use the measurement and time category.
 | home directory | The directory that the operating system assigns to a user. |
 | hostname | The server name that TLS validates. |
 | HTTP | The protocol for bank requests and responses. |
+| HTTPS | HTTP with a verified TLS connection. |
 | ID | An identifier for a product, operation, or workflow. |
+| IPv6 | The Internet address format with 128 address bits. |
 | JSON | The structured data format for CLI results. |
 | local server | A test server on the same computer. |
 | login | The account identifier or the authentication command, as specified by context. |
@@ -253,11 +290,13 @@ Numbers, units, and dates use the measurement and time category.
 | profile | The private file that contains session and device data. |
 | publication | The atomic step that puts a validated profile at its destination. |
 | protocol | The rules for requests, responses, and state transitions. |
+| proxy | A server that forwards the selected network connections. |
 | read-only mode | A policy that lets the CLI read data and disables bank data changes. |
 | request | One application message to the bank. |
 | response | The bank message for a request. |
 | root CA | A trusted certificate authority at the top of a certificate chain. |
 | SDK | The native Go library that the CLI uses. |
+| SOCKS5 | A proxy protocol with optional username and password authentication. |
 | session | The bank access state at a specified time. |
 | shell completion | A shell function that suggests command names or options from partial input. |
 | SMS code | A temporary bank code sent by SMS. |

@@ -351,9 +351,9 @@ func TestRememberedLoginForwardsExplicitBrowserRenderingWithoutSecretInputToBrow
 	dir := testPrivateDir(t)
 	var output, diagnostics bytes.Buffer
 	auth := &syntheticRemembered{}
-	code := RunWithOptions(context.Background(), []string{"login", "--profile", filepath.Join(dir, "new.json"), "--remembered-profile", "selected.json", "--browser-profile", dir, "--playwright-driver", "/explicit/driver", "--firefox-executable", "/explicit/firefox"}, &output, &diagnostics, Options{Authentication: &Authentication{
+	code := RunWithOptions(context.Background(), []string{"login", "--profile", filepath.Join(dir, "new.json"), "--remembered-profile", "selected.json", "--browser-profile", dir, "--playwright-driver", "/explicit/driver", "--firefox-executable", "/explicit/firefox", "--proxy", "socks5://127.0.0.1:1080:u:p"}, &output, &diagnostics, Options{Authentication: &Authentication{
 		NewPIN: func(_ string, o sber.AuthOptions) (PINAuthenticator, error) {
-			if !o.BrowserFirst || o.BrowserBootstrap == nil {
+			if !o.BrowserFirst || o.BrowserBootstrap == nil || o.TransportOptions.Proxy != (sber.ProxyOptions{URL: "socks5://127.0.0.1:1080", Username: "u", Password: "p"}) {
 				t.Fatal("explicit browser initialization lost")
 			}
 			return auth, nil

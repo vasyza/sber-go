@@ -24,7 +24,13 @@ The bank package is one cohesive resource/lifecycle boundary. Files separate cli
 
 The CLI has one command registry and option parser (`commands.go`, `run.go`). Its default profile is stored under the current user's operating system configuration directory; `--profile` overrides it for one command. Resolution follows argument validation and is skipped for help. Offline inspection, new-profile enrollment, existing-profile refresh, interactive read renewal, PIN enrollment, and mutation confirmation each have separate application modules. The application validates arguments before opening a client. SDK resources own request contracts and response models; the CLI owns hidden input, output streams, exit codes, and safe diagnostics. Non-streaming JSON is published only after command success and client cleanup. Documentation tests check the registry, parsed examples, and the selected STE writing limits.
 
-Transport TLS establishment (`tls_establishment.go`) advertises the supported HTTP/1.1 protocol and can recover a peer closure before HTTP transmission. Its three-attempt bound shares the original request deadline and cancellation. Certificate/protocol failures stop immediately. Established business connections retain one HTTP request per connection; transmitted financial/authentication POSTs retain their no-replay policy.
+Direct transport TLS establishment (`tls_establishment.go`) advertises the supported HTTP/1.1 protocol and can recover a peer closure before HTTP transmission. Its three-attempt bound shares the original request deadline and cancellation. Certificate/protocol failures stop immediately. Established business connections retain one HTTP request per connection; transmitted financial/authentication POSTs retain their no-replay policy.
+
+`internal/proxy` validates explicit HTTP, HTTPS, and SOCKS5 settings shared by the CLI, transport, and Firefox provider.
+The native transport uses verified standard Go proxy connections.
+Firefox uses direct proxy settings or a bounded local CONNECT adapter for authenticated SOCKS5.
+The CLI stores proxy settings separately from bank profiles, with enrollment's private directory checks, stable process locking, and atomic replacement.
+Environment proxy selection and direct fallback are disabled.
 
 Private unit tests stay beside implementations and are grouped by behavior. Public-consumer tests live under `tests/sdk`, `tests/mcp`, and `tests/rental`; compiled CLI tests live under `tests/cli`. Explicit live tests live under `tests/integration`. Go examples remain at the root. Fixtures are repository-relative under `testdata`. [DEVELOPMENT.md](DEVELOPMENT.md) gives the layout and check commands. `internal/testutil` is imported only by tests. Constructors perform no bank business request; authentication and selected-profile opening are explicit. History coverage and pagination termination remain separate facts.
 
