@@ -5,6 +5,7 @@ package enrollment
 import (
 	"context"
 	"errors"
+
 	"golang.org/x/sys/unix"
 )
 

@@ -2,8 +2,9 @@ package sber_test
 
 import (
 	"context"
-	sber "github.com/vasyza/sber-go"
 	"testing"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 // Expected values are from actual Python3.12.3 independent DATE/DATETIME and

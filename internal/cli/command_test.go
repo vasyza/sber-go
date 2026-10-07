@@ -10,7 +10,7 @@ import (
 )
 
 func TestNativeCommandOfflineStatus(t *testing.T) {
-	dir := t.TempDir()
+	dir := testPrivateDir(t)
 	binary := filepath.Join(dir, "sber")
 	goBinary := filepath.Join(runtime.GOROOT(), "bin", "go")
 	build := exec.CommandContext(context.Background(), goBinary, "build", "-o", binary, "../../cmd/sber")

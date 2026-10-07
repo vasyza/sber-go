@@ -1,45 +1,68 @@
-# sber-go — WIP
+# sber-go
 
-Native Go migration of the unofficial ex3lite Sber SDK, local CLI/MCP layers, and a pure rental ledger. **Owner-requested source handoff, not a production-ready release.** Autonomous work is paused; the owner will finish the project.
+Native Go SDK for the unofficial Sber online-banking protocol: session persistence, primary/PIN/OTP authentication, typed bank resources, exact decimal amounts, a native CLI, a local MCP server, and an independent rental reconciliation engine.
 
-This snapshot includes the latest combined SDK repair-cycle-4 source, regression tests and synthetic fixtures, plus the existing CLI, MCP and rental packages. See **[handoff and known blockers](docs/HANDOFF.md)** before use. Historical manifests/review reports are evidence, not a claim that every acceptance criterion passes.
+Go **1.27.1**, Linux and macOS. Hidden terminal login and first-time profile enrollment currently support Linux. The SDK authentication API and existing-profile reads also work on macOS.
 
-## Build
-
-Go **1.27.1** is pinned in `go.mod`; there is no Python runtime adapter.
+## Build and check
 
 ```sh
-go build ./...
-go build -o bin/sber ./cmd/sber
-go build -o bin/rental-check ./cmd/rental-check
+make check
+./bin/sber --help
 ```
 
-The `sber` command currently provides partial offline status/session-inspection surfaces, not a verified complete bank login/server installation. `rental-check` accepts an explicit synthetic or owner-supplied noncredential ledger on stdin and prints an offline preview:
+`make check` checks formatting, runs vet and the complete race suite, builds all packages and both commands, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs.
+
+## CLI
+
+Create a profile in a local Linux terminal; login, password, OTP and any newly enrolled online-banking PIN are hidden prompts:
 
 ```sh
+./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber status --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber check-session --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber products --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber operations --profile "$HOME/.local/share/sber-go/profile.json" \
+  --from 2026-01-01 --to 2026-01-31 --limit 30 --max-pages 100
+```
+
+An existing profile needs a private parent directory (0700) and a regular private file (0600). `login` creates missing private directories and refuses to replace an existing profile. Credentials are never accepted through arguments, environment variables or MCP. See [CLI behavior and exit codes](docs/CLI.md).
+
+History retains explicit completeness metadata. A final or empty page still has `WindowCompleteness: "unknown"` without independent coverage evidence. An error or page cap produces a nonzero CLI exit without a successful partial result.
+
+## Go API
+
+```go
+client, err := sber.NewSberClientFromSessionFile(profilePath, sber.ClientOptions{})
+if err != nil {
+    return err
+}
+defer client.Close()
+
+products, err := client.Products().Get(ctx, false)
+if err != nil {
+    return err
+}
+encoded, err := sber.ExportJSON(products)
+```
+
+Import `github.com/vasyza/sber-go` as `sber`. Root aliases and forwards preserve the previous source API while implementations live in separate internal layers. [The runnable example](examples/read/main.go) includes cancellation, cleanup and deliberate JSON export. [Authentication usage](docs/AUTH.md) explains primary login, OTP and remembered-device renewal.
+
+`Decimal` preserves values such as `9007199254740993.10`. Decode response JSON with `sber.DecodeJSON` to retain number lexemes. `ExportJSON` preserves financial quantities and masks card numbers in display text. Diagnostic formatting of session/auth/client values is redacted; explicit credential and financial exports have separate APIs.
+
+## MCP and rental reconciliation
+
+```sh
+./bin/sber mcp --profile /absolute/private/path/profile.json
 ./bin/rental-check < explicit-ledger.json
 ```
 
-Its output keeps `reminders_enabled: false` and `bank_authorization_checked: false`. It does not collect bank history, invent contracts or send reminders.
+MCP serves six implemented tools against the selected session: setup status, session info/close, products, operations and one operations page. Authentication remains owner-operated. See [MCP setup](docs/MCP.md). Rental reconciliation consumes an explicit ledger and keeps reminders disabled; see [rental input and output](docs/RENTAL-CLI.md).
 
-## Development checks
+## Architecture and verification boundary
 
-```sh
-go test -race ./...
-go vet ./...
-```
+Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [migration notes](MIGRATION.md) and [current verification](docs/STATUS.md).
 
-**The full acceptance suite is not green/approved.** A known failing client-rejection privacy regression is deliberately retained; the complete parity matrix, foundation/auth safety, protocol conformance, CI, server installation and authorized live-history checks remain unfinished. Do not treat `go build` or previously passing scoped tests as full readiness.
+Local tests, race checks, vet and build cover the implemented contracts. Real bank login, current bank-protocol compatibility and authenticated history require a separate owner-operated smoke check. This is not production acceptance or complete historical parity approval. Earlier WIP/review reports remain historical evidence in `docs/`; their paused/failing status describes the original snapshot.
 
-## Contents
-
-- Module root: auth/session/transport, exact financial models/parsers, client/resources and transfer workflows.
-- `browser/`, `internal/ownerinput`, `internal/enrollment`: partial native/browser/bootstrap and local owner-input boundaries.
-- `internal/mcpwire`, `internal/mcptools`: native stdio engine and catalog; catalog slice accepted offline, wire conformance still blocked.
-- `rental/`, `internal/rentalcli`, `cmd/rental-check`: pure ledger and independently accepted offline CLI boundary.
-- `testdata/`: synthetic fixtures/reference contracts; the Python inventory script is development-only, not a runtime dependency.
-- `docs/`: parity inventory, design notes, retained failed reviews, current handoff.
-
-Never commit real bank credentials, profiles, cookies, HARs or account history. TLS/sandbox remain enabled; mutations require explicit local opt-in and must not replay uncertain financial requests. Live login/history and tenant delivery require separate owner operation and reconciliation.
-
-MIT upstream notices are retained in `LICENSE`/`NOTICE`; CPython-derived scanner/sort contract notices are preserved under `third_party/cpython` and `docs/DATETIME-CYCLE4.md`.
+MIT attribution is retained in [LICENSE](LICENSE) and [NOTICE](NOTICE). CPython notices remain in [third_party/cpython/LICENSE](third_party/cpython/LICENSE). There is no Python runtime adapter.

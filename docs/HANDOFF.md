@@ -1,5 +1,7 @@
 # Owner handoff — unfinished private WIP
 
+> Historical report for snapshot `104c8d86ca63f9b5d0c6e6b8dafd3d53d635eb28`. The owner's 2026-10-07 request resumed development. Current architecture, repairs and checks are in [../README.md](../README.md), [../MIGRATION.md](../MIGRATION.md) and [STATUS.md](STATUS.md). Original verdicts below are historical evidence, not current test results.
+
 The owner requested source publication and will finish the project. This request supersedes autonomous continuation and the earlier prohibition on applying an unaccepted candidate **only for this explicit private WIP handoff**. It does not mark the completion contract achieved or authorize bank access. The standing goal is paused; no live child agents remain. Do not resume work without a new request.
 
 ## What was handed over

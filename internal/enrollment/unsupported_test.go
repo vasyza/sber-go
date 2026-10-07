@@ -5,6 +5,7 @@ package enrollment
 import (
 	"context"
 	"errors"
+	"runtime"
 	"testing"
 )
 
@@ -15,7 +16,7 @@ func TestUnsupportedEnrollmentFailsClosed(t *testing.T) {
 		t.Fatal("unsupported OS did not reject enrollment")
 	}
 	exists, e := SafeProfileExists("synthetic-unused-path")
-	if exists || !errors.Is(e, ErrUnsupported) {
+	if runtime.GOOS != "darwin" && (exists || !errors.Is(e, ErrUnsupported)) {
 		t.Fatal("unsupported metadata query accepted")
 	}
 }

@@ -43,14 +43,19 @@ func TestStrictRequestParsing(t *testing.T) {
 }
 
 func TestMalformedClientResponsesStillTerminateWithoutReply(t *testing.T) {
-    server,err:=New(Options{});if err!=nil{t.Fatal(err)}
-    for _,frame:=range []string{
-        `{"jsonrpc":"2.0","id":1,"result":{"x":1,"\u0078":2}}`,
-        `{"jsonrpc":"2.0","id":1,"error":{"message":"\ud800"}}`,
-    } {
-        var out bytes.Buffer
-        if err:=server.Serve(context.Background(),strings.NewReader(frame+"\n"),&out);err!=ErrClientResponse||out.Len()!=0{t.Fatal("want rejected client response, not reply")}
-    }
+	server, err := New(Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, frame := range []string{
+		`{"jsonrpc":"2.0","id":1,"result":{"x":1,"\u0078":2}}`,
+		`{"jsonrpc":"2.0","id":1,"error":{"message":"\ud800"}}`,
+	} {
+		var out bytes.Buffer
+		if err := server.Serve(context.Background(), strings.NewReader(frame+"\n"), &out); err != ErrClientResponse || out.Len() != 0 {
+			t.Fatal("want rejected client response, not reply")
+		}
+	}
 }
 
 func TestClientResponseTerminatesWithoutReply(t *testing.T) {

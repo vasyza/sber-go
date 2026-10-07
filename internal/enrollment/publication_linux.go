@@ -5,9 +5,10 @@ package enrollment
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"golang.org/x/sys/unix"
 	"os"
 	"strconv"
+
+	"golang.org/x/sys/unix"
 )
 
 func fdPath(fd int) string { return "/proc/self/fd/" + strconv.Itoa(fd) }

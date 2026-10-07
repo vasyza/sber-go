@@ -4,13 +4,14 @@ package browser
 import (
 	"context"
 	"errors"
-	pw "github.com/mxschmitt/playwright-go"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"path/filepath"
 	"sync"
 	"testing"
 	"time"
+
+	pw "github.com/mxschmitt/playwright-go"
+	sber "github.com/vasyza/sber-go"
 )
 
 type fakeFrame struct {

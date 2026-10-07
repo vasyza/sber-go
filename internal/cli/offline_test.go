@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/vasyza/sber-go"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/vasyza/sber-go"
 )
 
 func TestOfflineStatusDoesNotReadOrCreateState(t *testing.T) {
-	parent := t.TempDir()
+	parent := testPrivateDir(t)
 	profile := filepath.Join(parent, "absent-state", "profile.json")
 	var out, diagnostics bytes.Buffer
 	if code := Run(context.Background(), []string{"status", "--profile", profile}, &out, &diagnostics); code != 0 {
@@ -31,7 +32,7 @@ func TestOfflineStatusDoesNotReadOrCreateState(t *testing.T) {
 }
 
 func TestOfflineInspectOnlyEmitsRedactedMetadata(t *testing.T) {
-	dir := t.TempDir()
+	dir := testPrivateDir(t)
 	profile := filepath.Join(dir, "profile.json")
 	canary := "synthetic-cookie-private-only"
 	bundle, err := sber.NewSessionBundle(sber.SessionBundle{APIBase: sber.AppOrigin, WebBase: sber.AppOrigin, Cookies: []sber.CookieRecord{{Name: "fixture", Value: canary, Domain: "online.sberbank.ru", Path: "/", Secure: true, HTTPOnly: true, HostOnly: true}}})
@@ -63,7 +64,7 @@ func TestOfflineInspectOnlyEmitsRedactedMetadata(t *testing.T) {
 
 func TestCLIRejectsUnsupportedSecretArgumentsWithoutEcho(t *testing.T) {
 	canary := "synthetic-argument-never-print"
-	for _, args := range [][]string{{canary}, {"status", "--password=" + canary}, {"status", "--profile", filepath.Join(t.TempDir(), "profile.json"), canary}, {"login", "--pin=" + canary}} {
+	for _, args := range [][]string{{canary}, {"status", "--password=" + canary}, {"status", "--profile", filepath.Join(testPrivateDir(t), "profile.json"), canary}, {"login", "--pin=" + canary}} {
 		var out, diagnostics bytes.Buffer
 		if code := Run(context.Background(), args, &out, &diagnostics); code != 2 {
 			t.Fatalf("unsupported arguments returned %d", code)
@@ -75,7 +76,7 @@ func TestCLIRejectsUnsupportedSecretArgumentsWithoutEcho(t *testing.T) {
 }
 
 func TestOfflineInspectUnsafeProfileFailsClosed(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "profile.json")
+	path := filepath.Join(testPrivateDir(t), "profile.json")
 	if err := os.WriteFile(path, []byte(`{"synthetic":"do-not-echo"}`), 0644); err != nil {
 		t.Fatal(err)
 	}

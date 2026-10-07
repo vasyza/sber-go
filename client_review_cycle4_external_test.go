@@ -105,7 +105,7 @@ func TestIndependentClient3ExternalSDKMarkerDoesNotBypassSanitization(t *testing
 				if route == "factory" {
 					_, e = sdk.NewSberClient(b, sdk.ClientOptions{TransportFactory: func(sdk.SessionBundle, sdk.TransportOptions) (sdk.Transport, error) { return nil, injected }})
 				} else if route == "renewal" {
-					p := filepath.Join(t.TempDir(), "synthetic-profile.json")
+					p := filepath.Join(testPrivateDir(t), "synthetic-profile.json")
 					if e = b.Save(p); e != nil {
 						t.Fatal(e)
 					}

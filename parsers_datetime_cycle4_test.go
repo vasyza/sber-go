@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"testing"
 	"time"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 type cycle4Offline struct {

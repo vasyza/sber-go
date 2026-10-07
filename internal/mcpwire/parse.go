@@ -33,10 +33,14 @@ func parseRequest(frame []byte) (request, int, error) {
 		// echoed. No permissive decode is an acceptance oracle.
 		var invalid map[string]json.RawMessage
 		if json.Unmarshal(frame, &invalid) == nil {
-            if _,exists:=invalid["result"];exists{return req,0,ErrClientResponse}
-            if _,exists:=invalid["error"];exists{return req,0,ErrClientResponse}
-            req.notification = notificationShape(invalid)
-        }
+			if _, exists := invalid["result"]; exists {
+				return req, 0, ErrClientResponse
+			}
+			if _, exists := invalid["error"]; exists {
+				return req, 0, ErrClientResponse
+			}
+			req.notification = notificationShape(invalid)
+		}
 		return req, -32700, nil
 	}
 	var fields map[string]json.RawMessage
@@ -87,7 +91,9 @@ func parseRequest(frame []byte) (request, int, error) {
 	_, inlineCapabilities := req.meta["io.modelcontextprotocol/clientCapabilities"]
 	req.modern = method == "server/discover" || inlineVersion || inlineCapabilities
 	for key := range req.meta {
-		if strings.EqualFold(key, "io.modelcontextprotocol/protocolVersion") || strings.EqualFold(key, "io.modelcontextprotocol/clientCapabilities") { req.modern = true }
+		if strings.EqualFold(key, "io.modelcontextprotocol/protocolVersion") || strings.EqualFold(key, "io.modelcontextprotocol/clientCapabilities") {
+			req.modern = true
+		}
 	}
 	return req, 0, nil
 }
@@ -113,34 +119,57 @@ func staticMessage(code int) string {
 func trimmed(raw json.RawMessage) json.RawMessage { return bytes.TrimSpace(raw) }
 
 func notificationShape(fields map[string]json.RawMessage) bool {
-	if fields == nil { return false }
-	if _, hasID := fields["id"]; hasID { return false }
-	for key := range fields { if strings.EqualFold(key, "method") { return true } }
+	if fields == nil {
+		return false
+	}
+	if _, hasID := fields["id"]; hasID {
+		return false
+	}
+	for key := range fields {
+		if strings.EqualFold(key, "method") {
+			return true
+		}
+	}
 	return false
 }
 
 func allowedFields(fields map[string]json.RawMessage, allowed ...string) bool {
 	for key := range fields {
 		found := false
-		for _, name := range allowed { if key == name { found = true; break } }
-		if !found { return false }
+		for _, name := range allowed {
+			if key == name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
 	}
 	return true
 }
 
 func validCancellation(req request) bool {
-	if !allowedFields(req.params, "_meta", "requestId", "reason") || !validID(req.params["requestId"]) { return false }
+	if !allowedFields(req.params, "_meta", "requestId", "reason") || !validID(req.params["requestId"]) {
+		return false
+	}
 	if reason, exists := req.params["reason"]; exists {
-		if _, ok := stringValue(reason); !ok { return false }
+		if _, ok := stringValue(reason); !ok {
+			return false
+		}
 	}
 	return true
 }
 
 func validImplementation(raw json.RawMessage) bool {
-	if !object(raw){return false}
+	if !object(raw) {
+		return false
+	}
 	var fields map[string]json.RawMessage
-	if json.Unmarshal(raw,&fields)!=nil{return false}
-	name,nameOK:=stringValue(fields["name"])
-	version,versionOK:=stringValue(fields["version"])
-	return nameOK&&versionOK&&name!=""&&version!=""
+	if json.Unmarshal(raw, &fields) != nil {
+		return false
+	}
+	name, nameOK := stringValue(fields["name"])
+	version, versionOK := stringValue(fields["version"])
+	return nameOK && versionOK && name != "" && version != ""
 }

@@ -93,6 +93,9 @@ func TestLockPathSwapAfterOpenBeforeFlockRejected(t *testing.T) {
 
 func TestForeignUIDMetadataRejectedWithoutPrivilege(t *testing.T) {
 	directory := t.TempDir()
+	if err := os.Chmod(directory, 0700); err != nil {
+		t.Fatal("synthetic private directory unavailable")
+	}
 	path := filepath.Join(directory, "synthetic")
 	os.WriteFile(path, nil, 0600)
 	var file, dir unix.Stat_t

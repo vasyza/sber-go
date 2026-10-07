@@ -48,12 +48,16 @@ func TestDispatchExactArgumentsOnce(t *testing.T) {
 	byID := make(map[string]map[string]json.RawMessage)
 	for _, response := range responses {
 		id := string(response["id"])
-		if _, duplicate := byID[id]; duplicate { t.Fatal("duplicate response ID") }
+		if _, duplicate := byID[id]; duplicate {
+			t.Fatal("duplicate response ID")
+		}
 		byID[id] = response
 	}
 	currentResponse, currentOK := byID[`"current"`]
 	legacyResponse, legacyOK := byID[`"legacy"`]
-	if !currentOK || !legacyOK { t.Fatal("missing correlated tool result") }
+	if !currentOK || !legacyOK {
+		t.Fatal("missing correlated tool result")
+	}
 	current, legacy := resultFields(t, currentResponse), resultFields(t, legacyResponse)
 	if string(current["resultType"]) != `"complete"` || string(current["structuredContent"]) != arguments {
 		t.Fatalf("want exact current tool result; got %s", responses[0]["result"])

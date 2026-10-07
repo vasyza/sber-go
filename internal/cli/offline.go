@@ -1,5 +1,5 @@
-// Package cli is the owner-operated native command boundary. Current commands
-// are offline; no default owner-state discovery or bank request occurs.
+// Package cli is the owner-operated native command boundary. A command and
+// profile must be selected explicitly; secrets are read only from a local tty.
 package cli
 
 import (
@@ -21,7 +21,7 @@ func fail(output io.Writer, code int, message string) int {
 
 // Run executes an explicitly selected offline command. Secret argument/env
 // loaders are deliberately absent; a profile path is not opened by status.
-func Run(ctx context.Context, args []string, output, diagnostics io.Writer) int {
+func runOffline(ctx context.Context, args []string, output, diagnostics io.Writer) int {
 	if ctx == nil || ctx.Err() != nil || output == nil {
 		return fail(diagnostics, 2, "invalid command context")
 	}

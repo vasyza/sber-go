@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"reflect"
 	"testing"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 func TestCycle4CanonicalSortApplication(t *testing.T) {

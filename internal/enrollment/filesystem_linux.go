@@ -3,8 +3,9 @@
 package enrollment
 
 import (
-	"golang.org/x/sys/unix"
 	"strings"
+
+	"golang.org/x/sys/unix"
 )
 
 // privateParent walks literal components without following symlinks, pins the

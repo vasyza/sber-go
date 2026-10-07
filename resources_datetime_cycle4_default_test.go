@@ -3,10 +3,11 @@ package sber_test
 import (
 	"context"
 	"encoding/json"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"testing"
 	"time"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 func TestCycle4CanonicalDefaultWindowCivilClock(t *testing.T) {

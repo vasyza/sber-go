@@ -3,10 +3,15 @@ package main
 import (
 	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/vasyza/sber-go/internal/cli"
 )
 
 func main() {
-	os.Exit(cli.Run(context.Background(), os.Args[1:], os.Stdout, os.Stderr))
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	code := cli.Run(ctx, os.Args[1:], os.Stdout, os.Stderr)
+	cancel()
+	os.Exit(code)
 }

@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"testing"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 func TestCycle4CanonicalBankStrptime(t *testing.T) {

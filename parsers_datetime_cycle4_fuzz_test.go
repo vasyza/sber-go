@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 func FuzzCycle4SourceDateValues(f *testing.F) {

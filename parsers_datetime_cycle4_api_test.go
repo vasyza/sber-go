@@ -3,11 +3,12 @@ package sber_test
 import (
 	"encoding/json"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 var _ func(string) (sber.SourceDateTime, error) = sber.ParseSourceDateTime

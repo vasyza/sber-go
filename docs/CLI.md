@@ -1,27 +1,34 @@
-# Native Go CLI — текущий offline срез
+# CLI
 
-Бинарник собран локально в `bin/sber`. Это частично перенесённый CLI, **не готовый банковский коннектор**. Он не заменяет установленный Python launcher и не подключён к Hermes/MCP или cron.
+Сборка: `make build`. Справка: `./bin/sber --help`. Каждая команда требует явный `--profile PATH`; автоматического поиска профилей нет.
 
-## Рабочие команды
+| Команда | Поведение |
+| --- | --- |
+| `login` | Linux: скрытый ввод, primary login, OTP и подтверждение онлайн-PIN при запросе банка; атомарное создание нового профиля |
+| `status` | Только файловая metadata, профиль не читается |
+| `inspect-session` | Офлайн-чтение redacted metadata |
+| `check-session` | Проверка выбранной сессии через warm-up |
+| `products`, `accounts`, `cards` | Типизированные снимки продуктов |
+| `operations` | Постраничная история с metadata полноты |
+| `operations-page` | Одна страница и следующий offset |
+| `mcp` | MCP stdio с шестью реализованными инструментами |
 
 ```sh
-./bin/sber status --profile /explicit/private/path/profile.json
-./bin/sber inspect-session --profile /explicit/private/path/profile.json
+./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber inspect-session --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber operations --profile "$HOME/.local/share/sber-go/profile.json" \
+  --resource account:EXPLICIT_ID --from 2026-01-01 --to 2026-01-31 \
+  --limit 30 --max-pages 100
 ```
 
-- `status` проверяет только безопасную файловую metadata; содержимое профиля не открывает и состояние не создаёт.
-- `inspect-session` — явно выбранная владельцем offline-команда: принимает private profile v1–v4 и выводит только redacted metadata, без cookie values/deviceprints/token state. Это не банковская авторизация и не проверка текущей сессии.
-- Оба результата содержат `bank_authorization_checked: false`.
-- Нет автоматического поиска owner профилей и нет secret loaders из аргументов, окружения или pipe. Unsupported login/password/PIN arguments отвергаются без печати их значений.
-- Exit 0 — выполненная offline-команда; 2 — некорректный вызов/отменённый контекст; 3 — unsafe/invalid profile metadata или ошибка вывода.
+Логин, пароль, OTP и PIN вводятся только в локальном терминале. `--password` и другие secret-аргументы отвергаются без печати значения. `login` держит приватный межпроцессный lock и не заменяет существующий профиль. CAPTCHA и WebAuthn требуют отдельного SDK/UI-сценария владельца; CLI останавливается без автоматических повторов. На macOS доступны SDK auth, готовые профили и MCP; скрытый CLI login ограничен Linux.
 
-`login`, `doctor`, операции/балансы, profile/HAR import, MCP и rental commands ещё не wired. Не передавайте банковские секреты через Telegram. До завершения полного review нельзя использовать этот срез для подключения счёта или делать выводы о задолженности.
+Профиль — regular 0600, parent — 0700. `status` не создаёт директории; `inspect-session` не доказывает авторизацию. `login` сохраняет проверенный session bundle после cleanup, без пароля/PIN/OTP.
 
-## Реально выполненная проверка
+История: `--limit` 1–100, `--max-pages` 1–10000 (default 100), `--offset` неотрицательный. Даты проверяются до открытия клиента. `--force-update` передаётся в чтение продуктов. Без дат используется ограниченное окно SDK, а не вся история.
 
-- RED→GREEN: новый `status`, затем `inspect-session`, затем сборка и запуск native command.
-- `go test -race ./internal/cli` — 6 tests pass.
-- `go vet ./internal/cli ./cmd/sber` и `go build -o bin/sber ./cmd/sber` — pass на Go 1.27.1.
-- Реальный `bin/sber status` с отсутствующим synthetic path вернул `profile_exists: false` и `bank_authorization_checked: false`; owner paths не использовались.
+Суммы точные, display-текст маскирует PAN. `WindowCompleteness: "unknown"` сохраняется после последней страницы. Page cap или ошибка backend дают nonzero exit и пустой stdout. SDK `Collect` отдельно предоставляет partial data вместе с ошибкой для явной обработки приложением.
 
-Локальные raw logs и smoke result находятся вне git в `research/go-migration/cli-evidence`. Independent review этого CLI-среза ещё не выполнено; passing tests не являются release approval.
+Exit: 0 — выполнено; 2 — неверные аргументы/контекст; 3 — ошибка профиля, запроса, публикации, cleanup или вывода; 130 — отмена активной команды. MCP stdout содержит только протокол, diagnostics — stderr. После ошибки публикации сначала выполните `status`: fsync может завершиться ошибкой после появления файла.
+
+Предыдущий offline-срез сохранён в [history/CLI-WIP.md](history/CLI-WIP.md). Проверки — [STATUS.md](STATUS.md).

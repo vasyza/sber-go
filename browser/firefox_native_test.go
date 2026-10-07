@@ -12,7 +12,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	pw "github.com/mxschmitt/playwright-go"
 	"io"
 	"log"
 	"log/slog"
@@ -27,6 +26,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	pw "github.com/mxschmitt/playwright-go"
 )
 
 func TestNativeFirefoxRealTLSControls(t *testing.T) {
