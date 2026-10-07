@@ -1,39 +1,166 @@
-# Offline native rental-check
+# rental-check CLI
 
-`bin/rental-check` — отдельный native Go preview уже реализованного pure rental engine. Это **не банковский login CLI, не интеграция с MCP/cron и не разрешение отправлять сообщения**. Existing Python launcher и owner-установка не изменяются.
+The `rental-check` command reads a rental ledger from standard input.
+It writes an offline preview as JSON.
+It uses the same Cobra version as the [sber CLI](CLI.md).
 
-```sh
-go build -o bin/rental-check ./cmd/rental-check
-./bin/rental-check < explicit-ledger.json
+The command does not make bank requests, get the current time, or send reminders.
+It does not search for files or profiles.
+Give all dates, tenant identifiers, prices, currency codes, and tenant assignments in the ledger.
+
+## Build and show help
+
+1. Build the command with Go 1.27.1.
+
+   ```sh
+   go build -o bin/rental-check ./cmd/rental-check
+   ```
+
+2. Show command help.
+
+   ```sh
+   ./bin/rental-check --help
+   ```
+
+3. Give the command a ledger through standard input.
+
+   ```sh
+   ./bin/rental-check < explicit-ledger.json
+   ```
+
+You can use `-h` instead of `--help`.
+You can also use `rental-check help`.
+A help request does not read the ledger.
+The command does not accept ledger file arguments or other options.
+It rejects shell completion commands.
+
+Do not put a login, password, PIN, cookie, HAR, or bank profile in the ledger.
+
+## Input format
+
+Use one complete JSON document.
+The maximum input size is 1 MiB (1,048,576 bytes).
+The command rejects incomplete input, extra JSON documents, and input above this limit.
+
+Use these field names with the exact letter case:
+
+- `AsOf`
+- `Tenants`
+- `Periods`
+- `Receipts`
+- `Evidence`
+
+Use the exact field names in nested objects.
+For example, `Confirmed` and `confirmed` are different names.
+The command rejects unknown fields, names with the wrong letter case, and duplicate keys after JSON escape decoding.
+It checks UTF-8 and Unicode surrogate pairs before it reads field values.
+
+Use JSON integers for all `Minor` values.
+The values must fit in an `int64`.
+The command does not round fractional values or values outside that range.
+
+See [the rental data types](../rental/README.md) and [rental/evaluate.go](../rental/evaluate.go) for all fields and ledger rules.
+
+## Timestamps
+
+Use this timestamp format:
+
+```text
+YYYY-MM-DDTHH:MM:SS[.fraction](Z|+HH:MM|-HH:MM)
 ```
 
-STDIN принимает только **некреденциальный explicit rental ledger**. PIN/password/cookies/HAR/банковские profiles этому формату не принадлежат; через чат их не передавайте. Автоматического поиска файлов/профилей, сетевого обращения и получения текущего времени нет.
+The brackets show an optional fraction.
+The parentheses show the permitted time zone forms.
+Do not put the brackets or parentheses in a timestamp.
 
-## Строгий формат
+Use four digits for the year.
+Use two digits for each month, day, hour, minute, and second.
+Use uppercase `T` and `Z`.
+Use a decimal point before a fraction with 1 through 9 ASCII digits.
+A time zone offset needs two hour digits (00 through 23) and two minute digits (00 through 59).
 
-- Одна полная JSON-документная структура, максимум 1 MiB (1048576 bytes), без truncation/trailing JSON.
-- Canonical names строго совпадают с exported Go полями `rental.Input`: `AsOf`, `Tenants`, `Periods`, `Receipts`, `Evidence`. Поля вложенных объектов также exact-case: `ID`, `TenantID`, `Minor`, `Currency`, `Confirmed`, `CoverageStart`, `OwnerReconciled` и т. д.; полный typed shape описан в `rental/README.md`/`rental/evaluate.go`.
-- Неизвестные поля, регистровые aliases и decoded duplicate keys отвергаются до struct decode. Это важно: обычный Go JSON decoder трактует `Confirmed` и `confirmed` как одно поле, хотя JSON names различны.
-- UTF-8/surrogate integrity проверяется до декодирования. Денежные Minor — int64 JSON integers; fractional/overflow values не округляются.
-- Все supplied timestamps проверяются **до `time.Time` struct decode**: four-digit year, two-digit month/day/hour/minute/second, uppercase `T`, optional **dot** fraction с 1–9 ASCII digits, uppercase `Z` либо signed fixed-width `HH:MM` offset (hours 00–23, minutes 00–59). Затем native parser проверяет фактический календарь/часы. Single-digit hours, comma fractions, malformed offsets, leap seconds и **любые >9 fractional digits, включая trailing zeroes**, — schema error; округления/усечения нет.
-- Правило времени применяется через typed schema traversal к `AsOf`, `Tenant.LedgerStart`, `Period.Start/End/DueAt`, `Receipt.ReceivedAt`, `Evidence.CoverageStart/CoverageThrough/ObservedAt`. Supported fractions 0–9 digits, valid offsets и разные spelling одного exact instant допустимы; byte-for-byte decode→encode equality не требуется. Explicit `null` timestamp отвергается; omitted/zero required contract times остаются native ledger errors, а omitted/zero proof boundaries — UNKNOWN.
-- Каждая supplied `Evidence` **object** обязана явно содержать boolean `HasGaps`, `Truncated`, `PageUncertain`. Missing/null/wrong-type negative flag — schema error (exit 3, static stderr, no stdout), а не invented false/true evidence. Explicit unsafe `true` блокирует negative completeness proof. `Evidence` absent/null/empty допустим; omitted `Complete`/`OwnerReconciled` остаются false и не доказывают полноту. Missing proof boundaries также не авторизуют debt candidates; подтверждённое достаточное funding по-прежнему может доказать PAID.
-- Presence rule — намеренное prerelease stdin schema hardening, **не изменение typed `rental.Input`/`CollectionEvidence` zero semantics и не SDK datetime compatibility**. Dates/IDs/prices/currency/mapping вводятся явно и затем проверяются engine. Никаких выдуманных реальных tenants или договорных сроков.
+The command checks the calendar date and clock values.
+It rejects comma fractions, leap seconds, malformed offsets, and fractions with more than 9 digits.
+It rejects excess fractional digits even when those digits are zero.
+It does not round or remove excess digits.
 
-## Результат
+These rules apply before native timestamp decoding to:
 
-Выводятся explicit copies `periods`, `allocations`, `credits`, `totals`, `owner_review`, `candidate_decisions`, `as_of`. Всегда присутствуют `reminders_enabled: false` и `bank_authorization_checked: false`. Candidate metadata не является authorisation/Telegram destination и никуда не отправляется.
+- `AsOf`
+- `Tenant.LedgerStart`
+- `Period.Start`, `Period.End`, and `Period.DueAt`
+- `Receipt.ReceivedAt`
+- `Evidence.CoverageStart`, `Evidence.CoverageThrough`, and `Evidence.ObservedAt`
 
-Доказательство полноты в `Evidence` — assertion владельца о coherently reconciled ledger/all channels, не проведённая этим CLI банковская проверка. Без него observed positive remainder остаётся UNKNOWN. Не трактуйте fixture flags как доказанную реальную полноту.
+Different valid timestamp forms can specify the same instant.
+A `null` timestamp is not valid.
+A missing or zero required contract time causes a ledger error.
+A missing or zero evidence time does not prove complete history.
 
-Exit 0 — successful offline preview (включая UNKNOWN); 2 — invalid I/O/arguments; 3 — JSON/schema/size/read failure; 4 — invalid/equivocal/overflow ledger; 5 — encoding/output failure. Ошибки не включают raw input, arguments или private causes; partial decisions не выдаются при invalid input. Short output write не считается успехом.
+## Evidence of complete history
 
-## Проверка CLI repair cycle 1 — independent review pending
+Each supplied `Evidence` object must contain these three boolean fields:
 
-Initial CLI implementation прошла собственные gates, но **independent CLI review 1: FAIL** выявил silent subnanosecond truncation с изменением receipt allocation, DueAt и coverage decisions, а также native normalization malformed clock/fraction/offset spellings. Original failed verdict, frozen bytes и synthetic fixtures сохранены: `research/go-migration/rental-cli-review-1.json`, `rental-cli-review-1-parent-verification.json`, `rental-cli-review-1/`.
+- `HasGaps`
+- `Truncated`
+- `PageUncertain`
 
-Bounded repair cycle 1 реализован с **3 separate actual RED→GREEN tracers** (precision, lexical grammar, supplied negative proof presence); complete package regression gate выполнялся после каждого GREEN. Последующее test-only strengthening production semantics не меняло. Current CLI suite: **27 regular tests, 217 subtests, 3 fuzz seed suites / 177 seed cases, no test skips**. Scoped package race/vet/build pass (`internal/rentalcli`, `internal/strictjson`, `rental`, `cmd/rental-check`); command package не содержит собственных test functions, но запускается real native subprocess regressions. Structured temporal-cutoff и proof-acceptance fuzz — **20000 actual executions each**, не только panic/live-flag checks.
+A missing field, a `null` value, or a value of the wrong type causes an input format error.
+A `true` value in any of these fields prevents proof of complete history.
 
-Actual old/new binaries повторно запущены на всех **379 original synthetic review inputs + 10 parent controls**: **778 executions**, 368 cases с byte-identical outcome, 21 intentional new schema rejection, no unexpected change. Original bad precision/offset/omitted-proof cases теперь exit 3 с empty stdout; supported 1 ns controls сохраняют PAID/DUE/NOT_DUE/UNKNOWN, receipt availability и обе observation freshness границы. Full logs, copied fixture/source SHA manifests и proposed review snapshot — `research/go-migration/rental-cli-fix-1/` (в соседнем research tree).
+You can omit `Evidence`, set it to `null`, or give an empty list.
+Missing `Complete` and `OwnerReconciled` fields keep their value of `false`.
+Missing evidence cannot prove that rent is due.
+Confirmed receipts can still prove `PAID` when they cover the required amount.
 
-Approved pure rental engine и `internal/strictjson` production bytes не изменены; текущие dependency tests/testdata включены в frozen review evidence. **Эти passing gates не являются повторным independent review или CLI acceptance**, не доказывают whole SDK port/real bank completeness и не сбрасывают separate SDK review budget. Реальные данные, login, owner profiles/credentials, tenant delivery, cron, publishing и установка не подключены. Повторное независимое review исправленной frozen CLI boundary остаётся обязательным.
+The owner supplies evidence of complete history.
+The CLI does not check the bank or confirm that evidence.
+Without proof of complete history, a rent shortfall gives `UNKNOWN`.
+Review each candidate decision against the owner's contracts, tenant assignments, and complete bank and cash records.
+
+## Output and exit codes
+
+The output contains `periods`, `allocations`, `credits`, `totals`, `owner_review`, `candidate_decisions`, and `as_of`.
+It always contains `reminders_enabled: false` and `bank_authorization_checked: false`.
+A candidate decision does not give permission to send a message.
+
+The CLI writes JSON and help text to standard output.
+It writes error messages to standard error.
+Error messages do not contain raw input, argument values, or private error details.
+Invalid input produces no decision output.
+An output write failure can leave partial output.
+A short write causes an output error.
+
+| Exit code | Meaning |
+| --- | --- |
+| 0 | The offline preview or help request is complete. A preview can contain `UNKNOWN`. |
+| 2 | The arguments, context, input, or output are not valid. |
+| 3 | The input read, size check, JSON check, or input format check failed. |
+| 4 | The ledger contains invalid or inconsistent data, or an arithmetic overflow occurred. |
+| 5 | The preview preparation or output write failed. This includes a help output failure. |
+
+For an argument error, the CLI writes:
+
+```text
+The command arguments are not valid.
+Use rental-check --help for command help.
+```
+
+## Development checks and earlier reviews
+
+Run these checks with synthetic data:
+
+```sh
+go test -race ./internal/rentalcli ./internal/command ./internal/strictjson ./rental
+go vet ./internal/rentalcli ./internal/command ./cmd/rental-check
+go build -o bin/rental-check ./cmd/rental-check
+```
+
+Follow the [CLI writing rules](CLI-WRITING.md) when you change help text or messages.
+
+The [earlier acceptance record](RENTAL-CLI-ACCEPTANCE.md) applies to the source hashes listed in that record.
+The Cobra migration changes the command parser and diagnostic text.
+That earlier acceptance does not cover these new source bytes.
+The earlier guide remains in Git history.
+The original failed review and the later acceptance record remain unchanged.
+See [HANDOFF.md](HANDOFF.md) for the remaining SDK issues and live use limits.

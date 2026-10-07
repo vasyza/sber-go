@@ -14,13 +14,23 @@ go build -o bin/sber ./cmd/sber
 go build -o bin/rental-check ./cmd/rental-check
 ```
 
-The `sber` command currently provides partial offline status/session-inspection surfaces, not a verified complete bank login/server installation. `rental-check` accepts an explicit synthetic or owner-supplied noncredential ledger on stdin and prints an offline preview:
+Both CLI commands use Cobra v1.10.2.
+The `sber` command checks local profile files and shows profile properties with secret values removed.
+The `rental-check` command reads a supplied rental ledger from standard input and writes an offline preview.
+Both commands provide help with `--help` or `-h`.
 
 ```sh
+./bin/sber --help
+./bin/sber status --profile /explicit/private/path/profile.json
+./bin/rental-check --help
 ./bin/rental-check < explicit-ledger.json
 ```
 
-Its output keeps `reminders_enabled: false` and `bank_authorization_checked: false`. It does not collect bank history, invent contracts or send reminders.
+The rental preview contains `reminders_enabled: false` and `bank_authorization_checked: false`.
+The commands do not collect bank history or send reminders.
+Give the rental command all contract data in the ledger.
+Read the [sber guide](docs/CLI.md) and [rental-check guide](docs/RENTAL-CLI.md) for input rules and exit codes.
+CLI guides, help text, and messages follow the [ASD-STE100 writing rules](docs/CLI-WRITING.md).
 
 ## Development checks
 
@@ -36,7 +46,7 @@ go vet ./...
 - Module root: auth/session/transport, exact financial models/parsers, client/resources and transfer workflows.
 - `browser/`, `internal/ownerinput`, `internal/enrollment`: partial native/browser/bootstrap and local owner-input boundaries.
 - `internal/mcpwire`, `internal/mcptools`: native stdio engine and catalog; catalog slice accepted offline, wire conformance still blocked.
-- `rental/`, `internal/rentalcli`, `cmd/rental-check`: pure ledger and independently accepted offline CLI boundary.
+- `rental/`, `internal/rentalcli`, `cmd/rental-check`: pure ledger and offline CLI. The earlier CLI acceptance applies to its listed source hashes.
 - `testdata/`: synthetic fixtures/reference contracts; the Python inventory script is development-only, not a runtime dependency.
 - `docs/`: parity inventory, design notes, retained failed reviews, current handoff.
 
