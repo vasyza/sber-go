@@ -28,6 +28,7 @@ const (
 	NewPIN
 	ConfirmPIN
 	PIN
+	ConfirmAction
 )
 
 func promptLabel(prompt Prompt) (string, bool) {
@@ -44,6 +45,8 @@ func promptLabel(prompt Prompt) (string, bool) {
 		return "Confirm new PIN (hidden): ", true
 	case PIN:
 		return "Online-banking PIN (not card PIN, hidden): ", true
+	case ConfirmAction:
+		return "Type CONFIRM to send this operation (hidden): ", true
 	}
 	return "", false
 }

@@ -1,5 +1,7 @@
 # Authentication and profiles
 
+The CLI operator procedures, complete options, and session restoration are in [CLI.md](CLI.md) and [CLI-REFERENCE.md](CLI-REFERENCE.md). These Go API notes retain their engineering format. The latest real verification is in [CLI-VERIFICATION.md](CLI-VERIFICATION.md).
+
 On Linux and macOS the native owner path is `./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"`. It acquires an enrollment lock before prompts, creates missing private parents and refuses an existing profile. Login/password are hidden, requested OTP is handled once, and online-PIN enrollment asks for confirmation. Password/PIN/OTP are not profile fields. Echo-control failure stops input. CAPTCHA/WebAuthn are not automated CLI flows.
 
 macOS uses the terminal device path returned by the kernel, verified against the original input descriptor, and native exclusive rename for first publication. Linux uses its pinned procfs descriptor capabilities. Both restore terminal settings after success, failure or cancellation and preserve an existing profile. Profile paths must have literal, symlink-free components; use your home directory rather than macOS `/tmp` or `/var` aliases.
@@ -11,6 +13,8 @@ An optional `--ca-bundle PATH` replaces default trust for that client. Embedded 
 PIN enrollment announces the length from the validated live configuration. Invalid local digit input or a confirmation mismatch can be corrected within the same authentication process, without repeating login/OTP or submitting another PIN creation request. The final seamless navigation retains the originating `Process-Id`, matching the bank's public `r-97.0.0` login client contract.
 
 Native authentication retains verified HTTP/1.1 connections across its steps. It rejects replay-enabling POST headers and never repeats a transmitted POST after an uncertain response, including the empty seamless-navigation POST. Business transports keep one request per connection. `TransportOptions.Timeout` bounds the complete request, including connection establishment, TLS verification and response reading; transport phases do not silently shorten this budget.
+
+TLS establishment advertises HTTP/1.1 through ALPN. A peer closure before TLS completion can cause at most three connection attempts within the original request budget. Certificate/protocol failures and cancellation stop establishment; recovery never replays a transmitted HTTP request. Synthetic TLS tests cover exact POST counts, the connection-attempt cap, trust failures, cancellation, and close during recovery. The final real primary-profile CLI and SDK E2E passed with this policy.
 
 For an embedded application, call `GenerateDeviceprint` once and retain the identity explicitly. Pass its value in `AuthOptions.Deviceprint`; `GenerateAntifraudDeviceprint(device.Value())` derives the separate wire form. These are protocol identities, not observed browser-compatibility evidence. An existing observed bundle can use `NewPrimaryAuthFromBundle`.
 
@@ -33,7 +37,9 @@ The CLI also supports remembered-device login without changing the existing PIN:
   --profile "$HOME/.config/sber-sdk/profile-next.json"
 ```
 
-It asks for the existing online-banking PIN and one OTP only if required. It does not ask for primary credentials or create another PIN. The source profile is read without replacement; the new destination must be absent. Missing source, cleanup failure and rejected authentication prevent publication. Existing-profile CLI reads do not prompt for renewal. MCP remains separate from terminal input.
+It asks for the existing online-banking PIN and one OTP only if required. It does not ask for primary credentials or create another PIN. The source profile is read without replacement; the new destination must be absent. Missing source, cleanup failure and rejected authentication prevent publication. Interactive existing-profile CLI reads can renew once through hidden PIN/OTP input and retry one read. `--no-renew`, batch input, MCP, export, credential inspection, and mutation commands do not prompt for renewal. MCP remains separate from terminal input.
+
+`refresh-session --profile EXISTING_PATH` restores and atomically updates an existing full remembered profile. Authentication and cleanup complete before publication; failures retain the old profile. Primary and remembered CLI authentication load public configuration before asking for secret input. Definite new-PIN policy rejections can request a fresh owner choice in the same process, at most three bank attempts; no password/SMS or uncertain PIN request is replayed.
 
 When an observed browser identity/cookie initialization is required, select ordinary public rendering explicitly:
 
@@ -55,8 +61,8 @@ On 2026-10-07, native remembered PIN login and the real authenticated E2E below 
 After owner login, the separately enabled integration test checks authorization, products and one page (at most five returned operations) for the last seven days. It prints only success stages and counts. It does not initiate payments, renew through PIN/OTP, export responses or prove complete history coverage. Default tests do not compile or execute it:
 
 ```sh
-go test -tags=live -run '^TestLiveReadOnly$' -count=1 -v ./integration \
+go test -tags=live -run '^TestLive(CLIReadOnly|ReadOnly)$' -count=1 -v ./integration \
   -args -sber-live -sber-profile "$HOME/.local/share/sber-go/profile.json"
 ```
 
-Running `go test -tags=live ./integration` without `-sber-live` compiles and skips the test without opening a profile or contacting the bank. Session cookies may rotate and be saved back to the explicitly selected private profile during authenticated reads.
+The native CLI test additionally covers all data-read commands, offline metadata, credential metadata, and private session export. It supplies `--no-renew`, holds identifiers/results in transient memory, and removes the temporary private export. Running `go test -tags=live ./integration` without `-sber-live` compiles and skips both tests before opening a profile, building a temporary binary, or contacting the bank. Session cookies may rotate and be saved back to the explicitly selected private profile during authenticated reads.

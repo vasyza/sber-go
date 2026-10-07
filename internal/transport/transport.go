@@ -144,11 +144,12 @@ func newHTTPTransport(b sdkSession.SessionBundle, o TransportOptions, authConnec
 	// The client deadline covers DNS, connection, verified TLS, headers and
 	// body together. Do not shorten configured budgets with hidden phase caps.
 	wire := &http.Transport{Proxy: nil, DialContext: (&net.Dialer{Timeout: o.Timeout}).DialContext,
-		TLSClientConfig: &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}, TLSHandshakeTimeout: o.Timeout,
+		TLSClientConfig: &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12, NextProtos: []string{"http/1.1"}}, TLSHandshakeTimeout: o.Timeout,
 		DisableCompression: true, DisableKeepAlives: !authConnections, MaxConnsPerHost: o.MaxClients, ResponseHeaderTimeout: o.Timeout,
 		IdleConnTimeout:        o.Timeout,
 		MaxResponseHeaderBytes: 1 * 1024 * 1024, Protocols: protocols,
 	}
+	wire.DialTLSContext = verifiedTLSDialer(wire.TLSClientConfig, o.Timeout)
 	root, cancel := context.WithCancel(context.Background())
 	tr := &HTTPTransport{root: root, cancel: cancel, wire: wire, jar: seed.Cookies, headers: browserHeaders(seed.ObservedHeaders), slots: make(chan struct{}, o.MaxClients), maxResponseBytes: o.MaxResponseBytes, authConnections: authConnections}
 	tr.client = &http.Client{Transport: wire, Timeout: o.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
@@ -261,7 +262,10 @@ func (tr *HTTPTransport) request(ctx context.Context, method, target string, bod
 	if closed {
 		return nil, sdkErrs.ErrClosed
 	}
-	req, err := http.NewRequestWithContext(child, method, target, body)
+	requestContext, requestCancel := context.WithTimeout(child, tr.client.Timeout)
+	defer requestCancel()
+	requestContext = context.WithValue(requestContext, tlsRequestContextKey{}, requestContext)
+	req, err := http.NewRequestWithContext(requestContext, method, target, body)
 	if err != nil {
 		return nil, &sdkErrs.TransportError{Code: "unsafe_request"}
 	}

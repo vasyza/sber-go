@@ -33,7 +33,8 @@ func clientNormalizeOptions(o ClientOptions) (ClientOptions, error) {
 		return o, &sdkErrs.TransportError{Code: "invalid_client_options"}
 	}
 	o.TransportOptions.AllowUnready = false
-	if o.TransportFactory == nil {
+	defaultTransportFactory := o.TransportFactory == nil
+	if defaultTransportFactory {
 		o.TransportFactory = func(b sdkSession.SessionBundle, to sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
 			return sdkTransport.NewHTTPTransport(b, to)
 		}
@@ -48,7 +49,15 @@ func clientNormalizeOptions(o ClientOptions) (ClientOptions, error) {
 	o.AuthOptions.TransportOptions = o.TransportOptions
 	o.AuthOptions.TransportOptions.AllowUnready = true
 	if o.AuthOptions.TransportFactory == nil {
-		o.AuthOptions.TransportFactory = sdkAuth.AuthTransportFactory(o.TransportFactory)
+		if defaultTransportFactory {
+			o.AuthOptions.TransportFactory = func(b sdkSession.SessionBundle, to sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
+				return sdkTransport.NewAuthenticationTransport(b, to)
+			}
+		} else {
+			// Preserve deliberately injected caller factories. Native defaults
+			// use auth's connection policy rather than the business policy.
+			o.AuthOptions.TransportFactory = sdkAuth.AuthTransportFactory(o.TransportFactory)
+		}
 	}
 	return o, nil
 }

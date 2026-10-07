@@ -11,6 +11,62 @@ import (
 	"github.com/vasyza/sber-go/internal/ownerinput"
 )
 
+type policyRejectedPrimary struct {
+	configuredPrimary
+	creations int
+	failure   error
+	always    bool
+}
+
+func (a *policyRejectedPrimary) CreatePIN(ctx context.Context, pin string) (sber.SessionBundle, error) {
+	a.creations++
+	if a.creations == 1 || a.always {
+		return sber.SessionBundle{}, a.failure
+	}
+	return a.syntheticPrimary.CreatePIN(ctx, pin)
+}
+
+func TestRejectedNewPINRequiresFreshOwnerInputWithoutRepeatingLoginOrSMS(t *testing.T) {
+	for _, tt := range []struct {
+		name     string
+		failure  *sber.PinAuthError
+		always   bool
+		attempts int
+		status   int
+	}{
+		{"PIN policy", &sber.PinAuthError{Code: "invalid_pin", StatusCode: 400}, false, 2, 0},
+		{"birthdate policy", &sber.PinAuthError{Code: "invalid_pin_birthdate", StatusCode: 422}, false, 2, 0},
+		{"bounded owner corrections", &sber.PinAuthError{Code: "invalid_pin", StatusCode: 400}, true, 3, 3},
+		{"uncertain service error", &sber.PinAuthError{Code: "invalid_pin", StatusCode: 500}, false, 1, 3},
+		{"encryption error", &sber.PinAuthError{Code: "invalid_decode_pin", StatusCode: 400}, false, 1, 3},
+		{"reset identity", &sber.PinAuthError{Code: "invalid_pin", StatusCode: 400, ResetCookies: true}, false, 1, 3},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			auth := &policyRejectedPrimary{failure: tt.failure, always: tt.always}
+			newInputs := 0
+			var output, diagnostics bytes.Buffer
+			code := RunWithOptions(context.Background(), []string{"login", "--profile", filepath.Join(testPrivateDir(t), "profile.json")}, &output, &diagnostics, Options{Authentication: &Authentication{
+				NewPrimary: func() (PrimaryAuthenticator, error) { return auth, nil },
+				ReadSecret: func(_ context.Context, prompt ownerinput.Prompt) (string, error) {
+					if prompt == ownerinput.NewPIN {
+						newInputs++
+					}
+					return "13579", nil
+				},
+			}})
+			if code != tt.status || auth.creations != tt.attempts || newInputs != tt.attempts {
+				t.Fatal("PIN policy handling omitted fresh input, exceeded its bound, or replayed an uncertain attempt")
+			}
+			if !strings.HasPrefix(strings.Join(auth.steps, ","), "login,otp,") || auth.steps[len(auth.steps)-1] != "close" {
+				t.Fatal("PIN correction lost the existing authentication state or cleanup")
+			}
+			if strings.Count(strings.Join(auth.steps, ","), "login") != 1 || strings.Count(strings.Join(auth.steps, ","), "otp") != 1 || strings.Contains(diagnostics.String(), "13579") {
+				t.Fatal("PIN correction repeated primary authentication or exposed secret input")
+			}
+		})
+	}
+}
+
 type configuredPrimary struct{ syntheticPrimary }
 
 func (*configuredPrimary) LoadConfig(context.Context) (sber.FrontendConfig, error) {

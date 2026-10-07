@@ -60,6 +60,11 @@ func TestOwnerLoginReportsSafeFailureReasons(t *testing.T) {
 		{"session navigation", &sber.PinAuthError{Code: "redirect_failed", StatusCode: 500}, "bank session navigation returned HTTP 500"},
 		{"config", &sber.PinAuthError{Code: "invalid_frontend_config"}, "bank login page configuration is not supported"},
 		{"browser", &sber.PinAuthError{Code: "browser_check_required"}, "bank login page requires browser initialization"},
+		{"bank PIN policy", &sber.PinAuthError{Code: "invalid_pin_birthdate", StatusCode: 400}, "bank did not accept the new PIN"},
+		{"device limit", &sber.PinAuthError{Code: "browser_limit", StatusCode: 400}, "bank remembered-device limit reached"},
+		{"PIN decode", &sber.PinAuthError{Code: "invalid_decode_pin", StatusCode: 400}, "bank could not decode the PIN"},
+		{"session pair", &sber.PinAuthError{Code: "missing_ufs_session"}, "authenticated session cookies are missing"},
+		{"unknown HTTP response", &sber.PinAuthError{Code: "synthetic-private-code", StatusCode: 500}, "bank authentication returned HTTP 500"},
 		{"private metadata", &sber.PinAuthError{Code: "synthetic-private-code", Message: "synthetic-private-message"}, "owner login failed; profile not published"},
 		{"private raw error", errors.New("synthetic-private-error"), "owner login failed; profile not published"},
 	} {

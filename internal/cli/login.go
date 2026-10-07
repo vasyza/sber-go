@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"reflect"
@@ -27,10 +26,11 @@ type PrimaryAuthenticator interface {
 // Authentication injects synthetic dependencies into application tests. The
 // command's production defaults accept no alternative credential input channel.
 type Authentication struct {
-	NewPrimary func() (PrimaryAuthenticator, error)
-	NewPIN     func(string, sber.AuthOptions) (PINAuthenticator, error)
-	ReadSecret func(context.Context, ownerinput.Prompt) (string, error)
-	Enroll     func(context.Context, string, enrollment.Prepare) error
+	NewPrimary       func() (PrimaryAuthenticator, error)
+	NewPIN           func(string, sber.AuthOptions) (PINAuthenticator, error)
+	NewPINFromBundle func(sber.SessionBundle, sber.AuthOptions) (PINAuthenticator, error)
+	ReadSecret       func(context.Context, ownerinput.Prompt) (string, error)
+	Enroll           func(context.Context, string, enrollment.Prepare) error
 }
 
 func primaryWithOptions(options sber.AuthOptions) (PrimaryAuthenticator, error) {
@@ -56,29 +56,15 @@ func ownerSecret(ctx context.Context, prompt ownerinput.Prompt) (string, error) 
 	return string(secret.Bytes()), nil
 }
 
-func runLogin(ctx context.Context, args []string, output, diagnostics io.Writer, dependencies *Authentication) int {
-	flags := flag.NewFlagSet("sber login", flag.ContinueOnError)
-	flags.SetOutput(io.Discard)
-	profile := flags.String("profile", "", "explicit new private profile")
-	caBundle := flags.String("ca-bundle", "", "explicit trusted PEM certificate bundle")
-	remembered := flags.String("remembered-profile", "", "explicit private source for remembered PIN login")
-	selection := loginBrowserSelection{}
-	flags.StringVar(&selection.profile, "browser-profile", "", "dedicated private Firefox profile with verified NSS trust")
-	flags.StringVar(&selection.driver, "playwright-driver", "", "absolute matching installed Playwright driver directory")
-	flags.StringVar(&selection.executable, "firefox-executable", "", "absolute matching installed Firefox executable")
-	if flags.Parse(args) != nil || flags.NArg() != 0 || *profile == "" {
-		return fail(diagnostics, 2, "usage: sber login --profile NEW_PATH [--remembered-profile PATH] [--ca-bundle PATH]; enter secrets only at the hidden terminal prompts")
-	}
-	if !selection.valid() {
-		return fail(diagnostics, 2, "browser initialization requires all three absolute paths: --browser-profile, --playwright-driver and --firefox-executable")
-	}
+func runLogin(ctx context.Context, args *commandArguments, output, diagnostics io.Writer, dependencies *Authentication) int {
+	profile, caBundle, remembered, selection := args.profile, args.ca, args.remembered, args.browser
 	a := Authentication{}
 	if dependencies != nil {
 		a = *dependencies
 	}
 	if a.NewPrimary == nil {
 		a.NewPrimary = func() (PrimaryAuthenticator, error) {
-			options, err := selection.authOptions(*caBundle)
+			options, err := selection.authOptions(caBundle)
 			if err != nil {
 				return nil, err
 			}
@@ -97,15 +83,15 @@ func runLogin(ctx context.Context, args []string, output, diagnostics io.Writer,
 		a.Enroll = enrollment.Enroll
 	}
 	message := "owner login failed; profile not published"
-	err := a.Enroll(ctx, *profile, func(ctx context.Context) (enrollment.CandidateWriter, error) {
+	err := a.Enroll(ctx, profile, func(ctx context.Context) (enrollment.CandidateWriter, error) {
 		var writer enrollment.CandidateWriter
 		var err error
-		if *remembered != "" {
-			options, optionsErr := selection.authOptions(*caBundle)
+		if remembered != "" {
+			options, optionsErr := selection.authOptions(caBundle)
 			if optionsErr != nil {
 				err = optionsErr
 			} else {
-				writer, err = prepareRememberedLogin(ctx, a, *remembered, options)
+				writer, err = prepareRememberedLogin(ctx, a, remembered, options)
 			}
 		} else {
 			writer, err = prepareLogin(ctx, a, diagnostics)
@@ -141,7 +127,16 @@ func runLogin(ctx context.Context, args []string, output, diagnostics io.Writer,
 
 // Only known classifications become diagnostics. Remote messages, tokens,
 // arbitrary error strings and unknown codes must never reach terminal output.
-func loginFailureMessage(err error) string {
+func loginFailureMessage(err error) (message string) {
+	defer func() {
+		var phase *loginPhaseError
+		if errors.As(err, &phase) {
+			switch phase.phase {
+			case "public-configuration", "owner-input", "login-password", "sms-confirmation", "pin-enrollment", "session-validation", "cleanup":
+				message = "authentication stage=" + phase.phase + "; " + message
+			}
+		}
+	}()
 	var captcha *sber.PinCaptchaRequired
 	if errors.As(err, &captcha) {
 		return "CAPTCHA requires owner interaction; use the bank UI or the explicit SDK challenge API"
@@ -168,14 +163,33 @@ func loginFailureMessage(err error) string {
 			return "bank requires owner WebAuthn interaction; profile not published"
 		case "attempts_limit_reached":
 			return "bank authentication attempt limit reached; profile not published"
+		case "browser_limit":
+			return "bank remembered-device limit reached; use the bank website; profile not published"
+		case "invalid_pin_birthdate":
+			return "bank did not accept the new PIN; use a different PIN that meets the bank requirements; profile not published"
 		case "invalid_pin":
-			return "online-banking PIN does not meet the bank's digit requirements; profile not published"
+			return "online-banking PIN is not accepted; check the bank PIN requirements; profile not published"
+		case "invalid_decode_pin":
+			return "bank could not decode the PIN; authentication protocol needs review; profile not published"
 		case "invalid_pin_public_key":
 			return "bank supplied an unsupported PIN encryption key; profile not published"
 		case "redirect_failed":
 			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
 				return fmt.Sprintf("bank session navigation returned HTTP %d; profile not published", auth.StatusCode)
 			}
+		case "missing_ufs_session":
+			return "authenticated session cookies are missing; profile not published"
+		case "invalid_json", "invalid_csrf", "missing_redirect", "missing_ufs_host", "missing_ufs_api_host", "invalid_primary_auth_state":
+			return "bank authentication response format is not supported; profile not published"
+		case "ufs_ready_failed", "ufs_bootstrap_failed":
+			if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
+				return fmt.Sprintf("bank session initialization returned HTTP %d; profile not published", auth.StatusCode)
+			}
+		case "invalid_server_proof":
+			return "bank authentication proof is not valid; profile not published"
+		}
+		if auth.StatusCode >= 100 && auth.StatusCode <= 599 {
+			return fmt.Sprintf("bank authentication returned HTTP %d; profile not published", auth.StatusCode)
 		}
 	}
 	return "owner login failed; profile not published"
@@ -211,12 +225,21 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 	if auth == nil || (reflect.ValueOf(auth).Kind() == reflect.Pointer && reflect.ValueOf(auth).IsNil()) {
 		return nil, enrollment.ErrPrepare
 	}
+	phase := "public-configuration"
 	defer func() {
 		if closeErr := auth.Close(); closeErr != nil {
 			writer = nil
 			err = enrollment.ErrPrepare
+			phase = "cleanup"
+		}
+		if err != nil {
+			err = &loginPhaseError{phase: phase, cause: err}
 		}
 	}()
+	if err := prepareAuthentication(ctx, auth); err != nil {
+		return nil, err
+	}
+	phase = "owner-input"
 	login, err := a.ReadSecret(ctx, ownerinput.Login)
 	if err != nil {
 		return nil, err
@@ -225,14 +248,17 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 	if err != nil {
 		return nil, err
 	}
+	phase = "login-password"
 	bundle, err := auth.Login(ctx, login, password, sber.PrimaryLoginOptions{})
 	login, password = "", ""
 	var otp *sber.PinOTPRequired
 	if errors.As(err, &otp) {
+		phase = "owner-input"
 		code, readErr := a.ReadSecret(ctx, ownerinput.OTP)
 		if readErr != nil {
 			return nil, readErr
 		}
+		phase = "sms-confirmation"
 		bundle, err = auth.ConfirmOTP(ctx, code)
 		code = ""
 	}
@@ -240,17 +266,14 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 		return nil, err
 	}
 	if bundle == nil {
-		pin, readErr := readNewPIN(ctx, a, auth, diagnostics)
-		if readErr != nil {
-			return nil, readErr
-		}
-		created, createErr := auth.CreatePIN(ctx, pin)
-		pin = ""
+		phase = "pin-enrollment"
+		created, createErr := enrollOwnerPIN(ctx, a, auth, diagnostics)
 		if createErr != nil {
 			return nil, createErr
 		}
 		bundle = &created
 	}
+	phase = "session-validation"
 	validated, err := bundle.Clone()
 	if err != nil {
 		return nil, err

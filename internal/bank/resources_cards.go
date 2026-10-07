@@ -88,13 +88,15 @@ func (a *CardsAPI) Info(ctx context.Context, cardIDs ...any) ([]CardInfo, error)
 	if len(cardIDs) == 0 {
 		return nil, NewParseError("card_ids")
 	}
-	ids := make([]string, 0, len(cardIDs))
+	// The current bank frontend sends JSON numbers. Decimal strings from
+	// the original reference now produce HTTP 500 on this endpoint.
+	ids := make([]int64, 0, len(cardIDs))
 	for _, value := range cardIDs {
 		id, err := resourceNumericProductID(value)
 		if err != nil {
 			return nil, err
 		}
-		ids = append(ids, strconv.FormatInt(id, 10))
+		ids = append(ids, id)
 	}
 	payload, err := a.requester.PostRead(ctx, CardInfoPath, map[string]any{"cardIds": ids})
 	if err != nil {

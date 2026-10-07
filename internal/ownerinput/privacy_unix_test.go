@@ -24,7 +24,7 @@ func TestSecretFormattingNeverDisclosesBuffer(t *testing.T) {
 }
 
 func TestFixedPromptStagesRealPTY(t *testing.T) {
-	for _, prompt := range []Prompt{Login, Password, OTP, NewPIN, ConfirmPIN, PIN} {
+	for _, prompt := range []Prompt{Login, Password, OTP, NewPIN, ConfirmPIN, PIN, ConfirmAction} {
 		t.Run(fmt.Sprint(int(prompt)), func(t *testing.T) {
 			master, slave := syntheticPTY(t)
 			done := make(chan bool, 1)

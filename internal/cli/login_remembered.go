@@ -44,42 +44,10 @@ func (b loginBrowserSelection) authOptions(ca string) (sber.AuthOptions, error) 
 }
 
 func prepareRememberedLogin(ctx context.Context, a Authentication, source string, options sber.AuthOptions) (writer enrollment.CandidateWriter, err error) {
-	auth, err := a.NewPIN(source, options)
+	validated, err := authenticateRemembered(ctx, a.ReadSecret, func() (PINAuthenticator, error) {
+		return a.NewPIN(source, options)
+	})
 	if err != nil {
-		return nil, err
-	}
-	if auth == nil || reflect.ValueOf(auth).Kind() == reflect.Pointer && reflect.ValueOf(auth).IsNil() {
-		return nil, enrollment.ErrPrepare
-	}
-	defer func() {
-		if auth.Close() != nil {
-			writer = nil
-			err = enrollment.ErrPrepare
-		}
-	}()
-	pin, err := a.ReadSecret(ctx, ownerinput.PIN)
-	if err != nil {
-		return nil, err
-	}
-	bundle, err := auth.Login(ctx, pin, sber.CaptchaAnswer{})
-	pin = ""
-	var otp *sber.PinOTPRequired
-	if errors.As(err, &otp) {
-		code, readErr := a.ReadSecret(ctx, ownerinput.OTP)
-		if readErr != nil {
-			return nil, readErr
-		}
-		bundle, err = auth.ConfirmOTP(ctx, code)
-		code = ""
-	}
-	if err != nil {
-		return nil, err
-	}
-	validated, err := bundle.Clone()
-	if err != nil {
-		return nil, err
-	}
-	if _, err = validated.ToSeed(true); err != nil {
 		return nil, err
 	}
 	return func(ctx context.Context, path string) error {
@@ -88,4 +56,50 @@ func prepareRememberedLogin(ctx context.Context, a Authentication, source string
 		}
 		return sdkSession.WriteEnrollmentCandidate(path, validated)
 	}, nil
+}
+
+// Authentication and cleanup finish before callers can publish a session.
+func authenticateRemembered(ctx context.Context, read func(context.Context, ownerinput.Prompt) (string, error), create func() (PINAuthenticator, error)) (validated sber.SessionBundle, err error) {
+	auth, err := create()
+	if err != nil {
+		return validated, err
+	}
+	if auth == nil || reflect.ValueOf(auth).Kind() == reflect.Pointer && reflect.ValueOf(auth).IsNil() {
+		return validated, enrollment.ErrPrepare
+	}
+	defer func() {
+		if auth.Close() != nil {
+			validated = sber.SessionBundle{}
+			err = enrollment.ErrPrepare
+		}
+	}()
+	if err := prepareAuthentication(ctx, auth); err != nil {
+		return validated, err
+	}
+	pin, err := read(ctx, ownerinput.PIN)
+	if err != nil {
+		return validated, err
+	}
+	bundle, err := auth.Login(ctx, pin, sber.CaptchaAnswer{})
+	pin = ""
+	var otp *sber.PinOTPRequired
+	if errors.As(err, &otp) {
+		code, readErr := read(ctx, ownerinput.OTP)
+		if readErr != nil {
+			return validated, readErr
+		}
+		bundle, err = auth.ConfirmOTP(ctx, code)
+		code = ""
+	}
+	if err != nil {
+		return validated, err
+	}
+	validated, err = bundle.Clone()
+	if err != nil {
+		return validated, err
+	}
+	if _, err = validated.ToSeed(true); err != nil {
+		return sber.SessionBundle{}, err
+	}
+	return validated, nil
 }

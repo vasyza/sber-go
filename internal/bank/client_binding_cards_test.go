@@ -17,7 +17,7 @@ func TestClientBindingCardsFunctionalAccess(t *testing.T) {
 		t.Fatalf("native card info: %v", err)
 	}
 	calls := tr.snapshotCalls()
-	if len(calls) != 1 || calls[0].target != c.core().bundle.APIBase+CardInfoPath || !reflect.DeepEqual(calls[0].body, map[string]any{"cardIds": []string{"12345"}}) {
+	if len(calls) != 1 || calls[0].target != c.core().bundle.APIBase+CardInfoPath || !reflect.DeepEqual(calls[0].body, map[string]any{"cardIds": []int64{12345}}) {
 		t.Fatal("card info source request changed")
 	}
 }

@@ -26,11 +26,19 @@ Create a profile in your local Linux or macOS terminal; login, password, OTP and
   --from 2026-01-01 --to 2026-01-31 --limit 30 --max-pages 100
 ```
 
-An existing profile needs a private parent directory (0700) and a regular private file (0600). `login` creates missing private directories and refuses to replace an existing profile. Credentials are never accepted through arguments, environment variables or MCP. See [CLI behavior and exit codes](docs/CLI.md).
+The CLI has 20 commands. They cover primary and PIN login, session recovery, products, accounts, cards, card details and limits, portfolio relationships, paginated history, operation details, analytics, private export, and MCP. `sber help COMMAND` shows each command's options.
+
+An existing profile needs a private parent directory (0700) and a regular private file (0600). `login` creates missing private directories and refuses to replace an existing profile. Authentication prepares public configuration before secret prompts. Credentials are never accepted through arguments, environment variables or MCP. The English [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-TERMS.md) follow the [ASD-STE100 Issue 9 writing policy](docs/CLI-STYLE.md).
 
 The verified Russian Trusted Root CA is built into the SDK, CLI and MCP. Native bank requests need no certificate download, external CA file or `--ca-bundle` argument. Default trust retains the canonical system PEM bundle when available; TLS chain and hostname verification stay enabled. `--ca-bundle PATH` optionally replaces default trust for one client. See [certificate provenance and updates](internal/transport/certificates/README.md).
 
 Remembered-device login uses a hidden PIN: `login --remembered-profile EXISTING_PATH --profile NEW_PATH`. Optional public browser initialization requires explicit matching Firefox/Playwright paths and a dedicated private browser profile with verified certificate trust; see [authentication setup](docs/AUTH.md).
+
+`refresh-session` updates the selected existing profile through hidden PIN input and optional SMS confirmation. Interactive reads can restore an expired session once, save it, and retry the read. Use `--no-renew` for a read without secret prompts. Batch commands and MCP require separate terminal restoration. The bank controls session lifetime; session files do not promise access for a year.
+
+To restore an existing session explicitly, run `./bin/sber refresh-session --profile "$HOME/.local/share/sber-go/profile.json"`. TLS establishment advertises HTTP/1.1 and can recover a peer closure before HTTP is sent, within a three-attempt bound and the original timeout. Certificate failures and transmitted HTTP requests do not enter this recovery path.
+
+`card-rename` and `transfer-own` show offline plans by default. Execution requires `--execute` and hidden local `CONFIRM`; a transfer has a second confirmation after preparation. Financial requests never renew or replay automatically. These commands have synthetic validation only; real financial execution is outside the live verification scope.
 
 History retains explicit completeness metadata. A final or empty page still has `WindowCompleteness: "unknown"` without independent coverage evidence. An error or page cap produces a nonzero CLI exit without a successful partial result.
 
@@ -67,6 +75,6 @@ MCP serves six implemented tools against the selected session: setup status, ses
 
 Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [migration notes](MIGRATION.md) and [current verification](docs/STATUS.md).
 
-Local tests, race checks, vet and build cover the implemented contracts. On 2026-10-07, owner-authorized native PIN login and an authenticated read E2E passed on macOS: session validation, products and one history page for seven days. The successful session used observed browser identity after ordinary public rendering. Cold primary login without browser initialization, full history coverage and independent production review remain outside this evidence. Earlier WIP/review reports remain historical evidence in `docs/`; their paused/failing status describes the original snapshot.
+Local tests, race checks, vet and build cover the implemented contracts on Linux and macOS. On 2026-10-07, owner-authorized primary login, PIN restoration, interactive expiry recovery, and native CLI read E2E passed on macOS. The E2E covered all 15 read and local profile commands, including card details, limits, analytics, operation details, and private export. Authentication used ordinary public browser rendering with observed browser identity. See the [CLI verification record](docs/CLI-VERIFICATION.md) for executable checks and limits. Real financial mutations, full history coverage and independent production review remain outside this evidence. Earlier WIP/review reports remain historical evidence in `docs/`; their paused/failing status describes the original snapshot.
 
 MIT attribution is retained in [LICENSE](LICENSE) and [NOTICE](NOTICE). CPython notices remain in [third_party/cpython/LICENSE](third_party/cpython/LICENSE). There is no Python runtime adapter.

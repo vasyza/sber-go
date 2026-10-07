@@ -1,5 +1,7 @@
 # Complete migration acceptance matrix
 
+Current runtime adjustment (2026-10-07): the observed bank frontend sends `cardIds` as JSON numbers for `/ufs-carddetail/rest/card/v1/cardInfo`. The native `Cards.Info` and `Cards.Limits` methods now use checked `int64` values. The original string-array contract produced HTTP 500. The frozen source excerpts in `parity.json` remain unchanged as historical reference; the current command contract is in [CLI-REFERENCE.md](CLI-REFERENCE.md).
+
 **Every acceptance row is `pending`: none is declared implemented in Go.** `docs/parity.json` is the machine-authoritative matrix; this document is its readable surface and safety-seam index. Future `TestParity…`/`FuzzParity…` identifiers are required tests, not claims that they exist or pass.
 
 ## Frozen authority and boundaries
