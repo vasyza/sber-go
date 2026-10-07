@@ -9,6 +9,7 @@ import (
 	"github.com/vasyza/sber-go/mcp"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -42,7 +43,7 @@ func TestCLIHelpDoesNotInspectProfile(t *testing.T) {
 func TestCLIArgumentErrorsRemainStatic(t *testing.T) {
 	canary := "SYNTHETIC-private-argument"
 	for _, args := range [][]string{
-		nil, {}, {canary}, {"completion"}, {"status"}, {"inspect-session"},
+		nil, {}, {canary}, {"completion"},
 		{"status", "--profile"}, {"status", "--profile="},
 		{"status", "--profile", ""},
 		{"status", "--password=" + canary},
@@ -69,8 +70,14 @@ func TestCLIFlagValuesDoNotPersistAcrossRuns(t *testing.T) {
 		t.Run("run", func(t *testing.T) {
 			t.Parallel()
 			profile := filepath.Join(t.TempDir(), "absent", "profile.json")
+			defaultProfile := filepath.Join(t.TempDir(), "default", "profile.json")
+			lookups := 0
+			options := Options{DefaultProfilePath: func() (string, error) {
+				lookups++
+				return defaultProfile, nil
+			}}
 			var out, diagnostics bytes.Buffer
-			if code := Run(context.Background(), []string{"status", "--profile=" + profile}, &out, &diagnostics); code != 0 {
+			if code := RunWithOptions(context.Background(), []string{"status", "--profile=" + profile}, &out, &diagnostics, options); code != 0 || lookups != 0 {
 				t.Fatalf("status exit %d: %s", code, diagnostics.String())
 			}
 			var facts map[string]any
@@ -81,8 +88,11 @@ func TestCLIFlagValuesDoNotPersistAcrossRuns(t *testing.T) {
 				t.Fatalf("status result changed: %v", facts)
 			}
 			out.Reset()
-			if code := Run(context.Background(), []string{"status"}, &out, &diagnostics); code != 2 || out.Len() != 0 {
+			if code := RunWithOptions(context.Background(), []string{"status"}, &out, &diagnostics, options); code != 0 || lookups != 1 {
 				t.Fatal("a previous profile flag was reused")
+			}
+			if err := json.Unmarshal(out.Bytes(), &facts); err != nil || facts["profile_exists"] != false {
+				t.Fatal("default status reused a previous result")
 			}
 		})
 	}
@@ -240,4 +250,139 @@ func testPrivateDir(t *testing.T) string {
 		t.Fatal(err)
 	}
 	return dir
+}
+
+func TestDefaultProfileUsesUserConfigurationDirectory(t *testing.T) {
+	home := testPrivateDir(t)
+	configuration := filepath.Join(home, "configuration")
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_CONFIG_HOME", configuration)
+	expected := filepath.Join(configuration, "sber-go", "profile.json")
+	if runtime.GOOS == "darwin" {
+		expected = filepath.Join(home, "Library", "Application Support", "sber-go", "profile.json")
+	}
+	profile, err := defaultProfilePath()
+	if err != nil || profile != expected {
+		t.Fatalf("unexpected default profile: %q, %v", profile, err)
+	}
+	if runtime.GOOS == "linux" {
+		t.Setenv("XDG_CONFIG_HOME", "")
+		profile, err = defaultProfilePath()
+		if err != nil || profile != filepath.Join(home, ".config", "sber-go", "profile.json") {
+			t.Fatal("default profile did not use the user home directory")
+		}
+		t.Setenv("XDG_CONFIG_HOME", "synthetic-relative-directory")
+		if _, err := defaultProfilePath(); err == nil {
+			t.Fatal("relative configuration directory was accepted")
+		}
+	}
+	if _, err := os.Lstat(filepath.Dir(expected)); !os.IsNotExist(err) {
+		t.Fatal("path lookup created profile state")
+	}
+}
+
+func TestHelpAndInvalidArgumentsDoNotResolveDefaultProfile(t *testing.T) {
+	options := Options{DefaultProfilePath: func() (string, error) {
+		t.Fatal("help or invalid arguments resolved a profile")
+		return "", nil
+	}}
+	for _, args := range [][]string{{"--help"}, {"help", "login"}, {"status", "--help"}, {"login", "--help"}, {"products", "--help"}} {
+		var output, diagnostics bytes.Buffer
+		if code := RunWithOptions(context.Background(), args, &output, &diagnostics, options); code != 0 {
+			t.Fatalf("help failed: %d", code)
+		}
+		if strings.Contains(output.String(), "--profile PATH [options]") || strings.Contains(output.String(), "(required)") {
+			t.Fatal("help still requires a profile path")
+		}
+	}
+	for _, args := range [][]string{{"status", "--profile="}, {"products", "--password=synthetic-secret"}, {"operations", "--limit=0"}, {"analytics"}, {"login", "trailing"}} {
+		var output, diagnostics bytes.Buffer
+		if code := RunWithOptions(context.Background(), args, &output, &diagnostics, options); code != 2 || output.Len() != 0 {
+			t.Fatalf("invalid arguments returned %d", code)
+		}
+	}
+}
+
+func TestDefaultProfileLookupFailureDoesNotDisclosePathsOrCauses(t *testing.T) {
+	canary := "synthetic-private-default-path"
+	for _, result := range []struct {
+		path string
+		err  error
+	}{
+		{"", nil}, {canary, nil}, {"/synthetic/../" + canary, nil},
+		{"/synthetic/" + canary + "\x00", nil}, {"", errors.New(canary)},
+	} {
+		var output, diagnostics bytes.Buffer
+		code := RunWithOptions(context.Background(), []string{"products"}, &output, &diagnostics, Options{
+			DefaultProfilePath: func() (string, error) { return result.path, result.err },
+			OpenClient: func(string) (mcp.Client, error) {
+				t.Fatal("invalid default path opened a client")
+				return nil, nil
+			},
+		})
+		if code != 3 || output.Len() != 0 || diagnostics.String() != "The command cannot select the default profile.\nUse --profile PATH to select a profile.\n" {
+			t.Fatal("default profile failure was not static")
+		}
+	}
+}
+
+func TestMissingDefaultProfileStopsBeforeAuthenticationOrClientCreation(t *testing.T) {
+	profile := filepath.Join(testPrivateDir(t), "absent", "profile.json")
+	options := Options{
+		DefaultProfilePath: func() (string, error) { return profile, nil },
+		OpenClient: func(string) (mcp.Client, error) {
+			t.Fatal("missing profile opened a client")
+			return nil, nil
+		},
+		Authentication: &Authentication{NewPrimary: func() (PrimaryAuthenticator, error) {
+			t.Fatal("missing profile started authentication")
+			return nil, nil
+		}},
+	}
+	for _, args := range [][]string{{"products"}, {"check-session"}, {"mcp"}, {"inspect-session"}, {"refresh-session"}} {
+		var output, diagnostics bytes.Buffer
+		if code := RunWithOptions(context.Background(), args, &output, &diagnostics, options); code != 3 || output.Len() != 0 || diagnostics.String() != "The CLI has no saved profile.\nUse sber login to make a profile.\n" {
+			t.Fatalf("missing default profile has no safe login instruction: %d", code)
+		}
+	}
+	var output, diagnostics bytes.Buffer
+	if code := RunWithOptions(context.Background(), []string{"status"}, &output, &diagnostics, options); code != 0 || diagnostics.Len() != 0 {
+		t.Fatal("status failed without a saved profile")
+	}
+	var facts map[string]any
+	if err := json.Unmarshal(output.Bytes(), &facts); err != nil || facts["profile_exists"] != false || facts["bank_authorization_checked"] != false {
+		t.Fatal("missing default status claimed authorization")
+	}
+	if _, err := os.Lstat(filepath.Dir(profile)); !os.IsNotExist(err) {
+		t.Fatal("missing-profile commands created state")
+	}
+}
+
+func TestUnsafeDefaultProfileStopsBeforeClientCreation(t *testing.T) {
+	for _, symlink := range []bool{false, true} {
+		profile := filepath.Join(testPrivateDir(t), "profile.json")
+		if err := syntheticLoginBundle().Save(profile); err != nil {
+			t.Fatal(err)
+		}
+		if symlink {
+			alias := filepath.Join(filepath.Dir(profile), "alias.json")
+			if err := os.Symlink(profile, alias); err != nil {
+				t.Fatal(err)
+			}
+			profile = alias
+		} else if err := os.Chmod(profile, 0644); err != nil {
+			t.Fatal(err)
+		}
+		var output, diagnostics bytes.Buffer
+		code := RunWithOptions(context.Background(), []string{"products"}, &output, &diagnostics, Options{
+			DefaultProfilePath: func() (string, error) { return profile, nil },
+			OpenClient: func(string) (mcp.Client, error) {
+				t.Fatal("unsafe default profile opened a client")
+				return nil, nil
+			},
+		})
+		if code != 3 || output.Len() != 0 || diagnostics.String() != "The profile file properties are not safe.\n" {
+			t.Fatal("unsafe default profile was accepted")
+		}
+	}
 }

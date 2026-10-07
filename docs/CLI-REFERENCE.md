@@ -7,7 +7,7 @@ For unknown options or extra positional arguments, the CLI stops before it opens
 ## Syntax
 
 ```text
-sber COMMAND --profile PATH [options]
+sber COMMAND [options]
 sber help COMMAND
 sber COMMAND --help
 sber --help
@@ -23,7 +23,8 @@ Each `--card-id` on `card-info` adds one ID.
 For other options, another occurrence replaces the previous value.
 Two card IDs are invalid for `card-limits` and `card-rename`.
 A path is a filename, not secret input.
-Every operational command must have an explicit `--profile` path.
+Commands use the default profile when you omit `--profile`.
+The [profile locations](CLI.md#default-profile) follow the operating system configuration directory.
 
 ## Commands
 
@@ -55,7 +56,7 @@ Every operational command must have an explicit `--profile` path.
 | Option | Default | Commands | Meaning |
 | --- | --- | --- | --- |
 | `--help`, `-h` | `false`. | All commands. | Show command help without profile access or bank requests. |
-| `--profile PATH` | None; required. | All operational commands. | Select one private profile. |
+| `--profile PATH` | Default user profile. | All operational commands. | Select a different private profile for one command. |
 | `--ca-bundle PATH` | Embedded CA with available system PEM trust. | Authentication and client commands. | Replace the trust bundle for the selected client. |
 | `--timeout DURATION` | `30s`. | Client commands. | Limit each request to 1 through 120 seconds. |
 | `--no-renew` | `false`. | Data reads and `check-session`. | Disable interactive session restoration. |
@@ -210,11 +211,13 @@ Numbers, units, and dates use the measurement and time category.
 | CLI | The command line interface of the `sber` and `rental-check` executables. |
 | Cobra | The Go library that reads CLI arguments and produces help text. |
 | command | The selected CLI operation, such as `products`. |
+| configuration directory | The operating system location for application settings. |
 | command argument | A value that the caller supplies on the command line. |
 | cookie | A name, value, and scope in a browser session. |
 | coverage metadata | Information about the known limits of returned history. |
 | cryptographic proof | Data that shows possession of the expected authentication secret. |
 | credential | Data that gives authentication or session access. |
+| default profile | The saved CLI profile for the current operating system user. |
 | device identity | The remembered browser and device data in a profile. |
 | directory | A location that contains files. |
 | executable | The application file that the operating system starts. |
@@ -224,6 +227,7 @@ Numbers, units, and dates use the measurement and time category.
 | Go | The language and toolchain that build this repository. |
 | history | The returned list of bank operations. |
 | hidden input | Terminal input with character echo disabled. |
+| home directory | The directory that the operating system assigns to a user. |
 | hostname | The server name that TLS validates. |
 | HTTP | The protocol for bank requests and responses. |
 | ID | An identifier for a product, operation, or workflow. |

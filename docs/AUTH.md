@@ -2,7 +2,7 @@
 
 The CLI operator procedures, complete options, and session restoration are in [CLI.md](CLI.md) and [CLI-REFERENCE.md](CLI-REFERENCE.md). These Go API notes retain their engineering format. The latest real verification is in [STATUS.md](STATUS.md).
 
-On Linux and macOS the native owner path is `./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"`. It acquires an enrollment lock before prompts, creates missing private parents and refuses an existing profile. Login/password are hidden, requested OTP is handled once, and online-PIN enrollment asks for confirmation. Password/PIN/OTP are not profile fields. Echo-control failure stops input. CAPTCHA/WebAuthn are not automated CLI flows.
+On Linux and macOS the native owner path is `./bin/sber login`. The CLI uses the current user configuration directory for its default profile. `--profile PATH` selects another file for one command. It acquires an enrollment lock before prompts, creates missing private parents and refuses an existing profile. Login/password are hidden, requested OTP is handled once, and online-PIN enrollment asks for confirmation. Password/PIN/OTP are not profile fields. Echo-control failure stops input. CAPTCHA/WebAuthn are not automated CLI flows.
 
 macOS uses the terminal device path returned by the kernel, verified against the original input descriptor, and native exclusive rename for first publication. Linux uses its pinned procfs descriptor capabilities. Both restore terminal settings after success, failure or cancellation and preserve an existing profile. Profile paths must have literal, symlink-free components; use your home directory rather than macOS `/tmp` or `/var` aliases.
 

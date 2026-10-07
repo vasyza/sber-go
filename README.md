@@ -21,17 +21,22 @@ They cover authentication, session restoration, products, cards, history, analyt
 Use `sber help COMMAND` to show command options.
 Use `--help` or `-h` to show help without profile access or bank requests.
 
-Create a profile in your local Linux or macOS terminal.
+Run `sber login` once in your local Linux or macOS terminal.
+The CLI saves a default profile for the current user.
+Later commands select that profile automatically.
 Enter the login, password, SMS code, and any new online banking PIN at the hidden prompts.
 
 ```sh
-./bin/sber login --profile "$HOME/.local/share/sber-go/profile.json"
-./bin/sber status --profile "$HOME/.local/share/sber-go/profile.json"
-./bin/sber check-session --profile "$HOME/.local/share/sber-go/profile.json"
-./bin/sber products --profile "$HOME/.local/share/sber-go/profile.json"
-./bin/sber operations --profile "$HOME/.local/share/sber-go/profile.json" \
+./bin/sber login
+./bin/sber status
+./bin/sber check-session
+./bin/sber products
+./bin/sber operations \
   --from 2026-01-01 --to 2026-01-31 --limit 30 --max-pages 100
 ```
+
+Use `--profile PATH` to select a different profile for one command.
+[Profile locations](docs/CLI.md#default-profile) follow the operating system configuration directory.
 
 An existing profile requires a private parent directory with mode `0700` and a regular private file with mode `0600`.
 The `login` command makes missing private directories and refuses to replace an existing profile.
@@ -62,7 +67,7 @@ A session file does not promise access for a year.
 To restore an existing session, use this command:
 
 ```sh
-./bin/sber refresh-session --profile "$HOME/.local/share/sber-go/profile.json"
+./bin/sber refresh-session
 ```
 
 TLS setup supplies HTTP/1.1 through ALPN.

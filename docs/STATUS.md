@@ -23,6 +23,25 @@ The macOS check compiled tests without execution.
 
 This cleanup adds no bank verification or independent production approval.
 
+## Default profile follow-up — 2026-10-08
+
+The CLI now uses a saved profile for the current operating system user.
+Login, reads, session restoration, and MCP use this profile without a path option.
+The `--profile PATH` option selects another file for one command.
+[CLI.md](CLI.md#default-profile) gives the profile locations.
+
+Linux `make check` passed with Go 1.27.1.
+Synthetic tests covered default login, private publication, profile reuse, PIN restoration, and explicit overrides.
+The native command tests used isolated home and configuration directories.
+They checked profile selection across different command directories and redacted metadata.
+
+Missing and unsafe profiles stop before client creation.
+Help and initial argument errors skip default profile resolution.
+Export cannot replace its default source profile.
+The macOS ARM64 command and CLI tests compiled successfully without test execution.
+
+Real bank verification remains limited to the earlier results below.
+
 ## Earlier verification
 
 Before this cleanup, local Linux and macOS checks passed with Go 1.27.1.

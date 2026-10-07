@@ -108,6 +108,9 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 		switch {
 		case errors.Is(err, enrollment.ErrExists):
 			message = "The profile file already exists.\nSelect a new path."
+			if args.defaultProfile {
+				message = "The default profile already exists.\nUse sber refresh-session to restore the session."
+			}
 		case errors.Is(err, enrollment.ErrBusy):
 			message = "Another owner enrollment is active."
 		case errors.Is(err, enrollment.ErrUnsupported):

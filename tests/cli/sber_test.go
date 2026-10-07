@@ -4,15 +4,21 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 func TestNativeCommandOfflineStatus(t *testing.T) {
-	dir := t.TempDir()
+	dir, err := filepath.EvalSymlinks(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
 	binary := filepath.Join(dir, "sber")
 	goBinary := filepath.Join(runtime.GOROOT(), "bin", "go")
 	build := exec.CommandContext(context.Background(), goBinary, "build", "-o", binary, "../../cmd/sber")
@@ -30,6 +36,68 @@ func TestNativeCommandOfflineStatus(t *testing.T) {
 	if facts["profile_exists"] != false || facts["bank_authorization_checked"] != false {
 		t.Fatal("native offline status claimed bank state")
 	}
+	t.Run("default profile", func(t *testing.T) {
+		configuration := filepath.Join(dir, "configuration")
+		profile := filepath.Join(configuration, "sber-go", "profile.json")
+		if runtime.GOOS == "darwin" {
+			profile = filepath.Join(dir, "Library", "Application Support", "sber-go", "profile.json")
+		}
+		run := func(args ...string) (bytes.Buffer, bytes.Buffer, error) {
+			var out, diagnostics bytes.Buffer
+			command := exec.CommandContext(context.Background(), binary, args...)
+			command.Env = []string{"HOME=" + dir, "XDG_CONFIG_HOME=" + configuration}
+			command.Dir = t.TempDir()
+			command.Stdout, command.Stderr = &out, &diagnostics
+			err := command.Run()
+			if strings.Contains(out.String()+diagnostics.String(), profile) || strings.Contains(out.String()+diagnostics.String(), "synthetic-native-profile-secret") {
+				t.Fatal("native default command disclosed profile state")
+			}
+			return out, diagnostics, err
+		}
+		status := func(exists bool, args ...string) {
+			out, diagnostics, err := run(args...)
+			if err != nil {
+				t.Fatalf("native default status failed: %v: %s", err, diagnostics.String())
+			}
+			var result map[string]any
+			if err := json.Unmarshal(out.Bytes(), &result); err != nil {
+				t.Fatal(err)
+			}
+			if result["profile_exists"] != exists || result["bank_authorization_checked"] != false || diagnostics.Len() != 0 {
+				t.Fatal("default status selected the wrong profile or claimed bank authorization")
+			}
+		}
+		status(false, "status")
+		if _, err := os.Lstat(filepath.Dir(profile)); !os.IsNotExist(err) {
+			t.Fatal("default status created profile state")
+		}
+		out, diagnostics, err := run("products")
+		if exit, ok := err.(*exec.ExitError); !ok || exit.ExitCode() != 3 || out.Len() != 0 || diagnostics.String() != "The CLI has no saved profile.\nUse sber login to make a profile.\n" {
+			t.Fatal("native missing profile did not stop with a login instruction")
+		}
+		if err := os.MkdirAll(filepath.Dir(profile), 0700); err != nil {
+			t.Fatal(err)
+		}
+		bundle, err := sber.NewSessionBundle(sber.SessionBundle{
+			APIBase: sber.AppOrigin, WebBase: sber.AppOrigin,
+			Cookies: []sber.CookieRecord{{Name: "fixture", Value: "synthetic-native-profile-secret", Domain: "online.sberbank.ru", Path: "/", Secure: true}},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := bundle.Save(profile); err != nil {
+			t.Fatal(err)
+		}
+		status(true, "status")
+		status(false, "status", "--profile", filepath.Join(dir, "different", "profile.json"))
+		out, diagnostics, err = run("inspect-session")
+		var inspection struct {
+			Metadata struct{ Values string }
+		}
+		if err != nil || diagnostics.Len() != 0 || json.Unmarshal(out.Bytes(), &inspection) != nil || inspection.Metadata.Values != "<redacted>" {
+			t.Fatal("native inspection did not use a redacted default profile")
+		}
+	})
 	canary := "SYNTHETIC-private-native-argument"
 	for _, test := range []struct {
 		args []string

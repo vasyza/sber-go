@@ -215,13 +215,95 @@ func TestRefreshSessionUsesPINAndOTPPreservesProfileOnFailure(t *testing.T) {
 }
 
 func TestExpiredCLIReportsRecoveryInstruction(t *testing.T) {
-	client := &testutil.Client{Read: func(context.Context, string, map[string]any) (map[string]any, error) {
-		return nil, &sber.AuthenticationExpired{}
-	}}
+	for _, useDefault := range []bool{false, true} {
+		profile := filepath.Join(testPrivateDir(t), "profile.json")
+		if err := syntheticLoginBundle().Save(profile); err != nil {
+			t.Fatal(err)
+		}
+		client := &testutil.Client{Read: func(context.Context, string, map[string]any) (map[string]any, error) {
+			return nil, &sber.AuthenticationExpired{}
+		}}
+		args := []string{"products"}
+		instruction := "Use sber refresh-session to restore the session."
+		if !useDefault {
+			args = append(args, "--profile", profile)
+			instruction = "Use sber refresh-session --profile PATH to restore the session."
+		}
+		var output, diagnostics bytes.Buffer
+		code := RunWithOptions(context.Background(), args, &output, &diagnostics, Options{
+			DefaultProfilePath: func() (string, error) { return profile, nil },
+			OpenClient:         func(string) (mcp.Client, error) { return client, nil },
+		})
+		if code != 3 || output.Len() != 0 || client.Closes.Load() != 1 || !strings.Contains(diagnostics.String(), instruction) {
+			t.Fatal("expired session did not give the selected profile recovery action")
+		}
+	}
+}
+
+func TestExplicitProfileOverridesUnavailableDefault(t *testing.T) {
+	client := &testutil.Client{}
 	var output, diagnostics bytes.Buffer
-	code := RunWithOptions(context.Background(), []string{"products", "--profile", "synthetic-selected"}, &output, &diagnostics, Options{OpenClient: func(string) (mcp.Client, error) { return client, nil }})
-	if code != 3 || output.Len() != 0 || client.Closes.Load() != 1 || !strings.Contains(diagnostics.String(), "refresh-session") {
-		t.Fatal("expired session did not give a safe recovery action")
+	code := RunWithOptions(context.Background(), []string{"products", "--profile", "synthetic-explicit"}, &output, &diagnostics, Options{
+		DefaultProfilePath: func() (string, error) {
+			t.Fatal("explicit profile resolved the default path")
+			return "", errors.New("synthetic-private-directory-error")
+		},
+		OpenClient: func(path string) (mcp.Client, error) {
+			if path != "synthetic-explicit" {
+				t.Fatal("explicit profile was replaced")
+			}
+			return client, nil
+		},
+	})
+	if code != 0 || diagnostics.Len() != 0 || client.Closes.Load() != 1 || len(client.Requests()) != 1 {
+		t.Fatal("explicit profile did not bypass default selection")
+	}
+}
+
+func TestDefaultProfileExportCannotReplaceItsSource(t *testing.T) {
+	profile := filepath.Join(testPrivateDir(t), "profile.json")
+	if err := syntheticLoginBundle().Save(profile); err != nil {
+		t.Fatal(err)
+	}
+	before, err := os.ReadFile(profile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var output, diagnostics bytes.Buffer
+	code := RunWithOptions(context.Background(), []string{"export-session", "--destination", profile}, &output, &diagnostics, Options{
+		DefaultProfilePath: func() (string, error) { return profile, nil },
+		OpenClient: func(string) (mcp.Client, error) {
+			t.Fatal("export to the default source opened a client")
+			return nil, nil
+		},
+	})
+	after, err := os.ReadFile(profile)
+	if err != nil || !bytes.Equal(before, after) || code != 2 || output.Len() != 0 {
+		t.Fatal("default source was not protected from export")
+	}
+}
+
+func TestMCPUsesDefaultProfileWithoutAuthentication(t *testing.T) {
+	profile := filepath.Join(testPrivateDir(t), "profile.json")
+	if err := syntheticLoginBundle().Save(profile); err != nil {
+		t.Fatal(err)
+	}
+	client := &testutil.Client{}
+	opened := 0
+	var output, diagnostics bytes.Buffer
+	code := RunWithOptions(context.Background(), []string{"mcp"}, &output, &diagnostics, Options{
+		Input:              strings.NewReader(""),
+		DefaultProfilePath: func() (string, error) { return profile, nil },
+		OpenClient: func(path string) (mcp.Client, error) {
+			if path != profile {
+				t.Fatal("MCP selected a different profile")
+			}
+			opened++
+			return client, nil
+		},
+	})
+	if code != 0 || diagnostics.Len() != 0 || opened != 1 || client.Closes.Load() != 1 || len(client.Requests()) != 0 {
+		t.Fatal("MCP did not use and close the default client without bank requests")
 	}
 }
 

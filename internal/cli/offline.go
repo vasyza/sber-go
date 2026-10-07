@@ -1,5 +1,5 @@
-// Package cli is the owner-operated native command boundary. A command and
-// profile must be selected explicitly; secrets are read only from a local tty.
+// Package cli is the owner-operated native command boundary. Each command uses
+// --profile or the user default. Secrets are read only from a local terminal.
 package cli
 
 import (

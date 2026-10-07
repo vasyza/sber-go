@@ -19,7 +19,10 @@ import (
 // Options supplies application dependencies. No client is constructed until
 // the complete live command has passed validation.
 type Options struct {
-	Input                 io.Reader
+	Input io.Reader
+	// DefaultProfilePath resolves the user profile only when --profile is absent.
+	// Initial argument validation and help never call it.
+	DefaultProfilePath    func() (string, error)
 	OpenClient            func(string) (mcp.Client, error)
 	OpenClientWithOptions func(context.Context, string, sber.ClientOptions, sber.PINProvider) (mcp.Client, error)
 	Authentication        *Authentication
@@ -37,7 +40,8 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 	root := &cobra.Command{
 		Use:   "sber COMMAND",
 		Short: "Read bank data or manage a private profile.",
-		Long: "Select one command and one private profile.\n" +
+		Long: "Use the saved profile for the current user.\n" +
+			"Use --profile PATH to select a different profile.\n" +
 			"Enter secret values only at hidden terminal prompts.\n" +
 			"The bank root CA is part of the application.",
 		RunE: func(*cobra.Command, []string) error { return cliCommand.ErrArguments },
@@ -45,20 +49,28 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 	for _, definition := range commands {
 		flags, a := commandFlags(definition.name)
 		child := &cobra.Command{
-			Use:   definition.name + " --profile PATH",
+			Use:   definition.name + " [options]",
 			Short: definition.description,
-			Args: func(_ *cobra.Command, args []string) error {
-				if len(args) != 0 || !validateCommand(definition.name, a) {
+			Args: func(cmd *cobra.Command, args []string) error {
+				if len(args) != 0 || cmd.Flags().Changed("profile") && a.profile == "" || !validateCommand(definition.name, a) {
 					return cliCommand.ErrArguments
 				}
 				return nil
 			},
-			Run: func(cmd *cobra.Command, _ []string) {
+			RunE: func(cmd *cobra.Command, _ []string) error {
+				if err := selectProfile(a, o.DefaultProfilePath); err != nil {
+					code = fail(diagnostics, 3, "The command cannot select the default profile.\nUse --profile PATH to select a profile.")
+					return nil
+				}
+				// Resolve the source before checking an export destination against it.
+				if !validateCommand(definition.name, a) {
+					return cliCommand.ErrArguments
+				}
 				code = runValidated(cmd.Context(), definition.name, a, output, diagnostics, o)
+				return nil
 			},
 		}
 		child.Flags().AddFlagSet(flags)
-		_ = child.MarkFlagRequired("profile")
 		root.AddCommand(child)
 	}
 	if err := cliCommand.Execute(ctx, root, args, output); err != nil {
@@ -71,6 +83,15 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 }
 
 func runValidated(ctx context.Context, command string, a *commandArguments, output, diagnostics io.Writer, o Options) int {
+	if a.defaultProfile && command != "login" && command != "status" && !(isMutationCommand(command) && !a.execute) {
+		exists, err := enrollment.SafeProfileExists(a.profile)
+		if err != nil {
+			return fail(diagnostics, 3, "The profile file properties are not safe.")
+		}
+		if !exists {
+			return fail(diagnostics, 3, "The CLI has no saved profile.\nUse sber login to make a profile.")
+		}
+	}
 	switch command {
 	case "status", "inspect-session":
 		return runOffline(command, a, output, diagnostics)
@@ -214,7 +235,7 @@ func execute(ctx context.Context, command string, client mcp.Client, output, dia
 		value, err = resources.Session.Credentials()
 	}
 	if err != nil {
-		return requestFailure(ctx, diagnostics, err)
+		return requestFailure(ctx, diagnostics, err, a)
 	}
 	return writeResult(output, diagnostics, value)
 }
@@ -231,7 +252,7 @@ func writeResult(output, diagnostics io.Writer, value any) int {
 	return 0
 }
 
-func requestFailure(ctx context.Context, diagnostics io.Writer, err error) int {
+func requestFailure(ctx context.Context, diagnostics io.Writer, err error, args *commandArguments) int {
 	var uncertain *sber.MutationUncertain
 	if errors.As(err, &uncertain) {
 		return fail(diagnostics, 4, "The result of the operation is unknown.\nDo not repeat the operation.\nCheck the operation on the bank website.")
@@ -241,7 +262,11 @@ func requestFailure(ctx context.Context, diagnostics io.Writer, err error) int {
 	}
 	var expired *sber.AuthenticationExpired
 	if errors.As(err, &expired) {
-		return fail(diagnostics, 3, "The session has expired.\nUse sber refresh-session --profile PATH to restore the session.\nNo complete result is available.")
+		command := "sber refresh-session"
+		if !args.defaultProfile {
+			command += " --profile PATH"
+		}
+		return fail(diagnostics, 3, "The session has expired.\nUse "+command+" to restore the session.\nNo complete result is available.")
 	}
 	var rejected *sber.APIRejected
 	if errors.As(err, &rejected) {

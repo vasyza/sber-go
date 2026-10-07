@@ -56,6 +56,7 @@ type commandArguments struct {
 	name, source, amount, currency, purpose                               string
 	execute                                                               bool
 	profile, ca, resource, from, to, operationID, incomeType, destination string
+	defaultProfile                                                        bool
 	remembered                                                            string
 	browser                                                               loginBrowserSelection
 	force, noRenew                                                        bool
@@ -69,7 +70,7 @@ func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
 	a := &commandArguments{limit: 30, pages: 100, incomeType: "outcome", timeout: 30 * time.Second}
 	f := pflag.NewFlagSet("sber "+name, pflag.ContinueOnError)
 	f.SetOutput(io.Discard)
-	f.StringVar(&a.profile, "profile", "", "Select the private profile `PATH` (required).")
+	f.StringVar(&a.profile, "profile", "", "Select a private profile `PATH` instead of the default profile.")
 	if name == "status" || name == "inspect-session" {
 		return f, a
 	}
@@ -137,7 +138,7 @@ var cardIDPattern = regexp.MustCompile(`^[0-9]{1,16}$`)
 var historyResourcePattern = regexp.MustCompile(`^(?:card|ct-account|account):[A-Za-z0-9_-]{1,128}$`)
 
 func validateCommand(name string, a *commandArguments) bool {
-	if a.profile == "" || !a.browser.valid() || a.timeout < time.Second || a.timeout > 120*time.Second || a.limit < 1 || a.limit > 100 || a.pages < 1 || a.pages > 10000 || a.offset < 0 {
+	if !a.browser.valid() || a.timeout < time.Second || a.timeout > 120*time.Second || a.limit < 1 || a.limit > 100 || a.pages < 1 || a.pages > 10000 || a.offset < 0 {
 		return false
 	}
 	switch name {

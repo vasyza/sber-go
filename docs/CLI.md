@@ -7,7 +7,8 @@ The [term list](CLI-REFERENCE.md#technical-terms) defines the technical words in
 ## Purpose and limits
 
 The CLI supplies the implemented APIs of the unofficial Sber SDK.
-It operates on one profile that you select.
+It uses the saved default profile for the current user.
+Use `--profile PATH` to select a different profile.
 The bank controls authorization, data availability, and session lifetime.
 
 The default mode lets the CLI read data.
@@ -55,7 +56,7 @@ TLS validates the certificate chain and the server hostname.
 ## Command syntax
 
 Cobra v1.10.2 reads the command arguments and produces help text.
-Each operational command requires `--profile PATH`.
+Operational commands use the default profile when you omit `--profile PATH`.
 Use two hyphens for option names.
 Old forms such as `-profile` are not valid.
 
@@ -69,6 +70,25 @@ The CLI writes fixed argument errors to standard error.
 These errors do not include argument values or private paths.
 The CLI does not supply shell completion commands.
 
+## Default profile
+
+The CLI selects one default profile for the current operating system user.
+The command directory does not affect this selection.
+
+| Platform | Default profile |
+| --- | --- |
+| Linux | `~/.config/sber-go/profile.json`. |
+| macOS | `~/Library/Application Support/sber-go/profile.json`. |
+
+On Linux, an absolute `XDG_CONFIG_HOME` value replaces `~/.config`.
+The remaining path is `sber-go/profile.json`.
+The CLI makes missing private directories during login.
+Help and status do not make profile directories.
+
+If no default profile exists, data commands stop with a login instruction.
+The CLI does not start authentication during those commands.
+Use `sber login` to make the default profile.
+
 ## Make a profile
 
 The profile contains session cookies and device identity.
@@ -76,19 +96,18 @@ It does not contain your password, PIN, or SMS code.
 The CLI makes missing private directories.
 The profile must be a regular file with mode `0600` in a directory with mode `0700`.
 
-1. Select a new absolute path for the profile.
-2. Start login:
+1. Start login:
 
    ```sh
-   ./bin/sber login --profile "$HOME/.local/share/sber-go/session.json"
+   ./bin/sber login
    ```
 
-3. At the `Login` prompt, enter your account login.
-4. At the `Password` prompt, enter your password.
-5. If the bank shows an SMS challenge, enter the code at the hidden prompt.
-6. If the bank shows PIN enrollment, enter the specified number of digits.
-7. At the confirmation prompt, enter the same new PIN.
-8. Make sure that the result contains `"profile_created":true`.
+2. At the `Login` prompt, enter your account login.
+3. At the `Password` prompt, enter your password.
+4. If the bank shows an SMS challenge, enter the code at the hidden prompt.
+5. If the bank shows PIN enrollment, enter the specified number of digits.
+6. At the confirmation prompt, enter the same new PIN.
+7. Make sure that the result contains `"profile_created":true`.
 
 The CLI loads public configuration before it shows a secret prompt.
 Browser preparation stops before secret input if the selected runtime cannot start.
@@ -102,6 +121,7 @@ The CLI stops after three bank rejections.
 It does not send a PIN again after a connection error or unknown result.
 
 The command does not replace an existing profile.
+If the default profile already exists, use `sber refresh-session` to restore it.
 A private lock prevents simultaneous enrollment at the same path.
 Publication occurs only after successful authentication and authentication cleanup.
 
@@ -118,7 +138,7 @@ The PIN must be the PIN that the bank accepts for that identity.
 1. Start session restoration:
 
    ```sh
-   ./bin/sber refresh-session --profile "$HOME/.local/share/sber-go/session.json"
+   ./bin/sber refresh-session
    ```
 
 2. At the hidden prompt, enter the online banking PIN.
@@ -127,7 +147,7 @@ The PIN must be the PIN that the bank accepts for that identity.
 5. Do a session check:
 
    ```sh
-   ./bin/sber check-session --profile "$HOME/.local/share/sber-go/session.json" --no-renew
+   ./bin/sber check-session --no-renew
    ```
 
 If authentication or cleanup stops with an error, the CLI keeps the old profile.
@@ -151,6 +171,16 @@ The result of a session check applies to that request only.
 If the bank no longer accepts the device identity or PIN, use `login` with a new profile path.
 If the bank changes its protocol, update the application before another attempt.
 
+## Select another profile
+
+The `--profile PATH` option selects a different private file for one command.
+It applies to that command only.
+Use the same option for login, data reads, and restoration of that profile.
+
+```sh
+./bin/sber status --profile /absolute/private/path/profile.json
+```
+
 ## Copy a remembered identity
 
 This procedure makes a new profile through PIN authentication.
@@ -173,18 +203,18 @@ The source profile remains at its original path.
 1. Read the products:
 
    ```sh
-   ./bin/sber products --profile "$HOME/.local/share/sber-go/session.json" --no-renew
+   ./bin/sber products --no-renew
    ```
 
 2. Select the applicable identifiers from that result.
 3. Read data with the applicable command:
 
    ```sh
-   ./bin/sber accounts --profile "$HOME/.local/share/sber-go/session.json" --no-renew
-   ./bin/sber cards --profile "$HOME/.local/share/sber-go/session.json" --no-renew
-   ./bin/sber portfolio --profile "$HOME/.local/share/sber-go/session.json" --no-renew
-   ./bin/sber card-info --profile "$HOME/.local/share/sber-go/session.json" --card-id 123 --no-renew
-   ./bin/sber card-limits --profile "$HOME/.local/share/sber-go/session.json" --card-id 123 --no-renew
+   ./bin/sber accounts --no-renew
+   ./bin/sber cards --no-renew
+   ./bin/sber portfolio --no-renew
+   ./bin/sber card-info --card-id 123 --no-renew
+   ./bin/sber card-limits --card-id 123 --no-renew
    ```
 
 The value `123` is a synthetic example.
@@ -198,7 +228,7 @@ An absent limit appears as `null`; the actual card limits remain unknown.
 2. Read the history:
 
    ```sh
-   ./bin/sber operations --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber operations \
      --from 2026-08-01 --to 2026-08-31 --limit 30 --max-pages 100 --no-renew
    ```
 
@@ -206,14 +236,14 @@ An absent limit appears as `null`; the actual card limits remain unknown.
 4. To read one page, use `operations-page`:
 
    ```sh
-   ./bin/sber operations-page --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber operations-page \
      --from 2026-08-01 --to 2026-08-31 --limit 30 --offset 0 --no-renew
    ```
 
 5. To read an operation, use its `id`:
 
    ```sh
-   ./bin/sber operation-details --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber operation-details \
      --operation-id EXAMPLE_OPERATION --no-renew
    ```
 
@@ -235,7 +265,7 @@ If history is incomplete, an absent payment remains unknown.
 2. Read the totals:
 
    ```sh
-   ./bin/sber analytics --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber analytics \
      --from 2026-08-01 --to 2026-08-31 --income-type outcome \
      --between-own=false --no-renew
    ```
@@ -250,25 +280,25 @@ The command reference gives the inclusion and display options.
 1. Read file metadata without a bank request:
 
    ```sh
-   ./bin/sber status --profile "$HOME/.local/share/sber-go/session.json"
+   ./bin/sber status
    ```
 
 2. Read profile metadata with secret values removed:
 
    ```sh
-   ./bin/sber inspect-session --profile "$HOME/.local/share/sber-go/session.json"
+   ./bin/sber inspect-session
    ```
 
 3. Read credential metadata with secret values removed:
 
    ```sh
-   ./bin/sber inspect-credentials --profile "$HOME/.local/share/sber-go/session.json"
+   ./bin/sber inspect-credentials
    ```
 
 4. Write a private session copy to a new file:
 
    ```sh
-   ./bin/sber export-session --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber export-session \
      --destination "$HOME/.local/share/sber-go/session-copy.json"
    ```
 
@@ -287,7 +317,7 @@ The default plan sends no bank request and does not open the profile.
 1. Show a card name change plan:
 
    ```sh
-   ./bin/sber card-rename --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber card-rename \
      --card-id 123 --name "Travel card"
    ```
 
@@ -298,7 +328,7 @@ The default plan sends no bank request and does not open the profile.
 1. Show a transfer plan:
 
    ```sh
-   ./bin/sber transfer-own --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber transfer-own \
      --source account:SOURCE_ID --destination account:DESTINATION_ID \
      --amount 10.50 --currency RUB
    ```
@@ -324,7 +354,7 @@ The CLI does not send an uncertain financial request again.
 2. Set the MCP client to start this command:
 
    ```sh
-   ./bin/sber mcp --profile /absolute/private/path/session.json
+   ./bin/sber mcp
    ```
 
 3. Use the tools listed in [MCP.md](MCP.md).
@@ -393,7 +423,7 @@ A connection error after HTTP transmission does not start another HTTP attempt.
 2. Select the PEM bundle:
 
    ```sh
-   ./bin/sber check-session --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber check-session \
      --ca-bundle /absolute/verified/trust.pem --no-renew
    ```
 
@@ -416,7 +446,7 @@ Requirements:
 2. Select all three paths for session restoration:
 
    ```sh
-   ./bin/sber refresh-session --profile "$HOME/.local/share/sber-go/session.json" \
+   ./bin/sber refresh-session \
      --browser-profile /absolute/private/firefox-profile \
      --playwright-driver /absolute/installed/playwright-driver \
      --firefox-executable /absolute/installed/firefox
