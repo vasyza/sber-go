@@ -4,14 +4,109 @@ Native Go SDK for the unofficial Sber online-banking protocol: session persisten
 
 Go **1.27.1**, Linux and macOS, including hidden terminal login and first-time private profile enrollment.
 
-## Build and check
+## Install the CLI
+
+Requirements: Linux or macOS, Git, and [Go 1.27.1](https://go.dev/doc/install).
+Git must have access to this repository.
+These commands install the current `main` branch from source.
+
+1. Get the source:
+
+   ```sh
+   git clone --branch main https://github.com/vasyza/sber-go.git
+   cd sber-go
+   ```
+
+2. Install `sber` in your user directory:
+
+   ```sh
+   GOBIN="$HOME/.local/bin" go install ./cmd/sber
+   ```
+
+3. Add that directory to the command search path:
+
+   ```sh
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+4. Add the same export line to your shell startup file.
+
+   Use `~/.bashrc` for Bash or `~/.zshrc` for Zsh.
+   For a Bash login shell, use `~/.bash_profile`.
+
+5. Check the installed command:
+
+   ```sh
+   command -v sber
+   sber --help
+   ```
+
+`GOBIN` selects the directory where Go installs the executable.
+`PATH` lists the directories that the shell searches for commands.
+The command is available from any working directory.
+Use `sber login` for the first authentication, as described below.
+
+## Update the CLI
+
+1. Open a terminal in the source checkout.
+2. Get the current `main` branch:
+
+   ```sh
+   git switch main
+   git pull --ff-only
+   ```
+
+3. Replace the installed executable:
+
+   ```sh
+   GOBIN="$HOME/.local/bin" go install ./cmd/sber
+   ```
+
+4. Check the command location and help:
+
+   ```sh
+   command -v sber
+   sber --help
+   ```
+
+`command -v sber` must select `$HOME/.local/bin/sber` for this installation.
+If it selects another executable, put `$HOME/.local/bin` first in `PATH`.
+Run `hash -r` to clear command locations cached by Bash or Zsh.
+To read build information, use `go version -m "$(command -v sber)"`.
+
+The update replaces the executable and keeps the saved profile.
+If the bank session has expired, use `sber refresh-session`.
+If an MCP client keeps `sber` running, restart that client after the update.
+
+### Direct installation or update
+
+If Git can read the repository through HTTPS, you can install without a source checkout:
 
 ```sh
-make check
+GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@main
+```
+
+Use the same command for later updates.
+For a private repository, configure Git HTTPS authentication with repository access.
+Also supply the private module setting:
+
+```sh
+GOPRIVATE=github.com/vasyza/sber-go GOBIN="$HOME/.local/bin" \
+  go install github.com/vasyza/sber-go/cmd/sber@main
+```
+
+### Update a local build
+
+If you run `./bin/sber` from a source checkout, update that checkout:
+
+```sh
+git switch main
+git pull --ff-only
+make build
 ./bin/sber --help
 ```
 
-`make check` checks formatting, runs vet and the complete race suite, builds all packages and both commands, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs.
+The updated executable is `bin/sber` in that checkout.
 
 ## CLI
 
@@ -27,11 +122,11 @@ Later commands select that profile automatically.
 Enter the login, password, SMS code, and any new online banking PIN at the hidden prompts.
 
 ```sh
-./bin/sber login
-./bin/sber status
-./bin/sber check-session
-./bin/sber products
-./bin/sber operations \
+sber login
+sber status
+sber check-session
+sber products
+sber operations \
   --from 2026-01-01 --to 2026-01-31 --limit 30 --max-pages 100
 ```
 
@@ -67,7 +162,7 @@ A session file does not promise access for a year.
 To restore an existing session, use this command:
 
 ```sh
-./bin/sber refresh-session
+sber refresh-session
 ```
 
 TLS setup supplies HTTP/1.1 through ALPN.
@@ -110,13 +205,24 @@ Import `github.com/vasyza/sber-go` as `sber`. Root aliases and forwards preserve
 ## MCP and rental reconciliation
 
 ```sh
-./bin/sber mcp --profile /absolute/private/path/profile.json
+sber mcp
 ./bin/rental-check < explicit-ledger.json
 ```
 
 MCP serves six implemented tools against the selected session: setup status, session info/close, products, operations and one operations page. Authentication remains owner-operated. See [MCP setup](docs/MCP.md). Rental reconciliation consumes an explicit ledger and keeps reminders disabled; see [rental input and output](docs/RENTAL-CLI.md).
 
 The MCP transport uses the official Go SDK v1.8.0 for MCP 2026-07-28 and legacy 2025-11-25 clients. See [MCP adapter and verification](docs/MCP.md#adapter-profile).
+
+## Build and check
+
+For development, run these commands from the source checkout:
+
+```sh
+make check
+./bin/sber --help
+```
+
+`make check` checks formatting, runs vet and the complete race suite, builds all packages and both commands, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs.
 
 ## Architecture and verification boundary
 

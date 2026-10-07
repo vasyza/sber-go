@@ -22,6 +22,9 @@ The [verification record](STATUS.md) gives the results for real bank requests.
 
 ## Install the CLI
 
+For installation and updates, follow the [README instructions](../README.md#install-the-cli).
+The procedure below builds an executable in the source checkout.
+
 Requirements:
 
 - Linux or macOS.
