@@ -142,7 +142,7 @@ The [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), 
 
 ### Proxy settings
 
-Save a proxy once for all network commands, including login, Firefox initialization, and MCP:
+Save a proxy once for all network commands, including login and MCP:
 
 ```sh
 sber config set proxy 127.0.0.1:3128:user:password
@@ -188,8 +188,9 @@ Read the [certificate source and update instructions](internal/transport/certifi
 
 Remembered device login uses a hidden PIN.
 Use `login --remembered-profile EXISTING_PATH --profile NEW_PATH` to make a new profile from an existing identity.
-Optional public browser initialization requires matching Firefox and Playwright paths.
-It also requires a dedicated private browser profile with verified certificate trust.
+Authentication uses native Go HTTP requests.
+No browser or driver installation is required.
+Use `login --method phone`, `login --method card`, or `login --method qr` for another login method.
 Read the [authentication instructions](docs/AUTH.md).
 
 The `refresh-session` command restores an existing profile through hidden PIN input and optional SMS confirmation.
@@ -266,8 +267,6 @@ make check
 
 ## Architecture and verification boundary
 
-Core error, session, transport, authentication and bank-resource packages have separate responsibilities. Optional browser bootstrap, MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [SDK contracts](docs/SDK.md) and [current verification](docs/STATUS.md).
+Core error, session, transport, authentication and bank-resource packages have separate responsibilities. MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [SDK contracts](docs/SDK.md) and [current verification](docs/STATUS.md).
 
-Local tests, race checks, vet and build cover the implemented contracts on Linux and macOS. On 2026-10-07, owner-authorized primary login, PIN restoration, interactive expiry recovery, and native CLI read E2E passed on macOS. The E2E covered all 15 read and local profile commands, including card details, limits, analytics, operation details, and private export. Authentication used ordinary public browser rendering with observed browser identity. See the [CLI verification record](docs/STATUS.md) for executable checks and limits. Real financial mutations, full history coverage and independent production review remain outside this evidence. Earlier WIP and review reports remain in Git history; their results describe the original snapshots.
-
-MIT attribution is retained in [LICENSE](LICENSE) and [NOTICE](NOTICE). CPython notices remain in [third_party/cpython/LICENSE](third_party/cpython/LICENSE). There is no Python runtime adapter.
+Authentication now uses native Go HTTP requests for login/password, phone/password, card number, QR confirmation, and remembered PIN. The application does not need Playwright, Firefox, Chrome, or a JavaScript runtime. On 2026-10-08, all four initial login methods and PIN restoration completed on the real owner account. The QR session passed all 15 CLI read and local profile commands and the SDK authorization, products, and bounded history checks. See the [verification record](docs/STATUS.md) for current results and limits. Financial mutations, complete history coverage, and independent production review remain outside this evidence. Earlier reports in Git history describe their original snapshots.

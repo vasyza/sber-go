@@ -6,6 +6,77 @@ The root package exposes the public API through aliases and function forwards.
 [ARCHITECTURE.md](ARCHITECTURE.md) describes package boundaries.
 [STATUS.md](STATUS.md) records verification limits.
 
+## Native authentication
+
+Authentication uses Go HTTP requests and the embedded verified CA.
+It does not launch a browser or execute JavaScript.
+Generate a device identity once for each new authentication process.
+Retain it with the resulting session profile.
+
+```go
+device, antifraud, err := sber.GenerateFingerprints()
+if err != nil {
+    return err
+}
+deviceValue, antifraudValue := device.Value(), antifraud.Value()
+options := sber.AuthOptions{
+    Deviceprint: &deviceValue,
+    AntifraudDeviceprint: &antifraudValue,
+    TransportOptions: sber.TransportOptions{Timeout: 60 * time.Second},
+}
+```
+
+Supply credentials from your application's private input mechanism.
+The CLI uses hidden terminal input and does not read an environment file.
+`LoadConfig(ctx)` is optional public preparation before asking for a credential.
+Every method loads and reuses strictly validated bank configuration.
+Close the authenticator on every path.
+A successful `SessionBundle` can be saved or passed to `NewSberClient`.
+
+| Factory | Initial call | Explicit continuation |
+| --- | --- | --- |
+| `NewPrimaryAuth(options)` | `Login(ctx, login, password, PrimaryLoginOptions{})` | `ConfirmOTP(ctx, code)`, then `CreatePIN(ctx, pin)` when requested. |
+| `NewPhoneAuth(options)` | `Login(ctx, phone, password, PrimaryLoginOptions{})` | `ConfirmOTP(ctx, code)` when requested. |
+| `NewCardAuth(options)` | `Login(ctx, cardNumber, CaptchaAnswer{})` | `ConfirmOTP(ctx, code)`, then `CreatePIN(ctx, pin)` when requested. |
+| `NewQRAuth(options)` | `Start(ctx)` | Display `QRCode.Content()`, then call `Poll(ctx)` until a terminal result. |
+| `NewPINAuth(savedBundle, options)` | `Login(ctx, pin, CaptchaAnswer{})` | `ConfirmOTP(ctx, code)` when requested. |
+
+Primary, phone, and card `Login` return a bundle pointer and an error.
+`PinOTPRequired` indicates that the process needs an SMS code.
+Use `errors.As` to inspect its lifetime and remaining attempts.
+Primary and card confirmation can return `(nil, nil)` for PIN enrollment.
+Use `config.PINLength()` from a successful `LoadConfig(ctx)` call before `CreatePIN`.
+Do not interpret a pending challenge as a valid session.
+
+Phone numbers use 11 digits and start with 7.
+Spaces, parentheses, hyphens, and one leading plus sign can be supplied.
+Card numbers must pass the 12 through 19 digit Luhn check.
+Card identification encrypts the number with the bank's public RSA-OAEP key.
+Card authentication does not request a CVV, expiry date, or card PIN.
+Registration or password recovery is reported as `card_account_setup_required`.
+It does not reset credentials automatically.
+
+`QRAuth.Poll` returns `(QRStatus, *SessionBundle, error)`.
+The statuses are `QRNew`, `QRWaitConfirm`, `QRConfirmed`, `QRRefused`, and `QRExpired`.
+Only `QRConfirmed` with a non-nil, validated bundle establishes a session.
+Poll no more than once per second and use a bounded context.
+A refused or expired challenge needs a new explicit authentication process.
+An uncertain final QR verification is not replayed.
+`QRCode.Size()` and `Lifetime()` expose challenge metadata.
+Formatting and JSON hide its content; `Content()` is the deliberate display access.
+
+`AuthOptions.Browser` retains explicit HTTP headers for compatibility with saved profiles.
+It does not select or launch a browser.
+Without an explicit User-Agent, authentication uses a compatibility header that declares `sber-go`.
+The bank web-session handoff requires this prefix.
+The SDK never creates protection cookies or continues through a browser security check.
+Transport deadlines, TLS verification, proxy selection, and the POST no-replay policy apply to every method.
+
+A new bank login can invalidate another web session.
+Check authorization before using a previously saved profile.
+PIN restoration requires enrollment for that profile's remembered device.
+Phone or QR login does not guarantee PIN enrollment.
+
 ## Immutable values
 
 `FrontendConfig`, `ParseError`, `TransferResource`, `TransferDraft`,
@@ -42,9 +113,6 @@ Direct TLS recovery keeps its existing three-attempt limit.
 
 PIN-profile renewal copies these proxy options to authentication and the replacement transport.
 For standalone authentication, set `AuthOptions.TransportOptions.Proxy`.
-For explicit Firefox initialization, also set `browser.FirefoxOptions.Proxy` to the same value.
-Firefox uses NSS trust and keeps TLS verification enabled.
-Authenticated SOCKS5 uses a bounded loopback CONNECT adapter that closes with the browser.
 
 Proxy options and transport options redact ordinary `%v`, `%+v`, `%#v`, and JSON output.
 Explicit field access returns the raw login values.

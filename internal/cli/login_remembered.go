@@ -3,12 +3,10 @@ package cli
 import (
 	"context"
 	"errors"
-	"path/filepath"
 	"reflect"
 	"time"
 
 	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/browser"
 	"github.com/vasyza/sber-go/internal/enrollment"
 	"github.com/vasyza/sber-go/internal/ownerinput"
 	sdkSession "github.com/vasyza/sber-go/internal/session"
@@ -21,26 +19,8 @@ type PINAuthenticator interface {
 	Close() error
 }
 
-type loginBrowserSelection struct{ profile, driver, executable string }
-
-func (b loginBrowserSelection) valid() bool {
-	if b.profile == "" && b.driver == "" && b.executable == "" {
-		return true
-	}
-	return filepath.IsAbs(b.profile) && filepath.IsAbs(b.driver) && filepath.IsAbs(b.executable)
-}
-
-func (b loginBrowserSelection) authOptions(ca string, proxy sber.ProxyOptions) (sber.AuthOptions, error) {
-	o := sber.AuthOptions{TransportOptions: sber.TransportOptions{CABundle: ca, Timeout: 60 * time.Second, Proxy: proxy}}
-	if b.profile == "" {
-		return o, nil
-	}
-	provider, err := browser.NewFirefoxBootstrap(browser.FirefoxOptions{ProfileDir: b.profile, DriverDir: b.driver, FirefoxExecutable: b.executable, Timeout: 60 * time.Second, Proxy: proxy})
-	if err != nil {
-		return sber.AuthOptions{}, err
-	}
-	o.BrowserFirst, o.BrowserBootstrap, o.BrowserBootstrapTimeout = true, provider, 60*time.Second
-	return o, nil
+func nativeAuthOptions(ca string, proxy sber.ProxyOptions) (sber.AuthOptions, error) {
+	return sber.AuthOptions{TransportOptions: sber.TransportOptions{CABundle: ca, Timeout: 60 * time.Second, Proxy: proxy}}, nil
 }
 
 func prepareRememberedLogin(ctx context.Context, a Authentication, source string, options sber.AuthOptions) (writer enrollment.CandidateWriter, err error) {

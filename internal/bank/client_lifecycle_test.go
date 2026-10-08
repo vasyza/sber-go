@@ -17,7 +17,6 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
-	"time"
 )
 
 func TestClientPINFactoryCancellationCannotReturnALiveClient(t *testing.T) {
@@ -345,7 +344,7 @@ func TestClientDefaultPINFlowUsesOnlyInjectedAuthBootstrapAndClosesIt(t *testing
 		return clientResponse(403, `synthetic bootstrap rejection`), nil
 	}
 	providers, authBuilds := 0, 0
-	c, e := NewSberClientFromPINProfile(context.Background(), path, func(context.Context) (string, error) { providers++; return "13579", nil }, ClientOptions{Transport: old, TransportOptions: sdkTransport.TransportOptions{CABundle: "synthetic-ca"}, BrowserBootstrapTimeout: 4 * time.Second, AuthOptions: sdkAuth.AuthOptions{TransportFactory: func(got sdkSession.SessionBundle, to sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
+	c, e := NewSberClientFromPINProfile(context.Background(), path, func(context.Context) (string, error) { providers++; return "13579", nil }, ClientOptions{Transport: old, TransportOptions: sdkTransport.TransportOptions{CABundle: "synthetic-ca"}, AuthOptions: sdkAuth.AuthOptions{TransportFactory: func(got sdkSession.SessionBundle, to sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
 		authBuilds++
 		if !to.AllowUnready || to.CABundle != "synthetic-ca" {
 			t.Error("auth CA/options not forwarded")

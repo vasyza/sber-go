@@ -472,3 +472,47 @@ func TestFrontendConfigRedaction(t *testing.T) {
 		t.Fatal("unsafe parser diagnostic")
 	}
 }
+
+func TestFrontendNewLoginFieldsUseOnlyValidatedLiterals(t *testing.T) {
+	base, _ := frontendFixture(t, "primary_valid_literal")
+	for _, tc := range []struct {
+		name, fields string
+		valid        bool
+	}{
+		{"valid", `encryptionKeyId:"synthetic-key",encryptionKeyValue:"synthetic-public-key",qrConfig:{size:130,useIdentifyScopeSbol:"synthetic-scope"},`, true},
+		{"key-expression", `encryptionKeyValue:"synthetic"+"key",`, false},
+		{"key-type", `encryptionKeyId:123,`, false},
+		{"key-control", `encryptionKeyValue:"synthetic\nkey",`, false},
+		{"qr-expression", `qrConfig:loadConfig(),`, false},
+		{"qr-size-type", `qrConfig:{size:"130"},`, false},
+		{"qr-size-small", `qrConfig:{size:63},`, false},
+		{"qr-size-large", `qrConfig:{size:2049},`, false},
+		{"qr-size-duplicate", `qrConfig:{size:130,size:131},`, false},
+		{"qr-scope-type", `qrConfig:{useIdentifyScopeSbol:true},`, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			html := strings.Replace(base, "window.config = {", "window.config = {"+tc.fields, 1)
+			c, err := ParsePrimaryConfig(html)
+			if !tc.valid {
+				if err == nil || c != (FrontendConfig{}) {
+					t.Fatal("unsafe new auth field accepted")
+				}
+				return
+			}
+			id, key := c.CardEncryptionKey()
+			if err != nil || id != "synthetic-key" || key != "synthetic-public-key" || c.QRSize() != 130 || c.QRScope() != "synthetic-scope" {
+				t.Fatal("new auth config fields lost")
+			}
+		})
+	}
+}
+func TestFrontendQRDefaultDoesNotChangeZeroValueContract(t *testing.T) {
+	if (FrontendConfig{}).QRSize() != 0 {
+		t.Fatal("zero frontend config invented a QR size")
+	}
+	html, _ := frontendFixture(t, "primary_valid_literal")
+	c, err := ParsePrimaryConfig(html)
+	if err != nil || c.QRSize() != 190 {
+		t.Fatal("validated config did not apply the QR protocol default")
+	}
+}

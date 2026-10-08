@@ -31,7 +31,7 @@ The [profile locations](CLI.md#default-profile) follow the operating system conf
 
 | Command | Result or action | Bank access |
 | --- | --- | --- |
-| `login` | Make a new private profile through primary or PIN authentication. | Authentication. |
+| `login` | Make a new private profile through login, phone, card, QR, or PIN authentication. | Authentication. |
 | `refresh-session` | Restore the selected profile through PIN authentication. | Authentication. |
 | `status` | Read file metadata. | None. |
 | `inspect-session` | Read profile metadata without secret values. | None. |
@@ -107,13 +107,14 @@ Environment proxy variables do not select a connection.
 | Option | Default | Commands | Meaning |
 | --- | --- | --- | --- |
 | `--remembered-profile PATH` | None. | `login`. | Use a remembered identity for PIN login into a new file. |
-| `--browser-profile PATH` | None. | Authentication and interactive data reads. | Select the private Firefox profile. |
-| `--playwright-driver PATH` | None. | Authentication and interactive data reads. | Select the installed matching driver. |
-| `--firefox-executable PATH` | None. | Authentication and interactive data reads. | Select the installed matching Firefox executable. |
+| `--method METHOD` | `login`. | `login`. | Select `login`, `phone`, `card`, or `qr`. |
+| `--qr-output PATH` | None. | QR `login`. | Save the challenge as a new private PNG file. |
 
-The three browser paths must all be absent or all be absolute paths.
-They control public rendering before native authentication.
-They do not provide browser authentication or configure NSS trust automatically.
+The `--remembered-profile` option requires the default `login` method.
+It selects existing online banking PIN authentication.
+The `--qr-output` option requires `--method qr` and an absolute path.
+Authentication uses native HTTP requests.
+The CLI does not accept browser runtime options.
 
 ## History options
 
@@ -200,7 +201,7 @@ It is not a catalog of all bank APIs.
 
 | SDK method | CLI commands | Route |
 | --- | --- | --- |
-| Primary and PIN authentication | `login`, `refresh-session`, interactive restoration. | Native authentication state machine. |
+| Primary, phone, card, QR, and PIN authentication | `login`, `refresh-session`, interactive restoration. | Native authentication state machine. |
 | `Products.Get`, `Accounts.List`, `Cards.List`, `Resources.Portfolio` | `products`, `accounts`, `cards`, `portfolio`. | `/main-screen/rest/v2/m1/web/section/meta` |
 | `Cards.Info`, `Cards.Limits` | `card-info`, `card-limits`. | `/ufs-carddetail/rest/card/v1/cardInfo` |
 | `Operations.Collect`, `Operations.Page` | `operations`, `operations-page`. | `/uoh-bh/v1/operations/list` |
@@ -248,17 +249,16 @@ Numbers, units, and dates use the measurement and time category.
 | command | The selected CLI operation, such as `products`. |
 | configuration directory | The operating system location for application settings. |
 | command argument | A value that the caller supplies on the command line. |
-| cookie | A name, value, and scope in a browser session. |
+| cookie | A name, value, and scope in an HTTP session. |
 | coverage metadata | Information about the known limits of returned history. |
 | cryptographic proof | Data that shows possession of the expected authentication secret. |
 | credential | Data that gives authentication or session access. |
 | default profile | The saved CLI profile for the current operating system user. |
-| device identity | The remembered browser and device data in a profile. |
+| device identity | The remembered client and device data in a profile. |
 | directory | A location that contains files. |
 | executable | The application file that the operating system starts. |
 | enrollment | Initial authentication, optional PIN creation, and first private profile publication. |
 | exit code | The numeric result that a command gives to its caller. |
-| Firefox | The browser that does optional public initialization. |
 | Go | The language and toolchain that build this repository. |
 | history | The returned list of bank operations. |
 | hidden input | Terminal input with character echo disabled. |
@@ -274,7 +274,6 @@ Numbers, units, and dates use the measurement and time category.
 | MCP | The protocol for local SDK tools over standard input and output. |
 | metadata | Information about data, without its secret values. |
 | mode | The file or directory permission bits, such as `0600`. |
-| NSS | The certificate store that the Firefox profile uses. |
 | offset | The starting position for a history page. |
 | operation | A bank history item or bank data change, as specified by context. |
 | option | A named command parameter, such as `--profile`. |
@@ -283,7 +282,6 @@ Numbers, units, and dates use the measurement and time category.
 | path | The file location supplied to a command. |
 | PEM | The text encoding of certificates in a CA bundle. |
 | PIN | The online banking code for a remembered identity. |
-| Playwright driver | The installed runtime that controls Firefox. |
 | portfolio | Accounts, cards, and relationships from one product response. |
 | private file | A regular owner file with private permissions. |
 | product | An account or card returned by the products API. |
@@ -295,6 +293,11 @@ Numbers, units, and dates use the measurement and time category.
 | request | One application message to the bank. |
 | response | The bank message for a request. |
 | root CA | A trusted certificate authority at the top of a certificate chain. |
+| CVV | The card security code; authentication does not request it. |
+| PNG | The image format for a saved QR challenge. |
+| QR code | A scannable authentication challenge that the bank application confirms. |
+| RSA | Public-key encryption used for bank authentication values. |
+| SRP | A password proof protocol that validates both parties without sending the password. |
 | SDK | The native Go library that the CLI uses. |
 | SOCKS5 | A proxy protocol with optional username and password authentication. |
 | session | The bank access state at a specified time. |
@@ -334,7 +337,6 @@ For their use as nouns, define separate noun terms.
 | log in | Make a bank session through authentication. |
 | open | Read or start the specified file, terminal, or application. |
 | restore | Make a new bank session from a remembered identity. |
-| render | Execute the public page scripts and read the resulting browser document. |
 | save | Write the validated session to its private file. |
 | type | Supply characters through terminal input. |
 | update | Install or produce a new application version. |

@@ -10,6 +10,9 @@ import (
 // credential prompt. Login reuses that validated configuration. Synthetic
 // authenticators may omit the optional configuration interface.
 func prepareAuthentication(ctx context.Context, auth any) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if loader, ok := auth.(interface {
 		LoadConfig(context.Context) (sber.FrontendConfig, error)
 	}); ok {

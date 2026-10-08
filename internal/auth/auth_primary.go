@@ -13,7 +13,7 @@ import (
 	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
-// PrimaryAuth performs cold-browser SRP, owner OTP and optional PIN enrollment.
+// PrimaryAuth performs primary SRP, owner OTP and optional PIN enrollment.
 // A nil session with nil error means enrollment is permitted, not authentication.
 type PrimaryAuth struct{ *authFlow }
 

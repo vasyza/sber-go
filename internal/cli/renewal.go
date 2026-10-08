@@ -48,7 +48,7 @@ func readClientOptions(command string, args *commandArguments, dependencies *Aut
 			return sber.NewPINAuth(bundle, options)
 		}
 	}
-	authOptions, err := args.browser.authOptions(args.ca, args.selectedProxy)
+	authOptions, err := nativeAuthOptions(args.ca, args.selectedProxy)
 	if err != nil {
 		return options, nil, err
 	}

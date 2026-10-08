@@ -8,7 +8,6 @@
 | `internal/transport` | TLS-verified HTTP, bounded decoding and bootstrap contracts |
 | `internal/auth` | SRP/RSA primary login, PIN/OTP/CAPTCHA and cleanup |
 | `internal/bank` | Client lifecycle/renewal, `BusinessRequester`, domain models, parsers, resources and transfer workflows |
-| `browser` | Explicit Firefox public bootstrap and frozen cookie adoption |
 | `internal/ownerinput`, `internal/enrollment` | Hidden terminal input and private lock/no-replace publication |
 | `internal/cli`, `cmd/sber` | Validation, application orchestration and signal-aware command |
 | `internal/mcptools`, `internal/mcpwire` | Tool schemas and bounded/cancelable protocol engine |
@@ -16,7 +15,7 @@
 | `rental`, `internal/rentalcli`, `cmd/rental-check` | Independent reconciliation and offline JSON command |
 | `internal/strictjson`, `internal/srp`, `internal/rsaoaep` | Protocol/crypto primitives |
 
-Dependencies flow root/app → bank → auth/transport/session → errors/primitives. Session, transport and auth never import the facade. Browser bootstrap is injected through transport interfaces, avoiding a bank-to-browser cycle. Rental does not import the bank SDK. MCP wire/catalog do not authenticate or read profiles.
+Dependencies flow root/app → bank → auth/transport/session → errors/primitives. Session, transport and auth never import the facade. Authentication uses a verified native HTTP transport. Rental does not import the bank SDK. MCP wire/catalog do not authenticate or read profiles.
 
 The bank package is one cohesive resource/lifecycle boundary. Files separate client lifecycle (`client_*`), resource services (`resources_*`), bound entities (`entities_*`), money (`money.go`), models (`models*.go`), deliberate export (`export.go`), dates/time filters and response parsers. Financial export recognizes its own native models without trusting arbitrary caller structs.
 
@@ -26,9 +25,9 @@ The CLI has one command registry and option parser (`commands.go`, `run.go`). It
 
 Direct transport TLS establishment (`tls_establishment.go`) advertises the supported HTTP/1.1 protocol and can recover a peer closure before HTTP transmission. Its three-attempt bound shares the original request deadline and cancellation. Certificate/protocol failures stop immediately. Established business connections retain one HTTP request per connection; transmitted financial/authentication POSTs retain their no-replay policy.
 
-`internal/proxy` validates explicit HTTP, HTTPS, and SOCKS5 settings shared by the CLI, transport, and Firefox provider.
+`internal/proxy` validates explicit HTTP, HTTPS, and SOCKS5 settings shared by the CLI and transport.
 The native transport uses verified standard Go proxy connections.
-Firefox uses direct proxy settings or a bounded local CONNECT adapter for authenticated SOCKS5.
+Native HTTP, HTTPS, and SOCKS5 connections share the explicit proxy policy.
 The CLI stores proxy settings separately from bank profiles, with enrollment's private directory checks, stable process locking, and atomic replacement.
 Environment proxy selection and direct fallback are disabled.
 

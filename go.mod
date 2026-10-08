@@ -9,17 +9,14 @@ require (
 	github.com/creack/pty v1.1.24
 	github.com/klauspost/compress v1.20.1
 	github.com/modelcontextprotocol/go-sdk v1.8.0
-	github.com/mxschmitt/playwright-go v0.6201.1
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.9
-	golang.org/x/net v0.59.0
 	golang.org/x/sys v0.48.0
 	golang.org/x/term v0.46.0
 )
 
 require (
-	github.com/deckarep/golang-set/v2 v2.8.0 // indirect
-	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/segmentio/asm v1.1.3 // indirect

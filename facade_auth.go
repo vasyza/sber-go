@@ -19,6 +19,7 @@ type AuthStage = sdkAuth.AuthStage
 const AuthStageBootstrap = sdkAuth.AuthStageBootstrap
 const AuthStageConfigured = sdkAuth.AuthStageConfigured
 const AuthStageOTP = sdkAuth.AuthStageOTP
+const AuthStageQR = sdkAuth.AuthStageQR
 const AuthStagePINEnrollment = sdkAuth.AuthStagePINEnrollment
 const AuthStageAuthenticated = sdkAuth.AuthStageAuthenticated
 const AuthStageClosed = sdkAuth.AuthStageClosed
@@ -45,3 +46,21 @@ func NewPrimaryAuth(o AuthOptions) (*PrimaryAuth, error) { return sdkAuth.NewPri
 func NewPrimaryAuthFromBundle(b SessionBundle, o AuthOptions) (*PrimaryAuth, error) {
 	return sdkAuth.NewPrimaryAuthFromBundle(b, o)
 }
+
+type PhoneAuth = sdkAuth.PhoneAuth
+type CardAuth = sdkAuth.CardAuth
+type QRAuth = sdkAuth.QRAuth
+type QRCode = sdkAuth.QRCode
+type QRStatus = sdkAuth.QRStatus
+
+const (
+	QRNew         = sdkAuth.QRNew
+	QRWaitConfirm = sdkAuth.QRWaitConfirm
+	QRConfirmed   = sdkAuth.QRConfirmed
+	QRRefused     = sdkAuth.QRRefused
+	QRExpired     = sdkAuth.QRExpired
+)
+
+func NewPhoneAuth(o AuthOptions) (*PhoneAuth, error) { return sdkAuth.NewPhoneAuth(o) }
+func NewCardAuth(o AuthOptions) (*CardAuth, error)   { return sdkAuth.NewCardAuth(o) }
+func NewQRAuth(o AuthOptions) (*QRAuth, error)       { return sdkAuth.NewQRAuth(o) }

@@ -19,6 +19,7 @@ func (f *authFlow) resetProcess() {
 	f.srp = nil
 	f.csrf = ""
 	f.otpPending = false
+	f.qrPending = false
 	f.primarySRP = nil
 	f.primaryToken = ""
 	f.primaryOTPPending = false
@@ -100,7 +101,7 @@ func (f *authFlow) pinResponseError(p map[string]any, r *sdkTransport.Response, 
 		e.RemainingAttempts = authNonnegative(details["remainingAttempts"], false)
 		e.ResetCookies = authTruthy(details["resetCookies"])
 	}
-	if code == "need_captcha" || code == "invalid_captcha" {
+	if code == "need_captcha" || code == "captcha_required" || code == "invalid_captcha" {
 		c, _ := p["captcha"].(map[string]any)
 		return &sdkErrs.PinCaptchaRequired{PinAuthError: *e, ImageURL: authCaptchaLink(c, "imageUrl", base), AudioURL: authCaptchaLink(c, "audioUrl", base)}
 	}
@@ -235,6 +236,7 @@ const (
 	AuthStageBootstrap     AuthStage = "bootstrap"
 	AuthStageConfigured    AuthStage = "configured"
 	AuthStageOTP           AuthStage = "otp"
+	AuthStageQR            AuthStage = "qr"
 	AuthStagePINEnrollment AuthStage = "pin_enrollment"
 	AuthStageAuthenticated AuthStage = "authenticated"
 	AuthStageClosed        AuthStage = "closed"
@@ -252,6 +254,9 @@ func (f *authFlow) Stage() AuthStage {
 	}
 	if f.otpPending || f.primaryOTPPending {
 		return AuthStageOTP
+	}
+	if f.qrPending {
+		return AuthStageQR
 	}
 	if f.pinPublicKey != "" {
 		return AuthStagePINEnrollment

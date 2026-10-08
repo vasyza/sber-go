@@ -14,7 +14,6 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestAuthPrimaryCaptchaTokenAndFormChoices(t *testing.T) {
@@ -171,43 +170,6 @@ func TestAuthJSONAndInputBoundaries(t *testing.T) {
 		_ = a.Close()
 	}
 	_ = json.Valid
-}
-func TestAuthBrowserInvalidStateDoesNotAdopt(t *testing.T) {
-	for _, mode := range []string{"url", "ua", "config", "failure", "timeout"} {
-		t.Run(mode, func(t *testing.T) {
-			s := newAuthScript(t)
-			created := 0
-			provider := sdkTransport.BrowserBootstrapFunc(func(ctx context.Context, b sdkSession.SessionBundle, target string) (sdkTransport.BrowserBootstrapResult, error) {
-				r := sdkTransport.BrowserBootstrapResult{HTML: authHTML(false), URL: sdkTransport.PublicBootstrapURL, Browser: sdkSession.BrowserProfile{Headers: []sdkSession.BrowserHeader{{Name: "user-agent", Value: "synthetic"}}}}
-				switch mode {
-				case "url":
-					r.URL = sdkSession.AppOrigin + "/app/main"
-				case "ua":
-					r.Browser = sdkSession.BrowserProfile{}
-				case "config":
-					r.HTML = "invalid config"
-				case "failure":
-					return r, errors.New("private-support-id secret")
-				case "timeout":
-					<-ctx.Done()
-					return r, ctx.Err()
-				}
-				return r, nil
-			})
-			a, e := NewPINAuth(authBundle(t), AuthOptions{Transport: s, BrowserFirst: true, BrowserBootstrap: provider, BrowserBootstrapTimeout: 20 * time.Millisecond, TransportFactory: func(sdkSession.SessionBundle, sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
-				created++
-				return newAuthScript(t), nil
-			}})
-			if e != nil {
-				t.Fatal(e)
-			}
-			_, e = a.LoadConfig(context.Background())
-			if e == nil || created != 0 || a.config != nil || strings.Contains(fmt.Sprintf("%+v", e), "private-support-id") {
-				t.Fatal("invalid browser state adopted/leaked")
-			}
-			_ = a.Close()
-		})
-	}
 }
 
 // Server math is independently ported from test_pin_auth.py::_server_challenge.

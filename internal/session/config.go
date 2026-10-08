@@ -27,10 +27,12 @@ const MaxFrontendHTMLCharacters = 4 * 1024 * 1024
 type FrontendConfig struct{ data **frontendConfigData }
 
 type frontendConfigData struct {
-	baseURL, processID        string
-	pinLength                 int
-	nHex, gHex                string
-	seamlessWeb, redirectPost bool
+	baseURL, processID               string
+	pinLength                        int
+	nHex, gHex                       string
+	seamlessWeb, redirectPost        bool
+	cardKeyID, cardKeyValue, qrScope string
+	qrSize                           int
 }
 
 // NewFrontendConfig retains every supplied value verbatim, including partial
@@ -40,7 +42,7 @@ func NewFrontendConfig(baseURL, processID string, pinLength int, nHex, gHex stri
 	if baseURL == "" && processID == "" && pinLength == 0 && nHex == "" && gHex == "" && !seamlessWeb && !redirectPost {
 		return FrontendConfig{}
 	}
-	data := &frontendConfigData{baseURL, processID, pinLength, nHex, gHex, seamlessWeb, redirectPost}
+	data := &frontendConfigData{baseURL: baseURL, processID: processID, pinLength: pinLength, nHex: nHex, gHex: gHex, seamlessWeb: seamlessWeb, redirectPost: redirectPost}
 	// The terminal pointee must itself be a pointer: with an ordinary *record,
 	// fmt's nested badVerb can reset depth to zero and dereference the record.
 	// Neither level escapes through an accessor or a mutable raw-fields DTO.
@@ -101,6 +103,27 @@ func (c FrontendConfig) RedirectPost() bool {
 		return false
 	}
 	return (*c.data).redirectPost
+}
+
+// CardEncryptionKey returns the public RSA key and its bank key identifier.
+// The key is used only to encrypt a card number for an authentication request.
+func (c FrontendConfig) CardEncryptionKey() (id, key string) {
+	if c.data != nil {
+		return (*c.data).cardKeyID, (*c.data).cardKeyValue
+	}
+	return "", ""
+}
+func (c FrontendConfig) QRScope() string {
+	if c.data == nil {
+		return ""
+	}
+	return (*c.data).qrScope
+}
+func (c FrontendConfig) QRSize() int {
+	if c.data == nil {
+		return 0
+	}
+	return (*c.data).qrSize
 }
 
 func (c FrontendConfig) String() string               { return "FrontendConfig(<redacted>)" }
@@ -221,7 +244,38 @@ func assembleFrontendConfig(props map[string]string, length int, n, g string) (F
 	if !ok {
 		return invalid()
 	}
-	return NewFrontendConfig(base, process, length, n, g, seamless, post), nil
+	c := NewFrontendConfig(base, process, length, n, g, seamless, post)
+	(*c.data).qrSize = 190
+	for name, dest := range map[string]*string{"encryptionKeyId": &(*c.data).cardKeyID, "encryptionKeyValue": &(*c.data).cardKeyValue} {
+		if _, present := props[name]; present {
+			v, valid := literalString(props, name)
+			if !valid || len(v) > 16384 || HasControls(v) {
+				return invalid()
+			}
+			*dest = v
+		}
+	}
+	if raw, present := props["qrConfig"]; present {
+		qr, valid := objectProperties(raw)
+		if !valid {
+			return invalid()
+		}
+		if _, present = qr["useIdentifyScopeSbol"]; present {
+			v, valid := literalString(qr, "useIdentifyScopeSbol")
+			if !valid || len(v) > 128 || HasControls(v) {
+				return invalid()
+			}
+			(*c.data).qrScope = v
+		}
+		if _, present = qr["size"]; present {
+			v, valid := literalInt(qr, "size")
+			if !valid || v < 64 || v > 2048 {
+				return invalid()
+			}
+			(*c.data).qrSize = v
+		}
+	}
+	return c, nil
 }
 func safeFrontendGroup(nHex, gHex string) bool {
 	n, nOK := frontendHex(nHex)

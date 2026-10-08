@@ -65,7 +65,7 @@ func TestOwnerLoginReportsSafeFailureReasons(t *testing.T) {
 		{"HTTP error", &sber.PinAuthError{Code: "bootstrap_failed", StatusCode: 403}, "bank login page returned HTTP 403"},
 		{"session navigation", &sber.PinAuthError{Code: "redirect_failed", StatusCode: 500}, "bank session navigation returned HTTP 500"},
 		{"config", &sber.PinAuthError{Code: "invalid_frontend_config"}, "bank login page configuration is not supported"},
-		{"browser", &sber.PinAuthError{Code: "browser_check_required"}, "bank login page requires browser initialization"},
+		{"browser", &sber.PinAuthError{Code: "browser_check_required"}, "bank requires an interactive browser security check"},
 		{"bank PIN policy", &sber.PinAuthError{Code: "invalid_pin_birthdate", StatusCode: 400}, "bank did not accept the new PIN"},
 		{"device limit", &sber.PinAuthError{Code: "browser_limit", StatusCode: 400}, "bank limit for remembered devices was reached"},
 		{"PIN decode", &sber.PinAuthError{Code: "invalid_decode_pin", StatusCode: 400}, "bank could not decode the PIN"},

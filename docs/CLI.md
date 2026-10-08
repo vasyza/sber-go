@@ -96,7 +96,7 @@ Use `sber login` to make the default profile.
 
 The CLI supports HTTP, HTTPS, and SOCKS5 proxies.
 Each type supports connections with or without proxy authentication.
-The saved setting applies to login, session restoration, network reads, Firefox initialization, and MCP.
+The saved setting applies to login, session restoration, network reads, and MCP.
 
 1. Save the proxy address and its login values:
 
@@ -166,7 +166,6 @@ Without a saved or explicit proxy, network commands connect directly.
 Environment proxy variables do not select a connection.
 If a proxy fails, the request stops without a direct connection.
 TLS validates both the destination and any HTTPS proxy.
-Firefox retains its own verified NSS trust.
 
 To remove the saved proxy and its login values:
 
@@ -195,7 +194,7 @@ The profile must be a regular file with mode `0600` in a directory with mode `07
 7. Make sure that the result contains `"profile_created":true`.
 
 The CLI loads public configuration before it shows a secret prompt.
-Browser preparation stops before secret input if the selected runtime cannot start.
+The command stops before secret input if public preparation fails.
 The online banking PIN is different from a card PIN.
 The CLI shows the specified PIN length before input.
 An incorrect length or confirmation does not cause a new login attempt.
@@ -213,6 +212,92 @@ Publication occurs only after successful authentication and authentication clean
 If the bank shows CAPTCHA or WebAuthn, complete that step in the bank website.
 The CLI stops at these challenges.
 It does not send a password, PIN, or SMS attempt again automatically.
+
+## Native authentication
+
+All authentication requests use the native Go HTTP transport.
+The CLI needs no browser, driver, or JavaScript runtime.
+The application retains certificate and hostname verification.
+A bank security check can require interactive browser access.
+The native command stops at that check.
+
+## Select another login method
+
+Use a new profile path for each procedure below.
+The CLI does not replace an existing profile during login.
+
+### Phone and password
+
+1. Start phone authentication:
+
+   ```sh
+   ./bin/sber login --method phone --profile "$HOME/.config/sber-go/phone.json"
+   ```
+
+2. Enter the bank phone number at the hidden prompt.
+3. Enter the online banking password at the hidden prompt.
+4. Enter the SMS code if the bank requests it.
+5. Make sure that the result contains `"profile_created":true`.
+
+Use an 11-digit phone number that starts with 7.
+Spaces, parentheses, hyphens, and a leading plus sign are permitted.
+The CLI normally uses SRP for the password proof.
+It validates the server proof before SMS confirmation.
+If the bank requests another password method, the CLI uses that method through verified TLS.
+If the bank supplies an RSA key, the CLI encrypts the password with that key.
+
+### Card number
+
+1. Start card authentication:
+
+   ```sh
+   ./bin/sber login --method card --profile "$HOME/.config/sber-go/card.json"
+   ```
+
+2. Enter the complete card number at the hidden prompt.
+3. Enter the SMS code from the bank.
+4. Enter and confirm a new online banking PIN if the bank requests it.
+5. Make sure that the result contains `"profile_created":true`.
+
+The CLI encrypts the card number with the bank public RSA key.
+The command does not request a CVV, card PIN, or expiry date.
+If account registration or credential recovery is necessary, complete it on the bank website.
+The CLI does not reset a login or password as part of card authentication.
+
+### QR code
+
+1. Start QR authentication:
+
+   ```sh
+   ./bin/sber login --method qr --profile "$HOME/.config/sber-go/qr.json"
+   ```
+
+2. Open the bank application on your phone.
+3. Scan the QR code in the terminal with that application.
+4. Confirm the login in the application.
+5. Make sure that the result contains `"profile_created":true`.
+
+The command waits for a maximum of three minutes.
+An expired QR or refused login stops the command.
+The command does not start another QR automatically.
+Treat the displayed QR as an authentication secret.
+Do not share it or record the terminal output.
+
+For a PNG image, select a new absolute private file path:
+
+```sh
+./bin/sber login --method qr --qr-output "$HOME/.config/sber-go/login-qr.png" \
+  --profile "$HOME/.config/sber-go/qr.json"
+```
+
+The parent directory must be private.
+The file has mode `0600` and is published without replacement.
+Open the PNG locally and scan it in the bank application.
+Delete the PNG after the login ends.
+
+PIN restoration requires a PIN enrolled for the saved device identity.
+A phone or QR session can lack that enrollment.
+For such a profile, start its login method with a new private profile path.
 
 ## Restore a session
 
@@ -250,6 +335,8 @@ MCP does not do interactive authentication.
 Commands that change bank data do not restore a session or send a failed operation again.
 
 The bank can end a session at any time.
+A new login can end another web session.
+Check the selected profile after each login.
 A session can end less than one year after login.
 The result of a session check applies to that request only.
 
@@ -478,7 +565,7 @@ Data output can contain private financial information.
 | Invalid CA bundle | Select a readable PEM file with verified trust anchors. |
 | Untrusted TLS certificate | Update the application or select a verified CA bundle. |
 | TLS hostname or validity error | Make sure that the destination and system time are correct. |
-| Browser initialization error | Make sure that all three browser paths are correct. |
+| Interactive security check | Complete bank access in the website. Native authentication cannot continue through this check. |
 | HTTP error or bank rejection | Read the verification record before another attempt. |
 | Unsupported response format | Update the application for the bank protocol. |
 | Authentication attempt limit | Stop login attempts and use the bank website. |
@@ -515,33 +602,3 @@ A connection error after HTTP transmission does not start another HTTP attempt.
    ```
 
 The [certificate record](../internal/transport/certificates/README.md) gives the source, fingerprint, validity, and update procedure.
-
-## Use public browser initialization
-
-Use this procedure when the bank makes ordinary browser initialization necessary before native authentication.
-The browser receives no login, password, PIN, or SMS input from the CLI.
-It renders the public login document only.
-
-Requirements:
-
-- The Firefox build for the Playwright version in `go.mod`.
-- The installed Playwright driver for that build.
-- A dedicated private Firefox profile with verified NSS certificate trust.
-- Three absolute paths for the browser profile, driver, and executable.
-
-1. Prepare the runtime and trust as specified in [AUTH.md](AUTH.md).
-2. Select all three paths for session restoration:
-
-   ```sh
-   ./bin/sber refresh-session \
-     --browser-profile /absolute/private/firefox-profile \
-     --playwright-driver /absolute/installed/playwright-driver \
-     --firefox-executable /absolute/installed/firefox
-   ```
-
-3. Enter the PIN at the hidden terminal prompt.
-4. If the bank shows an SMS challenge, enter the code from that SMS.
-
-The same options apply to `login` and interactive data reads.
-The Go CA bundle does not configure the Firefox NSS store.
-TLS verification and the browser sandbox remain enabled.

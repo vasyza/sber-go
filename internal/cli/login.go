@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"reflect"
 
 	sber "github.com/vasyza/sber-go"
@@ -16,17 +17,27 @@ import (
 
 // PrimaryAuthenticator is the owner login state machine, separate from bank
 // business operations. Challenge responses are supplied once, never retried.
-type PrimaryAuthenticator interface {
+type CredentialAuthenticator interface {
 	Login(context.Context, string, string, sber.PrimaryLoginOptions) (*sber.SessionBundle, error)
 	ConfirmOTP(context.Context, string) (*sber.SessionBundle, error)
-	CreatePIN(context.Context, string) (sber.SessionBundle, error)
 	Close() error
+}
+type PINEnrollmentAuthenticator interface {
+	CreatePIN(context.Context, string) (sber.SessionBundle, error)
+}
+type PrimaryAuthenticator interface {
+	CredentialAuthenticator
+	PINEnrollmentAuthenticator
 }
 
 // Authentication injects synthetic dependencies into application tests. The
 // command's production defaults accept no alternative credential input channel.
 type Authentication struct {
 	NewPrimary       func() (PrimaryAuthenticator, error)
+	NewPhone         func() (CredentialAuthenticator, error)
+	NewCard          func() (CardAuthenticator, error)
+	NewQR            func() (QRAuthenticator, error)
+	DisplayQR        func(sber.QRCode) error
 	NewPIN           func(string, sber.AuthOptions) (PINAuthenticator, error)
 	NewPINFromBundle func(sber.SessionBundle, sber.AuthOptions) (PINAuthenticator, error)
 	ReadSecret       func(context.Context, ownerinput.Prompt) (string, error)
@@ -34,17 +45,24 @@ type Authentication struct {
 }
 
 func primaryWithOptions(options sber.AuthOptions) (PrimaryAuthenticator, error) {
-	device, err := sber.GenerateDeviceprint()
+	options, err := withDeviceIdentity(options)
 	if err != nil {
 		return nil, err
+	}
+	return sber.NewPrimaryAuth(options)
+}
+func withDeviceIdentity(options sber.AuthOptions) (sber.AuthOptions, error) {
+	device, err := sber.GenerateDeviceprint()
+	if err != nil {
+		return sber.AuthOptions{}, err
 	}
 	antifraud, err := sber.GenerateAntifraudDeviceprint(device.Value())
 	if err != nil {
-		return nil, err
+		return sber.AuthOptions{}, err
 	}
 	deviceValue, antifraudValue := device.Value(), antifraud.Value()
 	options.Deviceprint, options.AntifraudDeviceprint = &deviceValue, &antifraudValue
-	return sber.NewPrimaryAuth(options)
+	return options, nil
 }
 
 func ownerSecret(ctx context.Context, prompt ownerinput.Prompt) (string, error) {
@@ -57,14 +75,18 @@ func ownerSecret(ctx context.Context, prompt ownerinput.Prompt) (string, error) 
 }
 
 func runLogin(ctx context.Context, args *commandArguments, output, diagnostics io.Writer, dependencies *Authentication) int {
-	profile, caBundle, remembered, selection := args.profile, args.ca, args.remembered, args.browser
+	profile, caBundle, remembered := args.profile, args.ca, args.remembered
+	if args.qrOutput != "" && filepath.Clean(args.qrOutput) == filepath.Clean(profile) {
+		io.WriteString(diagnostics, "The QR output and profile paths must differ.\n")
+		return 2
+	}
 	a := Authentication{}
 	if dependencies != nil {
 		a = *dependencies
 	}
 	if a.NewPrimary == nil {
 		a.NewPrimary = func() (PrimaryAuthenticator, error) {
-			options, err := selection.authOptions(caBundle, args.selectedProxy)
+			options, err := nativeAuthOptions(caBundle, args.selectedProxy)
 			if err != nil {
 				return nil, err
 			}
@@ -76,6 +98,7 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 			return sber.NewPINAuthFromProfile(path, options)
 		}
 	}
+	configureLoginMethods(&a, args, diagnostics)
 	if a.ReadSecret == nil {
 		a.ReadSecret = ownerSecret
 	}
@@ -87,14 +110,14 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 		var writer enrollment.CandidateWriter
 		var err error
 		if remembered != "" {
-			options, optionsErr := selection.authOptions(caBundle, args.selectedProxy)
+			options, optionsErr := nativeAuthOptions(caBundle, args.selectedProxy)
 			if optionsErr != nil {
 				err = optionsErr
 			} else {
 				writer, err = prepareRememberedLogin(ctx, a, remembered, options)
 			}
 		} else {
-			writer, err = prepareLogin(ctx, a, diagnostics)
+			writer, err = prepareMethodLogin(ctx, a, args.method, diagnostics)
 		}
 		if err != nil {
 			message = loginFailureMessage(err)
@@ -135,7 +158,7 @@ func loginFailureMessage(err error) (message string) {
 		var phase *loginPhaseError
 		if errors.As(err, &phase) {
 			switch phase.phase {
-			case "public-configuration", "owner-input", "login-password", "pin-login", "sms-confirmation", "pin-enrollment", "session-validation", "cleanup":
+			case "public-configuration", "owner-input", "login-password", "phone-password", "card-login", "qr-login", "pin-login", "sms-confirmation", "pin-enrollment", "session-validation", "cleanup":
 				message = "Authentication stage=" + phase.phase + ".\n" + message
 			}
 		}
@@ -163,13 +186,21 @@ func loginFailureMessage(err error) (message string) {
 		case "invalid_frontend_config":
 			return "The bank login page configuration is not supported.\nThe command did not publish the profile."
 		case "browser_check_required":
-			return "The bank login page requires browser initialization.\nThe command did not publish the profile."
+			return "The bank requires an interactive browser security check.\nNative authentication cannot continue.\nThe command did not publish the profile."
 		case "browser_bootstrap_unavailable":
 			return "The selected browser runtime is not available.\nCheck its explicit paths.\nThe command did not publish the profile."
 		case "browser_bootstrap_failed", "browser_bootstrap_timeout", "unsupported_browser_state":
 			return "The selected browser initialization failed.\nCheck its private profile and verified certificate trust.\nThe command did not publish the profile."
 		case "webauthn_required":
 			return "The bank requires owner WebAuthn interaction.\nThe command did not publish the profile."
+		case "card_account_setup_required":
+			return "The bank requires account registration or credential recovery.\nComplete this step on the bank website.\nThe command did not publish the profile."
+		case "invalid_phone":
+			return "The bank phone number must contain 11 digits and start with 7.\nThe command did not publish the profile."
+		case "invalid_card":
+			return "The card number is not valid.\nThe command did not publish the profile."
+		case "qr_expired", "qr_refused":
+			return "The QR challenge expired or the owner refused it.\nStart a new login.\nThe command did not publish the profile."
 		case "attempts_limit_reached":
 			return "The bank authentication attempt limit was reached.\nThe command did not publish the profile."
 		case "browser_limit":
@@ -245,6 +276,9 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 	if err != nil {
 		return nil, err
 	}
+	return prepareCredentialLogin(ctx, a, auth, ownerinput.Login, "login-password", diagnostics)
+}
+func prepareCredentialLogin(ctx context.Context, a Authentication, auth CredentialAuthenticator, prompt ownerinput.Prompt, loginPhase string, diagnostics io.Writer) (writer enrollment.CandidateWriter, err error) {
 	if auth == nil || (reflect.ValueOf(auth).Kind() == reflect.Pointer && reflect.ValueOf(auth).IsNil()) {
 		return nil, enrollment.ErrPrepare
 	}
@@ -263,15 +297,18 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 		return nil, err
 	}
 	phase = "owner-input"
-	login, err := a.ReadSecret(ctx, ownerinput.Login)
+	login, err := a.ReadSecret(ctx, prompt)
 	if err != nil {
 		return nil, err
 	}
-	password, err := a.ReadSecret(ctx, ownerinput.Password)
-	if err != nil {
-		return nil, err
+	password := ""
+	if prompt != ownerinput.CardNumber {
+		password, err = a.ReadSecret(ctx, ownerinput.Password)
+		if err != nil {
+			return nil, err
+		}
 	}
-	phase = "login-password"
+	phase = loginPhase
 	bundle, err := auth.Login(ctx, login, password, sber.PrimaryLoginOptions{})
 	login, password = "", ""
 	var otp *sber.PinOTPRequired
@@ -290,7 +327,11 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 	}
 	if bundle == nil {
 		phase = "pin-enrollment"
-		created, createErr := enrollOwnerPIN(ctx, a, auth, diagnostics)
+		enroller, ok := auth.(PINEnrollmentAuthenticator)
+		if !ok {
+			return nil, &sber.PinAuthError{Code: "pin_create_not_ready"}
+		}
+		created, createErr := enrollOwnerPIN(ctx, a, enroller, diagnostics)
 		if createErr != nil {
 			return nil, createErr
 		}
@@ -315,7 +356,7 @@ func prepareLogin(ctx context.Context, a Authentication, diagnostics io.Writer) 
 // Current configuration is optional for injected authenticators. Native auth
 // supplies it from its already loaded, validated configuration without another
 // request. Correcting local input must not repeat login, OTP or PIN creation.
-func readNewPIN(ctx context.Context, a Authentication, auth PrimaryAuthenticator, diagnostics io.Writer) (string, error) {
+func readNewPIN(ctx context.Context, a Authentication, auth PINEnrollmentAuthenticator, diagnostics io.Writer) (string, error) {
 	length := 0
 	if provider, ok := auth.(interface {
 		LoadConfig(context.Context) (sber.FrontendConfig, error)

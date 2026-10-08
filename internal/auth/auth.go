@@ -3,11 +3,9 @@ package auth
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"sync"
-	"time"
 
 	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	sdkSession "github.com/vasyza/sber-go/internal/session"
@@ -25,10 +23,6 @@ type AuthOptions struct {
 	Transport                         sdkTransport.Transport
 	TransportFactory                  AuthTransportFactory
 	TransportOptions                  sdkTransport.TransportOptions
-	BrowserBootstrap                  sdkTransport.BrowserBootstrapProvider
-	BrowserBootstrapTimeout           time.Duration
-	// BrowserFirst requires explicit selection; malformed HTML never causes fallback.
-	BrowserFirst bool
 }
 
 func (AuthOptions) String() string               { return "AuthOptions(<redacted>)" }
@@ -36,11 +30,11 @@ func (o AuthOptions) Format(f fmt.State, v rune) { sdkErrs.FormatError(f, o.Stri
 func (AuthOptions) MarshalJSON() ([]byte, error) { return json.Marshal("<redacted>") }
 
 type authFlow struct {
-	currentOwned               *authOwnedTransport
 	primarySRP                 *srp.Client
 	primaryToken, pinPublicKey string
 	primaryOTPPending          bool
 	otpPending                 bool
+	qrPending                  bool
 	srp                        *srp.Client
 	csrf                       string
 	authenticated              bool
@@ -81,20 +75,17 @@ func newAuthFlow(bundle sdkSession.SessionBundle, o AuthOptions, primary bool) (
 	if err != nil {
 		return nil, err
 	}
+	// The bank's web-session handoff requires the Mozilla compatibility prefix.
+	// Declare the native SDK rather than a browser engine. Explicit observed
+	// headers remain authoritative; no browser process or security cookie is made.
+	if _, present := b.Browser.AsMap()["user-agent"]; !present {
+		b.Browser.Headers = append(b.Browser.Headers, sdkSession.BrowserHeader{Name: "user-agent", Value: "Mozilla/5.0 (compatible; sber-go/1.0; +https://github.com/vasyza/sber-go)"})
+	}
 	if b.Deviceprint == nil {
 		return nil, &sdkErrs.MissingSession{Message: "auth deviceprint required"}
 	}
 	if o.TransportOptions.Retry != 0 {
 		return nil, &sdkErrs.TransportError{Code: "retry_forbidden"}
-	}
-	if o.BrowserFirst && o.BrowserBootstrap == nil {
-		return nil, authFailure("browser_bootstrap_unavailable", nil)
-	}
-	if o.BrowserBootstrapTimeout == 0 {
-		o.BrowserBootstrapTimeout = 30 * time.Second
-	}
-	if o.BrowserBootstrapTimeout < 0 || o.BrowserBootstrapTimeout > 120*time.Second {
-		return nil, authFailure("invalid_auth_options", nil)
 	}
 	o.TransportOptions.AllowUnready = true
 	if o.TransportFactory == nil {
@@ -114,7 +105,7 @@ func newAuthFlow(bundle sdkSession.SessionBundle, o AuthOptions, primary bool) (
 	}
 	root, cancel := context.WithCancel(context.Background())
 	owned := &authOwnedTransport{transport: tr}
-	return &authFlow{gate: make(chan struct{}, 1), root: root, cancel: cancel, bundle: b, transport: tr, primary: primary, options: o, owned: []*authOwnedTransport{owned}, currentOwned: owned}, nil
+	return &authFlow{gate: make(chan struct{}, 1), root: root, cancel: cancel, bundle: b, transport: tr, primary: primary, options: o, owned: []*authOwnedTransport{owned}}, nil
 }
 func (f *authFlow) String() string               { return "Auth(<redacted>)" }
 func (f *authFlow) GoString() string             { return f.String() }
@@ -226,69 +217,22 @@ func (f *authFlow) loadConfig(ctx context.Context) (sdkSession.FrontendConfig, e
 	if f.config != nil {
 		return *f.config, nil
 	}
-	current, err := f.bundle.WithCookieJar(f.transport.CookieJar())
-	if err != nil {
+	r, e := f.transport.Get(ctx, sdkTransport.PublicBootstrapURL, authDocumentHeaders("", sdkTransport.PublicBootstrapURL))
+	if err := f.check(ctx); err != nil {
 		return sdkSession.FrontendConfig{}, authRequestError(err)
 	}
-	var rendered *sdkTransport.BrowserBootstrapResult
-	var html string
-	if !f.options.BrowserFirst {
-		r, e := f.transport.Get(ctx, sdkTransport.PublicBootstrapURL, authDocumentHeaders("", sdkTransport.PublicBootstrapURL))
-		if err = f.check(ctx); err != nil {
-			return sdkSession.FrontendConfig{}, authRequestError(err)
-		}
-		if e != nil {
-			return sdkSession.FrontendConfig{}, authRequestError(e)
-		}
-		if r == nil || r.StatusCode != 200 {
-			return sdkSession.FrontendConfig{}, authFailure("bootstrap_failed", r)
-		}
-		html = r.Text()
-		if sdkTransport.IsBrowserCheck(html) {
-			if f.options.BrowserBootstrap == nil {
-				return sdkSession.FrontendConfig{}, authFailure("browser_check_required", r)
-			}
-		} else {
-			goto parse
-		}
+	if e != nil {
+		return sdkSession.FrontendConfig{}, authRequestError(e)
 	}
-	{
-		child, cancel := context.WithTimeout(ctx, f.options.BrowserBootstrapTimeout)
-		result, e := f.options.BrowserBootstrap.Bootstrap(child, current, sdkTransport.PublicBootstrapURL)
-		deadline := child.Err()
-		cancel()
-		if err = f.check(ctx); err != nil {
-			return sdkSession.FrontendConfig{}, authRequestError(err)
-		}
-		if deadline != nil {
-			return sdkSession.FrontendConfig{}, authFailure("browser_bootstrap_timeout", nil)
-		}
-		if e != nil {
-			code := "browser_bootstrap_failed"
-			var ae *sdkErrs.PinAuthError
-			if errors.As(e, &ae) {
-				switch ae.Code {
-				case "browser_owner_required", "unsupported_browser_state", "browser_bootstrap_unavailable", "unsafe_bootstrap_request", "browser_bootstrap_timeout":
-					code = ae.Code
-				}
-			}
-			return sdkSession.FrontendConfig{}, authFailure(code, nil)
-		}
-		result, e = sdkTransport.NewBrowserBootstrapResult(result)
-		if e != nil {
-			return sdkSession.FrontendConfig{}, authFailure("unsupported_browser_state", nil)
-		}
-		if result.URL != sdkTransport.PublicBootstrapURL || result.Browser.AsMap()["user-agent"] == "" {
-			return sdkSession.FrontendConfig{}, authFailure("unsupported_browser_state", nil)
-		}
-		if sdkTransport.IsBrowserCheck(result.HTML) {
-			return sdkSession.FrontendConfig{}, authFailure("browser_check_required", nil)
-		}
-		rendered = &result
-		html = result.HTML
+	if r == nil || r.StatusCode != 200 {
+		return sdkSession.FrontendConfig{}, authFailure("bootstrap_failed", r)
 	}
-parse:
+	html := r.Text()
+	if sdkTransport.IsBrowserCheck(html) {
+		return sdkSession.FrontendConfig{}, authFailure("browser_check_required", r)
+	}
 	var c sdkSession.FrontendConfig
+	var err error
 	if f.primary {
 		c, err = sdkSession.ParsePrimaryConfig(html)
 	} else {
@@ -298,61 +242,20 @@ parse:
 	if err != nil {
 		return sdkSession.FrontendConfig{}, authFailure("invalid_frontend_config", nil)
 	}
-	var replacement sdkTransport.Transport
-	var replacementOwner *authOwnedTransport
-	if rendered != nil {
-		current.Cookies = rendered.Cookies
-		current.Browser = rendered.Browser
-		current, err = current.Clone()
-		if err != nil {
-			return sdkSession.FrontendConfig{}, authFailure("unsupported_browser_state", nil)
-		}
-		replacement, err = f.options.TransportFactory(current, f.options.TransportOptions)
-		if replacement != nil {
-			replacementOwner = f.trackTransport(replacement)
-		}
-		if err != nil {
-			if replacementOwner != nil {
-				_ = replacementOwner.close()
-			}
-			if e := f.check(ctx); e != nil {
-				return sdkSession.FrontendConfig{}, e
-			}
-			return sdkSession.FrontendConfig{}, authFailure("browser_bootstrap_failed", nil)
-		}
-		if replacement == nil || replacement.CookieJar() == nil {
-			if replacement != nil {
-				_ = replacementOwner.close()
-			}
-			return sdkSession.FrontendConfig{}, authFailure("unsupported_browser_state", nil)
-		}
-	}
 	f.mu.Lock()
 	if f.closed || ctx.Err() != nil {
 		f.mu.Unlock()
-		if replacement != nil {
-			_ = replacementOwner.close()
-		}
 		return sdkSession.FrontendConfig{}, f.check(ctx)
-	}
-	var old *authOwnedTransport
-	if replacement != nil {
-		old = f.currentOwned
-		f.bundle = current
-		f.transport = replacement
-		f.currentOwned = replacementOwner
 	}
 	f.resetProcess()
 	f.config = &c
 	f.mu.Unlock()
-	if old != nil {
-		_ = old.close()
-	}
 	if err = f.check(ctx); err != nil {
 		return sdkSession.FrontendConfig{}, authRequestError(err)
 	}
 	return c, nil
 }
+
 func authFailure(code string, r *sdkTransport.Response) *sdkErrs.PinAuthError {
 	e := &sdkErrs.PinAuthError{Code: code}
 	if r != nil {
@@ -382,17 +285,4 @@ func authFetchSite(source, target string) string { // all navigation targets wer
 		return "same-origin"
 	}
 	return "same-site"
-}
-
-// Track constructed transports even if close/cancel prevents adoption. A failed
-// cleanup remains owned and retryable; successful cleanup stays idempotent.
-func (f *authFlow) trackTransport(tr sdkTransport.Transport) *authOwnedTransport {
-	owned := &authOwnedTransport{transport: tr}
-	f.mu.Lock()
-	f.owned = append(f.owned, owned)
-	if f.closed {
-		f.closeComplete = false
-	}
-	f.mu.Unlock()
-	return owned
 }

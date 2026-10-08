@@ -451,7 +451,7 @@ func TestClientPINReadRenewsOncePersistsBeforeRetryAndOwnsBothTransports(t *test
 	started := make(chan struct{})
 	release := make(chan struct{})
 	proxy := sdkTransport.ProxyOptions{URL: "socks5://127.0.0.1:1080", Username: "synthetic-user", Password: "synthetic-password"}
-	o := ClientOptions{TransportOptions: sdkTransport.TransportOptions{CABundle: "synthetic-CA", Proxy: proxy}, BrowserBootstrapTimeout: 7 * time.Second,
+	o := ClientOptions{TransportOptions: sdkTransport.TransportOptions{CABundle: "synthetic-CA", Proxy: proxy},
 		TransportFactory: func(got sdkSession.SessionBundle, to sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
 			if to.CABundle != "synthetic-CA" || to.Proxy != proxy {
 				t.Error("CA or proxy not forwarded")
@@ -462,7 +462,7 @@ func TestClientPINReadRenewsOncePersistsBeforeRetryAndOwnsBothTransports(t *test
 			return next, nil
 		},
 		Renewal: func(ctx context.Context, got sdkSession.SessionBundle, provider sdkAuth.PINProvider, ao sdkAuth.AuthOptions) (sdkSession.SessionBundle, error) {
-			if ao.TransportOptions.CABundle != "synthetic-CA" || ao.TransportOptions.Proxy != proxy || ao.BrowserBootstrapTimeout != 7*time.Second {
+			if ao.TransportOptions.CABundle != "synthetic-CA" || ao.TransportOptions.Proxy != proxy {
 				t.Error("auth options not forwarded")
 			}
 			if len(got.Cookies) != 3 || got.Cookies[2].Path != "/CSAFront" {

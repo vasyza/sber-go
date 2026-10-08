@@ -24,12 +24,4 @@ type Transport = sdkTransport.Transport
 
 const PublicBootstrapURL = sdkTransport.PublicBootstrapURL
 
-type BrowserBootstrapResult = sdkTransport.BrowserBootstrapResult
-type BrowserBootstrapProvider = sdkTransport.BrowserBootstrapProvider
-type BrowserBootstrapFunc = sdkTransport.BrowserBootstrapFunc
-
-func NewBrowserBootstrapResult(r BrowserBootstrapResult) (BrowserBootstrapResult, error) {
-	return sdkTransport.NewBrowserBootstrapResult(r)
-}
-
 func IsBrowserCheck(html string) bool { return sdkTransport.IsBrowserCheck(html) }

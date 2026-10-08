@@ -26,13 +26,11 @@ type ClientOptions struct {
 	TransportFactory ClientTransportFactory
 	TransportOptions sdkTransport.TransportOptions
 	// AllowMutations is application policy, not bank-enforced read-only scope.
-	AllowMutations          bool
-	SessionPath             string
-	Monotonic               func() time.Time
-	Renewal                 ClientRenewal
-	AuthOptions             sdkAuth.AuthOptions
-	BrowserBootstrap        sdkTransport.BrowserBootstrapProvider
-	BrowserBootstrapTimeout time.Duration
+	AllowMutations bool
+	SessionPath    string
+	Monotonic      func() time.Time
+	Renewal        ClientRenewal
+	AuthOptions    sdkAuth.AuthOptions
 }
 
 func (ClientOptions) String() string               { return "ClientOptions(<redacted>)" }

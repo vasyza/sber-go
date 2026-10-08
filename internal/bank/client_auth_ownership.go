@@ -12,7 +12,7 @@ import (
 
 // Normalize direct and factory injection behind the same ownership gate. The
 // explicit transport is used only for auth's first construction; subsequent
-// auth/browser generations still use the caller's original factory.
+// authentication processes still use the caller's original factory.
 func clientGuardAuthOptions(o sdkAuth.AuthOptions, claim func(sdkTransport.Transport) (*clientOwnedTransport, error)) sdkAuth.AuthOptions {
 	injected, factory := o.Transport, o.TransportFactory
 	var mu sync.Mutex

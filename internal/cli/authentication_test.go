@@ -347,21 +347,21 @@ func TestLoginBrowserSelectionRejectsPartialOrRelativePathsBeforeEnrollment(t *t
 	}
 }
 
-func TestRememberedLoginForwardsExplicitBrowserRenderingWithoutSecretInputToBrowser(t *testing.T) {
+func TestRememberedLoginForwardsNativeProxyOptions(t *testing.T) {
 	dir := testPrivateDir(t)
 	var output, diagnostics bytes.Buffer
 	auth := &syntheticRemembered{}
-	code := RunWithOptions(context.Background(), []string{"login", "--profile", filepath.Join(dir, "new.json"), "--remembered-profile", "selected.json", "--browser-profile", dir, "--playwright-driver", "/explicit/driver", "--firefox-executable", "/explicit/firefox", "--proxy", "socks5://127.0.0.1:1080:u:p"}, &output, &diagnostics, Options{Authentication: &Authentication{
+	code := RunWithOptions(context.Background(), []string{"login", "--profile", filepath.Join(dir, "new.json"), "--remembered-profile", "selected.json", "--proxy", "socks5://127.0.0.1:1080:u:p"}, &output, &diagnostics, Options{Authentication: &Authentication{
 		NewPIN: func(_ string, o sber.AuthOptions) (PINAuthenticator, error) {
-			if !o.BrowserFirst || o.BrowserBootstrap == nil || o.TransportOptions.Proxy != (sber.ProxyOptions{URL: "socks5://127.0.0.1:1080", Username: "u", Password: "p"}) {
-				t.Fatal("explicit browser initialization lost")
+			if o.TransportOptions.Proxy != (sber.ProxyOptions{URL: "socks5://127.0.0.1:1080", Username: "u", Password: "p"}) {
+				t.Fatal("native proxy options lost")
 			}
 			return auth, nil
 		},
 		ReadSecret: func(context.Context, ownerinput.Prompt) (string, error) { return "12345", nil },
 	}})
 	if code != 0 || auth.loginCalls != 1 {
-		t.Fatal("explicit remembered browser login failed")
+		t.Fatal("native remembered login failed")
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 	"github.com/vasyza/sber-go/internal/enrollment"
 )
 
-func enrollOwnerPIN(ctx context.Context, a Authentication, auth PrimaryAuthenticator, diagnostics io.Writer) (sber.SessionBundle, error) {
+func enrollOwnerPIN(ctx context.Context, a Authentication, auth PINEnrollmentAuthenticator, diagnostics io.Writer) (sber.SessionBundle, error) {
 	for attempt := 0; ; attempt++ {
 		pin, err := readNewPIN(ctx, a, auth, diagnostics)
 		if err != nil {

@@ -104,7 +104,8 @@ func (f *authFlow) postJSON(ctx context.Context, c sdkSession.FrontendConfig, pa
 	if err != nil {
 		return nil, authRequestError(err)
 	}
-	if r.StatusCode < 200 || r.StatusCode >= 300 {
+	_, hasError := p["error"].(map[string]any)
+	if r.StatusCode < 200 || r.StatusCode >= 300 || hasError {
 		code := ""
 		if e, ok := p["error"].(map[string]any); ok {
 			code, _ = e["code"].(string)

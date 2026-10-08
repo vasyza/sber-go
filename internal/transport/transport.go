@@ -439,59 +439,6 @@ func TransportFailure(err error) *sdkErrs.TransportError {
 
 const PublicBootstrapURL = sdkSession.AppOrigin + "/CSAFront/index.do"
 
-// BrowserBootstrapResult is one frozen rendered document + complete cookie jar
-// + observed request identity. A caller MUST strictly parse its HTML, check URL
-// and user-agent before atomically adopting it; presence of window.config alone
-// does not constitute validated configuration or authenticated access.
-type BrowserBootstrapResult struct {
-	HTML    string
-	Cookies []sdkSession.CookieRecord
-	Browser sdkSession.BrowserProfile
-	URL     string
-}
-type BrowserBootstrapProvider interface {
-	Bootstrap(context.Context, sdkSession.SessionBundle, string) (BrowserBootstrapResult, error)
-}
-type BrowserBootstrapFunc func(context.Context, sdkSession.SessionBundle, string) (BrowserBootstrapResult, error)
-
-func (f BrowserBootstrapFunc) Bootstrap(ctx context.Context, b sdkSession.SessionBundle, u string) (BrowserBootstrapResult, error) {
-	return f(ctx, b, u)
-}
-func NewBrowserBootstrapResult(r BrowserBootstrapResult) (BrowserBootstrapResult, error) {
-	invalid := func() (BrowserBootstrapResult, error) {
-		return BrowserBootstrapResult{}, &sdkErrs.PinAuthError{Code: "unsupported_browser_state"}
-	}
-	if r.HTML == "" || !utf8.ValidString(r.HTML) || utf8.RuneCountInString(r.HTML) > 4*1024*1024 || len(r.Cookies) > sdkSession.MaxCookies {
-		return invalid()
-	}
-	b, err := sdkSession.NewBrowserProfile(r.Browser)
-	if err != nil {
-		return invalid()
-	}
-	r.Browser = b
-	cookies := make([]sdkSession.CookieRecord, 0, len(r.Cookies))
-	seen := map[sdkSession.CookieKey]bool{}
-	for _, c := range r.Cookies {
-		c, err = sdkSession.NewCookieRecord(c)
-		if err != nil {
-			return invalid()
-		}
-		key := sdkSession.KeyForCookie(c)
-		if seen[key] {
-			return invalid()
-		}
-		seen[key] = true
-		cookies = append(cookies, c)
-	}
-	r.Cookies = cookies
-	return r, nil
-}
-func (r BrowserBootstrapResult) Validate() error              { _, err := NewBrowserBootstrapResult(r); return err }
-func (r BrowserBootstrapResult) String() string               { return "BrowserBootstrapResult(<redacted>)" }
-func (r BrowserBootstrapResult) GoString() string             { return r.String() }
-func (r BrowserBootstrapResult) Format(f fmt.State, v rune)   { sdkErrs.FormatError(f, r.String()) }
-func (r BrowserBootstrapResult) MarshalJSON() ([]byte, error) { return json.Marshal("<redacted>") }
-
 var configAssignmentPattern = regexp.MustCompile(`\bwindow\s*\.\s*config\s*=`)
 
 func IsBrowserCheck(html string) bool {

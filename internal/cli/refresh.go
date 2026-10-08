@@ -10,11 +10,11 @@ import (
 )
 
 func runRefresh(ctx context.Context, args *commandArguments, output, diagnostics io.Writer, dependencies *Authentication) int {
-	profile, ca, selection := args.profile, args.ca, args.browser
+	profile, ca := args.profile, args.ca
 	if _, err := sber.LoadSessionBundle(profile); err != nil {
 		return fail(diagnostics, 3, "The command cannot open the private profile.\nThe command did not start login.")
 	}
-	options, err := selection.authOptions(ca, args.selectedProxy)
+	options, err := nativeAuthOptions(ca, args.selectedProxy)
 	if err != nil {
 		return fail(diagnostics, 3, "The command cannot prepare authentication.\nThe saved profile did not change.")
 	}

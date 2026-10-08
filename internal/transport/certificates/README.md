@@ -16,4 +16,4 @@ Only the self-signed root is bundled. The server supplies intermediate certifica
 
 For CA rotation, obtain the replacement from its official source, verify its provenance, fingerprint, CA constraints and self-signature, then update the PEM, pinned fingerprint test and this record together. Rebuild and run the local TLS suite plus the separately owner-authorized live check. Certificates are never updated by an implicit network request.
 
-An explicitly selected `TransportOptions.CABundle` or `--ca-bundle PATH` replaces all default trust for that client. Invalid explicit files fail closed; they do not fall back to the embedded root. This override supports a deliberately selected replacement bundle without requiring a new build. Firefox's optional public-rendering provider uses its dedicated NSS trust store separately.
+An explicitly selected `TransportOptions.CABundle` or `--ca-bundle PATH` replaces all default trust for that client. Invalid explicit files fail closed; they do not fall back to the embedded root. This override supports a deliberately selected replacement bundle without requiring a new build.

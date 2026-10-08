@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"time"
 )
 
 type authBlockingClose struct {
@@ -22,36 +21,6 @@ type authBlockingClose struct {
 func (s *authBlockingClose) Close() error {
 	s.once.Do(func() { close(s.started); <-s.release })
 	return s.authScript.Close()
-}
-func TestAuthCloseMarksClosedDuringRetirement(t *testing.T) {
-	old := &authBlockingClose{authScript: newAuthScript(t), started: make(chan struct{}), release: make(chan struct{})}
-	replacement := newAuthScript(t)
-	provider := sdkTransport.BrowserBootstrapFunc(func(context.Context, sdkSession.SessionBundle, string) (sdkTransport.BrowserBootstrapResult, error) {
-		return sdkTransport.BrowserBootstrapResult{HTML: authHTML(false), URL: sdkTransport.PublicBootstrapURL, Browser: sdkSession.BrowserProfile{Headers: []sdkSession.BrowserHeader{{Name: "user-agent", Value: "synthetic"}}}}, nil
-	})
-	a, _ := NewPINAuth(authBundle(t), AuthOptions{Transport: old, BrowserFirst: true, BrowserBootstrap: provider, TransportFactory: func(sdkSession.SessionBundle, sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
-		return replacement, nil
-	}})
-	loaded := make(chan error, 1)
-	go func() { _, e := a.LoadConfig(context.Background()); loaded <- e }()
-	<-old.started
-	closed := make(chan error, 1)
-	go func() { closed <- a.Close() }()
-	select {
-	case <-a.root.Done():
-	case <-time.After(time.Second):
-		t.Error("Close waited for cleanup before marking lifetime closed")
-	}
-	close(old.release)
-	if e := <-closed; e != nil {
-		t.Fatal(e)
-	}
-	if e := <-loaded; !errors.Is(e, sdkErrs.ErrClosed) {
-		t.Fatal("retired cleanup resurrected load")
-	}
-	if old.closes != 1 || replacement.closes != 1 {
-		t.Fatal("owned transports were closed more than once")
-	}
 }
 
 type authFlakyClose struct{ *authScript }
@@ -105,51 +74,5 @@ func TestAuthCloseRacingCredentialResponseNeverReady(t *testing.T) {
 	}
 	if a.authenticated {
 		t.Fatal("closed auth state committed")
-	}
-}
-
-func TestAuthUnadoptedReplacementCleanupCanRetry(t *testing.T) {
-	original := newAuthScript(t)
-	replacement := &authFlakyClose{newAuthScript(t)}
-	started, release := make(chan struct{}), make(chan struct{})
-	provider := sdkTransport.BrowserBootstrapFunc(func(context.Context, sdkSession.SessionBundle, string) (sdkTransport.BrowserBootstrapResult, error) {
-		return sdkTransport.BrowserBootstrapResult{HTML: authHTML(false), URL: sdkTransport.PublicBootstrapURL, Browser: sdkSession.BrowserProfile{Headers: []sdkSession.BrowserHeader{{Name: "user-agent", Value: "synthetic"}}}}, nil
-	})
-	a, e := NewPINAuth(authBundle(t), AuthOptions{Transport: original, BrowserBootstrap: provider, BrowserFirst: true, TransportFactory: func(sdkSession.SessionBundle, sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
-		close(started)
-		<-release
-		return replacement, nil
-	}})
-	if e != nil {
-		t.Fatal(e)
-	}
-	done := make(chan error, 1)
-	go func() { _, e := a.LoadConfig(context.Background()); done <- e }()
-	<-started
-	_ = a.Close()
-	close(release)
-	if e := <-done; !errors.Is(e, sdkErrs.ErrClosed) {
-		t.Fatal("closed factory result adopted")
-	}
-	if a.transport != original || a.config != nil {
-		t.Fatal("closed factory changed active state")
-	}
-	if e := a.Close(); e != nil || replacement.closes != 2 {
-		t.Fatal("unadopted failed cleanup was lost")
-	}
-}
-func TestAuthFailedFactoryReturnedTransportOwnedForCleanup(t *testing.T) {
-	original := newAuthScript(t)
-	replacement := &authFlakyClose{newAuthScript(t)}
-	provider := sdkTransport.BrowserBootstrapFunc(func(context.Context, sdkSession.SessionBundle, string) (sdkTransport.BrowserBootstrapResult, error) {
-		return sdkTransport.BrowserBootstrapResult{HTML: authHTML(false), URL: sdkTransport.PublicBootstrapURL, Browser: sdkSession.BrowserProfile{Headers: []sdkSession.BrowserHeader{{Name: "user-agent", Value: "synthetic"}}}}, nil
-	})
-	a, _ := NewPINAuth(authBundle(t), AuthOptions{Transport: original, BrowserBootstrap: provider, BrowserFirst: true, TransportFactory: func(sdkSession.SessionBundle, sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
-		return replacement, errors.New("private factory URL")
-	}})
-	_, e := a.LoadConfig(context.Background())
-	authErrorCode(t, e, "browser_bootstrap_failed")
-	if e = a.Close(); e != nil || replacement.closes != 2 {
-		t.Fatal("failed factory leaked a returned transport")
 	}
 }

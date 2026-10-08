@@ -1,5 +1,62 @@
 # Verification status
 
+## Native authentication migration — 2026-10-08
+
+This record describes the current native migration.
+The later sections describe checks of earlier repository states.
+
+The SDK and CLI use Go HTTP requests for each authentication method.
+Playwright, the browser package, runtime options, and browser installation steps were removed.
+Native HTTP, HTTPS, and SOCKS5 proxy support remains available.
+TLS chain and hostname verification remain enabled.
+The application retains its embedded verified CA.
+
+| Real check on macOS ARM64 | Result |
+| --- | --- |
+| Login and password, SMS, and online PIN enrollment | PASS. A new native CLI profile was created. |
+| Phone and password with SMS | PASS. A new native CLI profile was created. |
+| Card number with SMS and online PIN enrollment | PASS. A new native CLI profile was created. |
+| QR confirmation in the bank application | PASS. A new native CLI profile was created. |
+| Native PIN session restoration | PASS. New primary, card, and default profiles were restored. |
+| All 15 CLI read and local profile commands | PASS on the primary, QR, and default sessions. |
+| SDK authorization, products, and bounded history | PASS on primary, phone, card, and QR sessions. |
+
+The complete local `make check` passed with Go 1.27.1 on macOS ARM64.
+This includes formatting, vet, the full race suite, command builds, and module verification.
+Synthetic tests check SRP proofs, RSA encryption, challenge transitions, cancellation, private files, redaction, and failed publication.
+The CLI documentation checks passed for command syntax, sentence limits, and paragraph limits.
+The CLI dependency graph contains no browser runtime package.
+A Linux AMD64 cross-build also passed.
+
+GitHub CI has not run for this working tree.
+No independent production review is included in this record.
+
+The bank handoff returned HTTP 500 with the default Go User-Agent.
+A declared SDK compatibility header completed the same handoff without a browser.
+The native default now includes that header and preserves explicit headers.
+A synthetic regression checks its SDK declaration and explicit override behavior.
+
+One phone attempt received the bank-defined `password_bypass` transition.
+Synthetic tests now cover that transition at identification and proof verification.
+The current successful phone run used SRP and checked the server proof.
+The RSA password transition was not separately completed in a real bank session.
+
+A new login ended a previously active web session during these checks.
+Each final data check used the applicable current session.
+The result does not guarantee a fixed session lifetime.
+An expired session requires PIN restoration or another explicit login.
+
+The old default profile received HTTP 403 during PIN restoration.
+That failed command preserved its saved profile.
+The already validated new primary profile then became the default profile.
+PIN restoration and all read checks passed on that default profile.
+The bank did not supply the reason for the old profile rejection.
+
+Bank values, profiles, QR images, SMS codes, and response bodies remain outside the repository.
+No financial mutation was sent.
+Card credential registration and password recovery remain explicit website continuations.
+Full history coverage and financial mutation acceptance remain unverified.
+
 ## Repository cleanup
 
 The cleanup keeps the same production behavior and test cases.

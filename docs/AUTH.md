@@ -16,14 +16,11 @@ Native authentication retains verified HTTP/1.1 connections across its steps. It
 
 Direct TLS establishment advertises HTTP/1.1 through ALPN. A peer closure before TLS completion can cause at most three connection attempts within the original request budget. Certificate/protocol failures and cancellation stop establishment; recovery never replays a transmitted HTTP request. Synthetic TLS tests cover exact POST counts, the connection-attempt cap, trust failures, cancellation, and close during recovery. The final real primary-profile CLI and SDK E2E passed with this policy.
 
-The CLI uses its saved proxy for native authentication and optional Firefox initialization.
+The CLI uses its saved proxy for native authentication.
 `--proxy ADDRESS` replaces that setting; `--no-proxy` selects a direct connection.
 HTTP, HTTPS, and SOCKS5 support optional proxy authentication.
 Proxy errors stop requests without a direct connection.
 TLS verification stays enabled, including for HTTPS proxies.
-Firefox retains its own NSS trust.
-Authenticated SOCKS5 uses a temporary local CONNECT adapter with a separate random local token.
-Cancellation and browser cleanup close its listener and active tunnels.
 See the [proxy procedure](CLI.md#proxy-settings) and [SDK options](SDK.md#proxy-options).
 
 For an embedded application, call `GenerateDeviceprint` once and retain the identity explicitly. Pass its value in `AuthOptions.Deviceprint`; `GenerateAntifraudDeviceprint(device.Value())` derives the separate wire form. These are protocol identities, not observed browser-compatibility evidence. An existing observed bundle can use `NewPrimaryAuthFromBundle`.
@@ -51,18 +48,17 @@ It asks for the existing online-banking PIN and one OTP only if required. It doe
 
 `refresh-session --profile EXISTING_PATH` restores and atomically updates an existing full remembered profile. Authentication and cleanup complete before publication; failures retain the old profile. Primary and remembered CLI authentication load public configuration before asking for secret input. Definite new-PIN policy rejections can request a fresh owner choice in the same process, at most three bank attempts; no password/SMS or uncertain PIN request is replayed.
 
-When an observed browser identity/cookie initialization is required, select ordinary public rendering explicitly:
+All authentication paths now use native Go HTTP requests. No Playwright, Firefox, Chrome or JavaScript runtime is linked or launched. The SDK exposes separate `PhoneAuth`, `CardAuth`, and `QRAuth` state machines. The old `browser` package, browser bootstrap options, and CLI browser flags have been removed. Existing HTTP session profiles retain their cookie and device metadata.
 
-```sh
-./bin/sber login --profile /absolute/private/new-profile.json \
-  --browser-profile /absolute/private/dedicated-firefox-profile \
-  --playwright-driver /absolute/installed/matching-playwright-driver \
-  --firefox-executable /absolute/installed/matching-firefox
-```
+Native authentication declares `Mozilla/5.0 (compatible; sber-go/1.0; +https://github.com/vasyza/sber-go)` as its default User-Agent. The compatibility prefix is required by the bank web-session handoff. This header identifies the SDK and contains no browser-engine claim. Explicit supplied User-Agent headers remain unchanged. The successful session stores this header for subsequent native requests.
 
-These three browser paths must all be absolute. They can also accompany `--remembered-profile`. Provision the matching official Playwright runtime separately; the command never installs or discovers a browser implicitly. The dedicated browser directory must already be private (0700), owned by the caller and contain verified NSS certificate trust. Native Go trust, whether embedded or explicitly overridden with `--ca-bundle`, does not provision Firefox NSS. The browser provider keeps certificate/hostname verification and the sandbox enabled, renders the public login document only, and never receives login/password/PIN/OTP. The auth state machine atomically adopts validated rendered configuration, cookies and observed browser identity before native credential requests. Embedded callers select `AuthOptions.BrowserFirst` and `BrowserBootstrap` explicitly.
+Phone authentication uses `/uapi/v2/authenticate` for SRP identification and `/uapi/v2/verify` for the client proof and optional SMS. It checks the server SRP proof before accepting a challenge or redirect. An explicit `password_bypass` response can request the bank-defined password transition. The client uses the returned OUID and RSA-OAEP key for `encodedPassword`, or the TLS password method when the bank omits a key. A false SRP proof or an uncertain response never triggers this transition. The returned host must pass the same HTTPS bank-origin policy as primary and PIN authentication. `AuthToken` is encoded once in the final redirect.
 
-The matching runtime installation is documented in the official [Playwright Go project](https://github.com/mxschmitt/playwright-go). The provider expects the driver/browser version matching the dependency in `go.mod`.
+Card authentication encrypts the PAN with the public configuration key and its key identifier. `/api/v1/cardlogin/identify` starts SMS confirmation. `/api/v1/cardlogin/confirm` returns optional web PIN enrollment. `CreatePIN` and the final `/api/v1/auth` transition share the primary implementation. The SDK does not request a card PIN, CVV, or expiry date. Account setup or password recovery is an explicit unsupported continuation, never an automatic password reset.
+
+QR authentication calls `/uapi/v2/identify`, then polls `/uapi/v2/getOperation`. HTTP 204 means that no new status is available. A confirmed operation supplies the OUID for `/uapi/v2/verify` with `pat_check`. New, waiting, refused, expired, and confirmed states are distinct. Unknown states fail closed. The CLI waits up to three minutes and never rotates a QR automatically. QR contents have redacted formatting; `Content()` is an explicit secret read for display to the owner.
+
+Primary and PIN authentication retain the native HTTP protocol and no-replay policy. If the bank returns a browser security check, native authentication stops. It does not synthesize a protection cookie or run a fallback browser.
 
 HAR import is offline and bounded to 2 MiB. A successful seamless response's single validated `X-Response-URL` can identify `/main`, while strict runtime HTML identifies the API origin. SameSite policy casing is normalized without changing its meaning. Chromium's exact session-expiry sentinel is preserved as an unset expiry; explicit deletion still takes priority. See the [DevTools HAR writer](https://github.com/ChromeDevTools/devtools-frontend/blob/main/front_end/models/har/Log.ts) and [protocol cookie definition](https://github.com/ChromeDevTools/devtools-protocol/blob/master/pdl/domains/Network.pdl). Import success alone does not prove bank authorization.
 

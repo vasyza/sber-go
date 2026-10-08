@@ -16,7 +16,7 @@ import (
 type commandDefinition struct{ name, description string }
 
 var commands = []commandDefinition{
-	{"login", "Make a private profile with hidden terminal input."},
+	{"login", "Make a private profile through bank authentication."},
 	{"refresh-session", "Restore the selected session with hidden PIN input."},
 	{"status", "Get file metadata without a bank request."},
 	{"inspect-session", "Read profile metadata with secret values removed."},
@@ -59,7 +59,7 @@ type commandArguments struct {
 	profile, ca, resource, from, to, operationID, incomeType, destination string
 	defaultProfile                                                        bool
 	remembered                                                            string
-	browser                                                               loginBrowserSelection
+	method, qrOutput                                                      string
 	force, noRenew                                                        bool
 	betweenOwn, openBanking, showCategories, showProducts                 bool
 	limit, pages, offset                                                  int
@@ -84,18 +84,14 @@ func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
 	if name == "login" || name == "refresh-session" {
 		if name == "login" {
 			f.StringVar(&a.remembered, "remembered-profile", "", "Use an existing profile `PATH` for PIN login.")
+			f.StringVar(&a.method, "method", "login", "Select login, phone, card, or qr authentication.")
+			f.StringVar(&a.qrOutput, "qr-output", "", "Write the QR challenge to a new private PNG `PATH`.")
 		}
-		f.StringVar(&a.browser.profile, "browser-profile", "", "Select the private Firefox profile `PATH`.")
-		f.StringVar(&a.browser.driver, "playwright-driver", "", "Select the installed Playwright driver `PATH`.")
-		f.StringVar(&a.browser.executable, "firefox-executable", "", "Select the installed Firefox executable `PATH`.")
 		return f, a
 	}
 	f.DurationVar(&a.timeout, "timeout", 30*time.Second, "Set the maximum time for each request (1s to 120s).")
 	if name != "mcp" && name != "export-session" && name != "inspect-credentials" && !isMutationCommand(name) {
 		f.BoolVar(&a.noRenew, "no-renew", false, "Do not request a PIN if the session expires.")
-		f.StringVar(&a.browser.profile, "browser-profile", "", "Select the private Firefox profile `PATH` for PIN login.")
-		f.StringVar(&a.browser.driver, "playwright-driver", "", "Select the installed Playwright driver `PATH` for PIN login.")
-		f.StringVar(&a.browser.executable, "firefox-executable", "", "Select the installed Firefox executable `PATH` for PIN login.")
 	}
 	switch name {
 	case "card-rename":
@@ -149,10 +145,18 @@ func validateCommand(name string, a *commandArguments) bool {
 			return false
 		}
 	}
-	if !a.browser.valid() || a.timeout < time.Second || a.timeout > 120*time.Second || a.limit < 1 || a.limit > 100 || a.pages < 1 || a.pages > 10000 || a.offset < 0 {
+	if a.timeout < time.Second || a.timeout > 120*time.Second || a.limit < 1 || a.limit > 100 || a.pages < 1 || a.pages > 10000 || a.offset < 0 {
 		return false
 	}
 	switch name {
+	case "login":
+		if a.method != "login" && a.method != "phone" && a.method != "card" && a.method != "qr" {
+			return false
+		}
+		if a.remembered != "" && a.method != "login" {
+			return false
+		}
+		return a.qrOutput == "" || a.method == "qr" && filepath.IsAbs(a.qrOutput) && filepath.Clean(a.qrOutput) != filepath.Clean(a.profile)
 	case "card-rename", "transfer-own":
 		return validateMutation(name, a)
 	case "operations", "operations-page":

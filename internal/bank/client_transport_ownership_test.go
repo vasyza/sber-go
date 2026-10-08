@@ -122,7 +122,7 @@ func TestClientTypedNilTransportFailsClosedWithoutPanic(t *testing.T) {
 
 func TestClientCycle3OptionsRetainExistingExportedFieldLayout(t *testing.T) {
 	typ := reflect.TypeOf(ClientOptions{})
-	expected := []string{"Transport", "TransportFactory", "TransportOptions", "AllowMutations", "SessionPath", "Monotonic", "Renewal", "AuthOptions", "BrowserBootstrap", "BrowserBootstrapTimeout"}
+	expected := []string{"Transport", "TransportFactory", "TransportOptions", "AllowMutations", "SessionPath", "Monotonic", "Renewal", "AuthOptions"}
 	if typ.NumField() != len(expected) {
 		t.Fatal("ClientOptions gained a field, breaking prior positional literals")
 	}

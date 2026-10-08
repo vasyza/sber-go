@@ -23,15 +23,6 @@ func clientNormalizeOptions(o ClientOptions) (ClientOptions, error) {
 	if o.Monotonic == nil {
 		o.Monotonic = time.Now
 	}
-	if o.BrowserBootstrapTimeout == 0 {
-		o.BrowserBootstrapTimeout = o.AuthOptions.BrowserBootstrapTimeout
-	}
-	if o.BrowserBootstrapTimeout == 0 {
-		o.BrowserBootstrapTimeout = 30 * time.Second
-	}
-	if o.BrowserBootstrapTimeout < 0 || o.BrowserBootstrapTimeout > 120*time.Second {
-		return o, &sdkErrs.TransportError{Code: "invalid_client_options"}
-	}
 	o.TransportOptions.AllowUnready = false
 	defaultTransportFactory := o.TransportFactory == nil
 	if defaultTransportFactory {
@@ -42,10 +33,6 @@ func clientNormalizeOptions(o ClientOptions) (ClientOptions, error) {
 	if o.Renewal == nil {
 		o.Renewal = clientPINLogin
 	}
-	if o.BrowserBootstrap != nil {
-		o.AuthOptions.BrowserBootstrap = o.BrowserBootstrap
-	}
-	o.AuthOptions.BrowserBootstrapTimeout = o.BrowserBootstrapTimeout
 	o.AuthOptions.TransportOptions = o.TransportOptions
 	o.AuthOptions.TransportOptions.AllowUnready = true
 	if o.AuthOptions.TransportFactory == nil {
