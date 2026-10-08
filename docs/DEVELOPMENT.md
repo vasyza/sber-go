@@ -6,11 +6,11 @@
 | --- | --- |
 | Root package | Public SDK aliases, function forwards, and Go examples. |
 | `internal/` | SDK implementation and private unit tests. |
-| `mcp/`, `rental/` | Optional public packages. |
+| `mcp/` | Public SDK integration for local tools. |
 | `cmd/` | Executable entry points. |
 | `tests/sdk/` | Public SDK contract tests. |
 | `tests/cli/` | Compiled CLI tests. |
-| `tests/mcp/`, `tests/rental/` | Public package tests. |
+| `tests/mcp/` | Public MCP package tests. |
 | `tests/integration/` | Explicit live integration tests. |
 | `testdata/` | Synthetic fixtures and source compatibility records. |
 | `docs/` | Current usage, API, and development guides. |
@@ -60,13 +60,12 @@ These rules apply to terminal help, CLI messages, and these guides:
 
 - [CLI.md](CLI.md): operator procedures.
 - [CLI-REFERENCE.md](CLI-REFERENCE.md): commands, options, limits, and technical terms.
-- [RENTAL-CLI.md](RENTAL-CLI.md): offline preview procedures.
 - [STATUS.md](STATUS.md): verification results and limits.
 - This development guide.
 
 Go API notes retain their engineering format.
 Code blocks, API paths, JSON fields, and diagnostic labels keep their exact application spelling.
-The [technical terms](CLI-REFERENCE.md#technical-terms) define subject words for both commands.
+The [technical terms](CLI-REFERENCE.md#technical-terms) define subject words for the CLI.
 
 1. Use approved words with their approved meanings and parts of speech.
 2. Use one term for each defined item.

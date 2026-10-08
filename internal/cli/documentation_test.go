@@ -70,7 +70,7 @@ func TestCLIDocumentationCommandsOptionsAndExamplesMatchExecutable(t *testing.T)
 }
 
 func TestCLIDocumentationSentenceAndParagraphLimits(t *testing.T) {
-	for _, name := range []string{"CLI.md", "CLI-REFERENCE.md", "DEVELOPMENT.md", "STATUS.md", "RENTAL-CLI.md"} {
+	for _, name := range []string{"CLI.md", "CLI-REFERENCE.md", "DEVELOPMENT.md", "STATUS.md"} {
 		raw, err := os.ReadFile(filepath.Join("..", "..", "docs", name))
 		if err != nil {
 			t.Fatal(err)

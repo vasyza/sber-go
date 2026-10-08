@@ -42,6 +42,8 @@ The checker reads only manifest-listed public source/tests and these local
 catalogs. It makes no network/auth/bank call and writes no files. Supply the audited public Python source checkout explicitly with `--source-root`.
 The checker resolves source files relative to that checkout and retains the manifest hashes.
 It does not need the original absolute workspace path.
+Catalogs use relative source paths and omit host-specific checkout locations.
+Source hashes, line ranges, and synthetic fixture contents retain their audited values.
 The Python checkout is a development reference, not a Go runtime dependency.
 
 ## Attribution

@@ -1,5 +1,5 @@
 {
-  "source": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/mcp/sber_unofficial_mcp/server.py",
+  "source": "mcp/sber_unofficial_mcp/server.py",
   "source_sha256": "b4276ad77f35a8aa795ec61c159129f65714420f329e807c4c0f66304b6262e0",
   "method": "AST top-level sber_ coroutine functions (registration read separately)",
   "tool_count": 14,

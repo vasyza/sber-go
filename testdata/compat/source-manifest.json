@@ -5,364 +5,364 @@
   "read_boundary": "Only explicitly scoped source, tests, MIT license and package metadata; no private bank directory read",
   "files": [
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/__init__.py",
+      "path": "sber_unofficial/__init__.py",
       "relative_to_python_fork": "sber_unofficial/__init__.py",
       "line_count": 116,
       "sha256": "44cce4de23ebab4c4572d34e4bedc33dafd5d98fd543a072de001ab66e75d617",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/__main__.py",
+      "path": "sber_unofficial/__main__.py",
       "relative_to_python_fork": "sber_unofficial/__main__.py",
       "line_count": 368,
       "sha256": "eb60702ad352d11fd984b195c8ba077d1eab7e80a396b63d519806d97994ee36",
       "category": "sdk_cli"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/_http.py",
+      "path": "sber_unofficial/_http.py",
       "relative_to_python_fork": "sber_unofficial/_http.py",
       "line_count": 652,
       "sha256": "709894c024b06c55e925fa8adcb5dd06ee4e281c03b484d572bd456b856feaa3",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/bootstrap.py",
+      "path": "sber_unofficial/bootstrap.py",
       "relative_to_python_fork": "sber_unofficial/bootstrap.py",
       "line_count": 241,
       "sha256": "a83964fdbf73f2089c1ac37d029016f316cf4ba0edc086e4f3d8e44cd08c8964",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/client.py",
+      "path": "sber_unofficial/client.py",
       "relative_to_python_fork": "sber_unofficial/client.py",
       "line_count": 561,
       "sha256": "42886281c09554abcf10b5fce418edb233dd80083709f98f035a9a6e475a629b",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/deviceprint.py",
+      "path": "sber_unofficial/deviceprint.py",
       "relative_to_python_fork": "sber_unofficial/deviceprint.py",
       "line_count": 56,
       "sha256": "e82c66ac28df10e4b2bff6db1e27f288832cf7803ce8304c7a5ffea2c59da17c",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/entities.py",
+      "path": "sber_unofficial/entities.py",
       "relative_to_python_fork": "sber_unofficial/entities.py",
       "line_count": 267,
       "sha256": "ba423d88a8d7af0790e89bb46b8062eeb386f4005c5ad844a71318566514ac63",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/errors.py",
+      "path": "sber_unofficial/errors.py",
       "relative_to_python_fork": "sber_unofficial/errors.py",
       "line_count": 98,
       "sha256": "5cf2a99d58fae49d33e9f426b58984e38108c155af5893fd265b620480f66ea2",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/har.py",
+      "path": "sber_unofficial/har.py",
       "relative_to_python_fork": "sber_unofficial/har.py",
       "line_count": 276,
       "sha256": "8ab6878413279834d22fdb1725790eeec9339f90a659a4846413e211db6688a8",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/models.py",
+      "path": "sber_unofficial/models.py",
       "relative_to_python_fork": "sber_unofficial/models.py",
       "line_count": 657,
       "sha256": "b3ecad3c154635a18c95ffd6a5cebb0cd92adf15be3ac4e2bf0474d0008d81c3",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/pin.py",
+      "path": "sber_unofficial/pin.py",
       "relative_to_python_fork": "sber_unofficial/pin.py",
       "line_count": 1760,
       "sha256": "2f41526db7b5256c26bc755b1c68470841ec457a5d89a8c3f102ef90fe42d723",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/resources.py",
+      "path": "sber_unofficial/resources.py",
       "relative_to_python_fork": "sber_unofficial/resources.py",
       "line_count": 641,
       "sha256": "25caba583a718bf3c2a2d6209492f5eac84c80d1e8e563bab225c9d4f69addd6",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/session.py",
+      "path": "sber_unofficial/session.py",
       "relative_to_python_fork": "sber_unofficial/session.py",
       "line_count": 846,
       "sha256": "c426bb7223cfc34015668ba3ac61e98f8292f041cd85bd477c670e3a79627bc9",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_unofficial/transport.py",
+      "path": "sber_unofficial/transport.py",
       "relative_to_python_fork": "sber_unofficial/transport.py",
       "line_count": 250,
       "sha256": "aa9da01d0bad6fcc12bc46c3fa6dbf1489b913486661cec8ec992a2046b37923",
       "category": "sdk"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_async_sdk.py",
+      "path": "tests/test_async_sdk.py",
       "relative_to_python_fork": "tests/test_async_sdk.py",
       "line_count": 616,
       "sha256": "214c6cefeba9c41d9e777db549755180b564dc4a24db27ef6a74c1cbdbd0b987",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_atomicity.py",
+      "path": "tests/test_bootstrap_atomicity.py",
       "relative_to_python_fork": "tests/test_bootstrap_atomicity.py",
       "line_count": 81,
       "sha256": "803481d7b8c29361f89e07997a2ebb72c28cdebe869114d6831315a8b5fff76d",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
+      "path": "tests/test_bootstrap_cookie_metadata.py",
       "relative_to_python_fork": "tests/test_bootstrap_cookie_metadata.py",
       "line_count": 94,
       "sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
+      "path": "tests/test_bootstrap_factories.py",
       "relative_to_python_fork": "tests/test_bootstrap_factories.py",
       "line_count": 162,
       "sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
+      "path": "tests/test_bootstrap_lifetime.py",
       "relative_to_python_fork": "tests/test_bootstrap_lifetime.py",
       "line_count": 162,
       "sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_optional_dependency.py",
+      "path": "tests/test_bootstrap_optional_dependency.py",
       "relative_to_python_fork": "tests/test_bootstrap_optional_dependency.py",
       "line_count": 23,
       "sha256": "38e70e9a42841946704c90e61a1f2ae083849bb8dd6cd717e129a369412273d5",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_seed_boundary.py",
+      "path": "tests/test_bootstrap_seed_boundary.py",
       "relative_to_python_fork": "tests/test_bootstrap_seed_boundary.py",
       "line_count": 86,
       "sha256": "4a914267e494a02df3667e978515a1dc1cc3655f702fd5596e42d1bc608befe1",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_brand.py",
+      "path": "tests/test_brand.py",
       "relative_to_python_fork": "tests/test_brand.py",
       "line_count": 232,
       "sha256": "be4afcf278652a54da92c2e390b9a6e59a29e98f526821b525152098fc57bb60",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
+      "path": "tests/test_browser_bootstrap.py",
       "relative_to_python_fork": "tests/test_browser_bootstrap.py",
       "line_count": 148,
       "sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
+      "path": "tests/test_browser_bootstrap_failures.py",
       "relative_to_python_fork": "tests/test_browser_bootstrap_failures.py",
       "line_count": 105,
       "sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_cli.py",
+      "path": "tests/test_cli.py",
       "relative_to_python_fork": "tests/test_cli.py",
       "line_count": 388,
       "sha256": "a3b385f344b5e1dbc4c7beaf05bc9bb88147b62c25c6c66331bf12c0a515270d",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_compat_shims.py",
+      "path": "tests/test_compat_shims.py",
       "relative_to_python_fork": "tests/test_compat_shims.py",
       "line_count": 29,
       "sha256": "f3993bb1cb358c3bbc1ea97918b13ca98e0579491c4dba77cae192f3767447da",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_deviceprint.py",
+      "path": "tests/test_deviceprint.py",
       "relative_to_python_fork": "tests/test_deviceprint.py",
       "line_count": 22,
       "sha256": "aa9c76493ab7c0469a7754c79c691856ef58f133525e0e17d276162251ddb8f4",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_entities.py",
+      "path": "tests/test_entities.py",
       "relative_to_python_fork": "tests/test_entities.py",
       "line_count": 223,
       "sha256": "abde8fcc8257e7c5ec5f83a25dc21daf3d047ba2ef00316ce600c3949343fd19",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap.py",
+      "path": "tests/test_firefox_bootstrap.py",
       "relative_to_python_fork": "tests/test_firefox_bootstrap.py",
       "line_count": 194,
       "sha256": "80bd3ad15a4c260c8e4dc5ff2d62303c916cff57a38ebf111b98a134651432af",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
+      "path": "tests/test_firefox_bootstrap_failures.py",
       "relative_to_python_fork": "tests/test_firefox_bootstrap_failures.py",
       "line_count": 253,
       "sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_frontend_snapshot.py",
+      "path": "tests/test_frontend_snapshot.py",
       "relative_to_python_fork": "tests/test_frontend_snapshot.py",
       "line_count": 48,
       "sha256": "ff86975e8522a96ebe4810309f99400e30fe6a21c8ca44aecb117be9a60cbc36",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_mcp_server.py",
+      "path": "tests/test_mcp_server.py",
       "relative_to_python_fork": "tests/test_mcp_server.py",
       "line_count": 334,
       "sha256": "d8e01ae15d6edfc223339b01d6a34e94bf2fb365169f3427ff9baea0dcc84e9b",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_mutations.py",
+      "path": "tests/test_mutations.py",
       "relative_to_python_fork": "tests/test_mutations.py",
       "line_count": 612,
       "sha256": "7c6721fa0a771d0ab6a2bf20f9737f54c0dfe6f8748a1afdc13fca35d4bb4e0b",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_new_read_resources.py",
+      "path": "tests/test_new_read_resources.py",
       "relative_to_python_fork": "tests/test_new_read_resources.py",
       "line_count": 181,
       "sha256": "80f60886f7fd333e3b5c5b76a72eabfb651928a781bd04ba73eb06bc78d77952",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_operation_semantics.py",
+      "path": "tests/test_operation_semantics.py",
       "relative_to_python_fork": "tests/test_operation_semantics.py",
       "line_count": 72,
       "sha256": "94dbb605b748513ed526ee9d05a6c35095d6de064abfa0a5b6d316aecf6a9c18",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_parser_selftest.py",
+      "path": "tests/test_parser_selftest.py",
       "relative_to_python_fork": "tests/test_parser_selftest.py",
       "line_count": 6,
       "sha256": "3f9fdb3682d5e20785cb41d68adb8c1b20ec3d47fe37c596ec3dd2730b77b8c2",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_pin_auth.py",
+      "path": "tests/test_pin_auth.py",
       "relative_to_python_fork": "tests/test_pin_auth.py",
       "line_count": 428,
       "sha256": "a465b03636778e3398aff5cf016a898d5a3293eaf4c37f3ee45a9927e57cd08a",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_primary_auth.py",
+      "path": "tests/test_primary_auth.py",
       "relative_to_python_fork": "tests/test_primary_auth.py",
       "line_count": 643,
       "sha256": "124c6572e0e126e639184a32e94856347faae5940e9a5a7a4ae9122d8afb75e5",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_profile_reauth.py",
+      "path": "tests/test_profile_reauth.py",
       "relative_to_python_fork": "tests/test_profile_reauth.py",
       "line_count": 228,
       "sha256": "61b94e5b35cf23995a781e74b8b09b2fd8fe61939badab012afe6cc6a32e04d8",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_profile_reauth_edge_cases.py",
+      "path": "tests/test_profile_reauth_edge_cases.py",
       "relative_to_python_fork": "tests/test_profile_reauth_edge_cases.py",
       "line_count": 392,
       "sha256": "6838e562f2ffbaf552464080e8b7be724c4241acfa691c05cd815635dba29056",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_profile_schema.py",
+      "path": "tests/test_profile_schema.py",
       "relative_to_python_fork": "tests/test_profile_schema.py",
       "line_count": 187,
       "sha256": "f868aef6ca31c8a0b0b05498286d7a173639b2cb975d8c7635786ffccf49ef76",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_regressions.py",
+      "path": "tests/test_regressions.py",
       "relative_to_python_fork": "tests/test_regressions.py",
       "line_count": 94,
       "sha256": "de33522e67eada3cab75193612126a7fd78664c39156f0da70f01f926da18613",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_sber_client.py",
+      "path": "tests/test_sber_client.py",
       "relative_to_python_fork": "tests/test_sber_client.py",
       "line_count": 480,
       "sha256": "a920bacd4a9e3535779ab3c1f369483f675658121685a602f0a7eeada95618c2",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
+      "path": "tests/test_transport_cookie_metadata.py",
       "relative_to_python_fork": "tests/test_transport_cookie_metadata.py",
       "line_count": 167,
       "sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b",
       "category": "synthetic_tests"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/mcp/sber_unofficial_mcp/__init__.py",
+      "path": "mcp/sber_unofficial_mcp/__init__.py",
       "relative_to_python_fork": "mcp/sber_unofficial_mcp/__init__.py",
       "line_count": 7,
       "sha256": "1993a157456502dcfd5d3df666fbfd748a9c9ca1b2b163f5c937bdd801bbd236",
       "category": "mcp"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/mcp/sber_unofficial_mcp/demo.py",
+      "path": "mcp/sber_unofficial_mcp/demo.py",
       "relative_to_python_fork": "mcp/sber_unofficial_mcp/demo.py",
       "line_count": 124,
       "sha256": "9fef91a957f870321b7ddb00cbb35f04d3abdfb8f17570468254385602c6792b",
       "category": "mcp"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/mcp/sber_unofficial_mcp/server.py",
+      "path": "mcp/sber_unofficial_mcp/server.py",
       "relative_to_python_fork": "mcp/sber_unofficial_mcp/server.py",
       "line_count": 2014,
       "sha256": "b4276ad77f35a8aa795ec61c159129f65714420f329e807c4c0f66304b6262e0",
       "category": "mcp"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/sber_client.py",
+      "path": "sber_client.py",
       "relative_to_python_fork": "sber_client.py",
       "line_count": 380,
       "sha256": "e77171908c312a971ccdaa6520af83f1b933bf88eae9ef0f1d4aab01336b1820",
       "category": "legacy_compatibility"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/outputs/sber_parser.py",
+      "path": "outputs/sber_parser.py",
       "relative_to_python_fork": "outputs/sber_parser.py",
       "line_count": 54,
       "sha256": "3cbd1eb3cec8b529e3c036b772439fdc21d7d090cb685db9691e1af89e9a6258",
       "category": "legacy_compatibility"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/local_sber.py",
+      "path": "../local_sber.py",
       "relative_to_python_fork": "../local_sber.py",
       "line_count": 166,
       "sha256": "7c331fffee9bc76cf2aa55b6c7979975a008b6633620f41b849bfa85cb3b0143",
       "category": "local_safe_launcher"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/LICENSE",
+      "path": "LICENSE",
       "relative_to_python_fork": "LICENSE",
       "line_count": 21,
       "sha256": "0a82c29abed7d538e955e39f742a1cf566b1a615adbef3158686d17c1fc99787",
       "category": "attribution_metadata"
     },
     {
-      "path": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/pyproject.toml",
+      "path": "pyproject.toml",
       "relative_to_python_fork": "pyproject.toml",
       "line_count": 90,
       "sha256": "fa97fffd1349ee518ff64349eeceadb6f4865014091ed9a8157e142820f2ba9d",

@@ -9,6 +9,6 @@
 - Freeze pre-probe owner cookies; atomically adopt strictly validated rendered config/cookies/identity. Preserve SameSite names/values/scoping/deletion; closed state cannot resurrect transport.
 - Defaults expose read-only operations; mutation parity is behind an explicit policy, never auto-enabled for monitoring. This does not narrow the bank's session privilege.
 - Bank login secrets are local owner-operated hidden terminal input only, fail closed on echo-control failure. Proxy login values use the owner's requested explicit proxy argument format. Enrollment uses private lock + atomic no-replace publication.
-- Partial/unavailable history means UNKNOWN, not unpaid; no tenant sends until owner validation.
+- Partial/unavailable history means UNKNOWN; do not infer complete coverage from a partial response.
 - For production acceptance run go test -race ./..., go vet ./..., go build ./... and independent review. Describe live verification boundaries honestly.
-- The owner explicitly requested this private WIP source handoff before completion. Publication of this snapshot is not production acceptance; historical failures are retained in Git history and regression tests. Current verification limits are in docs/STATUS.md. Autonomous work is paused; do not resume, repair, authenticate or contact tenants without a new owner request.
+- The owner explicitly requested this private WIP source handoff before completion. Publication of this snapshot is not production acceptance; historical failures are retained in Git history and regression tests. Current verification limits are in docs/STATUS.md. Autonomous work is paused; do not resume, repair, authenticate or contact others without a new owner request.

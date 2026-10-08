@@ -8,7 +8,6 @@
         {
           "source": {
             "file": "tests/test_async_sdk.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_async_sdk.py",
             "line": 367,
             "end_line": 367,
             "source_sha256": "214c6cefeba9c41d9e777db549755180b564dc4a24db27ef6a74c1cbdbd0b987"
@@ -36,7 +35,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_atomicity.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_atomicity.py",
             "line": 15,
             "end_line": 15,
             "source_sha256": "803481d7b8c29361f89e07997a2ebb72c28cdebe869114d6831315a8b5fff76d"
@@ -58,7 +56,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_atomicity.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_atomicity.py",
             "line": 58,
             "end_line": 58,
             "source_sha256": "803481d7b8c29361f89e07997a2ebb72c28cdebe869114d6831315a8b5fff76d"
@@ -81,7 +78,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 16,
             "end_line": 16,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -104,7 +100,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 36,
             "end_line": 36,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -128,7 +123,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 61,
             "end_line": 64,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -171,7 +165,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 65,
             "end_line": 65,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -195,7 +188,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 76,
             "end_line": 76,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -214,7 +206,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 77,
             "end_line": 77,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -238,7 +229,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_cookie_metadata.py",
             "line": 85,
             "end_line": 85,
             "source_sha256": "be22f6c8160ecfcedfd485d4945758baadedb4d348d135d9322f0f91e9a6d54d"
@@ -260,7 +250,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_factories.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
             "line": 56,
             "end_line": 56,
             "source_sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c"
@@ -282,7 +271,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_factories.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
             "line": 90,
             "end_line": 90,
             "source_sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c"
@@ -304,7 +292,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_factories.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_factories.py",
             "line": 140,
             "end_line": 140,
             "source_sha256": "894b83504aec74f5c2ed6c749af8dc467bb0a108ce02c46d4ebe29a90a82411c"
@@ -327,7 +314,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_lifetime.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
             "line": 15,
             "end_line": 15,
             "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
@@ -344,7 +330,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_lifetime.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
             "line": 16,
             "end_line": 16,
             "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
@@ -361,7 +346,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_lifetime.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
             "line": 17,
             "end_line": 17,
             "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
@@ -384,7 +368,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_lifetime.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_lifetime.py",
             "line": 94,
             "end_line": 94,
             "source_sha256": "bd13a075d30b538e0aef0f663d5617d3b85ca0f910a134335daa8d81e2727d1e"
@@ -406,7 +389,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_seed_boundary.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_seed_boundary.py",
             "line": 17,
             "end_line": 17,
             "source_sha256": "4a914267e494a02df3667e978515a1dc1cc3655f702fd5596e42d1bc608befe1"
@@ -423,7 +405,6 @@
         {
           "source": {
             "file": "tests/test_bootstrap_seed_boundary.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_bootstrap_seed_boundary.py",
             "line": 18,
             "end_line": 18,
             "source_sha256": "4a914267e494a02df3667e978515a1dc1cc3655f702fd5596e42d1bc608befe1"
@@ -445,7 +426,6 @@
         {
           "source": {
             "file": "tests/test_browser_bootstrap.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
             "line": 62,
             "end_line": 62,
             "source_sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f"
@@ -467,7 +447,6 @@
         {
           "source": {
             "file": "tests/test_browser_bootstrap.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
             "line": 79,
             "end_line": 79,
             "source_sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f"
@@ -489,7 +468,6 @@
         {
           "source": {
             "file": "tests/test_browser_bootstrap.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap.py",
             "line": 95,
             "end_line": 95,
             "source_sha256": "fdf1dcca54df297e3eb956ef3919fa70ef1d2e672a20eba91fe40647ea05819f"
@@ -511,7 +489,6 @@
         {
           "source": {
             "file": "tests/test_browser_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
             "line": 17,
             "end_line": 17,
             "source_sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
@@ -528,7 +505,6 @@
         {
           "source": {
             "file": "tests/test_browser_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
             "line": 18,
             "end_line": 18,
             "source_sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
@@ -556,7 +532,6 @@
         {
           "source": {
             "file": "tests/test_browser_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_browser_bootstrap_failures.py",
             "line": 77,
             "end_line": 77,
             "source_sha256": "6428502766c3b605e8b6f3e91c96476a85a66fb40ec29d0e1c83fac966e55e47"
@@ -578,7 +553,6 @@
         {
           "source": {
             "file": "tests/test_cli.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_cli.py",
             "line": 295,
             "end_line": 295,
             "source_sha256": "a3b385f344b5e1dbc4c7beaf05bc9bb88147b62c25c6c66331bf12c0a515270d"
@@ -600,7 +574,6 @@
         {
           "source": {
             "file": "tests/test_cli.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_cli.py",
             "line": 350,
             "end_line": 353,
             "source_sha256": "a3b385f344b5e1dbc4c7beaf05bc9bb88147b62c25c6c66331bf12c0a515270d"
@@ -622,7 +595,6 @@
         {
           "source": {
             "file": "tests/test_firefox_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
             "line": 39,
             "end_line": 39,
             "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
@@ -646,7 +618,6 @@
         {
           "source": {
             "file": "tests/test_firefox_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
             "line": 76,
             "end_line": 79,
             "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
@@ -666,7 +637,6 @@
         {
           "source": {
             "file": "tests/test_firefox_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
             "line": 90,
             "end_line": 90,
             "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
@@ -691,7 +661,6 @@
         {
           "source": {
             "file": "tests/test_firefox_bootstrap_failures.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_firefox_bootstrap_failures.py",
             "line": 119,
             "end_line": 125,
             "source_sha256": "0a3643bf0dead2d3874dee2c58a2d9f0f09106df0e2a467e34b81dfc0dde3437"
@@ -711,7 +680,6 @@
         {
           "source": {
             "file": "tests/test_primary_auth.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_primary_auth.py",
             "line": 467,
             "end_line": 473,
             "source_sha256": "124c6572e0e126e639184a32e94856347faae5940e9a5a7a4ae9122d8afb75e5"
@@ -737,7 +705,6 @@
         {
           "source": {
             "file": "tests/test_sber_client.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_sber_client.py",
             "line": 430,
             "end_line": 430,
             "source_sha256": "a920bacd4a9e3535779ab3c1f369483f675658121685a602f0a7eeada95618c2"
@@ -759,7 +726,6 @@
         {
           "source": {
             "file": "tests/test_transport_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
             "line": 41,
             "end_line": 55,
             "source_sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"
@@ -844,7 +810,6 @@
         {
           "source": {
             "file": "tests/test_transport_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
             "line": 101,
             "end_line": 101,
             "source_sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"
@@ -867,7 +832,6 @@
         {
           "source": {
             "file": "tests/test_transport_cookie_metadata.py",
-            "absolute_file": "/home/hermes/workspace/rental-monitoring/sber-sdk/fork/tests/test_transport_cookie_metadata.py",
             "line": 128,
             "end_line": 128,
             "source_sha256": "298e999883360df076a4faffaa508fb980ddf6d6f20dd9e4bb51d9b8ccbd360b"

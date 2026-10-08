@@ -5,7 +5,7 @@
 // Implementations are layered under internal/session, internal/transport,
 // internal/auth and internal/bank; public type aliases preserve the root import.
 // Authentication uses native HTTP for password, phone, card, QR and PIN flows.
-// MCP stdio and rental reconciliation are separate packages.
+// MCP stdio integration is available in a separate package.
 // Constructors read only caller-selected profiles. A parsed profile
 // is not proof of authorization or complete bank history.
 package sber

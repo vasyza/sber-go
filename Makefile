@@ -3,7 +3,6 @@
 build:
 	go build ./...
 	go build -o bin/sber ./cmd/sber
-	go build -o bin/rental-check ./cmd/rental-check
 
 test:
 	go test ./...

@@ -32,7 +32,7 @@ func TestProbeBoundFinancialExport(t *testing.T) {
 	}
 }
 
-// Independent synthetic seam matrix. No requester, session, network or tenant.
+// Independent synthetic seam matrix. No requester, session, or network.
 func TestFreshReviewFinancialControls(t *testing.T) {
 	d, e := ParseDecimal("4111111111111111.50")
 	if e != nil {

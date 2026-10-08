@@ -1,5 +1,16 @@
 # Verification status
 
+## SDK repository scope — 2026-10-08
+
+The repository supplies the Sber SDK, its CLI, and local MCP integration.
+The `cmd/` directory contains one command entry point: `sber`.
+Reference catalogs use relative source paths and retain audited hashes and contract data.
+
+The complete `make check` passed on macOS ARM64 with Go 1.27.1.
+It covered formatting, vet, race tests, SDK and CLI builds, and module checksums.
+The checks used synthetic data and local servers.
+The authentication record below gives the earlier real bank verification.
+
 ## Native authentication migration — 2026-10-08
 
 This record describes the current native migration.
@@ -160,7 +171,7 @@ They covered private profile publication, hidden terminal input, transport limit
 Linux checks also covered inode publication and terminal failure fixtures.
 
 The Cobra migration passed the full Linux race suite, vet, build, module checks, and CLI documentation tests.
-Both commands use Cobra v1.10.2.
+The CLI uses Cobra v1.10.2.
 The `sber` command has 20 operational commands.
 
 The MCP migration uses the official Go SDK v1.8.0.
@@ -169,12 +180,6 @@ Synthetic tests covered the official client and all six application handlers.
 Independent MCP review covered the adapter and application integration.
 That review did not approve the complete SDK or live bank behavior.
 [MCP.md](MCP.md) gives the protocol limits.
-
-Earlier rental review covered the frozen offline engine.
-A later CLI review covered the timestamp input repair.
-Those records apply to their recorded source hashes.
-The Cobra migration changes parser and message source bytes.
-Earlier approval does not automatically cover changed bytes.
 
 ## Real bank verification
 

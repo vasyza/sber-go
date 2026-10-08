@@ -1,6 +1,6 @@
 # sber-go
 
-Native Go SDK for the unofficial Sber online-banking protocol: session persistence, primary/PIN/OTP authentication, typed bank resources, exact decimal amounts, a native CLI, a local MCP server, and an independent rental reconciliation engine.
+Native Go SDK for the unofficial Sber online-banking protocol: session persistence, primary/PIN/OTP authentication, typed bank resources, exact decimal amounts, a native CLI, and a local MCP server.
 
 Go **1.27.1**, Linux and macOS, including hidden terminal login and first-time private profile enrollment.
 
@@ -243,14 +243,13 @@ Import `github.com/vasyza/sber-go` as `sber`. Root aliases and forwards preserve
 
 `Decimal` preserves values such as `9007199254740993.10`. Decode response JSON with `sber.DecodeJSON` to retain number lexemes. `ExportJSON` preserves financial quantities and masks card numbers in display text. Diagnostic formatting of session/auth/client values is redacted; explicit credential and financial exports have separate APIs.
 
-## MCP and rental reconciliation
+## MCP integration
 
 ```sh
 sber mcp
-./bin/rental-check < explicit-ledger.json
 ```
 
-MCP serves six implemented tools against the selected session: setup status, session info/close, products, operations and one operations page. Authentication remains owner-operated. See [MCP setup](docs/MCP.md). Rental reconciliation consumes an explicit ledger and keeps reminders disabled; see [rental input and output](docs/RENTAL-CLI.md).
+MCP serves six implemented tools against the selected session: setup status, session info/close, products, operations and one operations page. Authentication remains owner-operated. See [MCP setup](docs/MCP.md).
 
 The MCP transport uses the official Go SDK v1.8.0 for MCP 2026-07-28 and legacy 2025-11-25 clients. See [MCP adapter and verification](docs/MCP.md#adapter-profile).
 
@@ -263,10 +262,10 @@ make check
 ./bin/sber --help
 ```
 
-`make check` checks formatting, runs vet and the complete race suite, builds all packages and both commands, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs.
+`make check` checks formatting, runs vet and the complete race suite, builds all packages and the Sber CLI, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs.
 
 ## Architecture and verification boundary
 
-Core error, session, transport, authentication and bank-resource packages have separate responsibilities. MCP and rental functionality have independent entry points. See [package responsibilities](docs/ARCHITECTURE.md), [SDK contracts](docs/SDK.md) and [current verification](docs/STATUS.md).
+Core error, session, transport, authentication and bank-resource packages have separate responsibilities. MCP connects the SDK to local tools through the Sber CLI. See [package responsibilities](docs/ARCHITECTURE.md), [SDK contracts](docs/SDK.md) and [current verification](docs/STATUS.md).
 
 Authentication now uses native Go HTTP requests for login/password, phone/password, card number, QR confirmation, and remembered PIN. The application does not need Playwright, Firefox, Chrome, or a JavaScript runtime. On 2026-10-08, all four initial login methods and PIN restoration completed on the real owner account. The QR session passed all 15 CLI read and local profile commands and the SDK authorization, products, and bounded history checks. See the [verification record](docs/STATUS.md) for current results and limits. Financial mutations, complete history coverage, and independent production review remain outside this evidence. Earlier reports in Git history describe their original snapshots.

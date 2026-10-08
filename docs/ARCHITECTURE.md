@@ -12,10 +12,9 @@
 | `internal/cli`, `cmd/sber` | Validation, application orchestration and signal-aware command |
 | `internal/mcptools`, `internal/mcpwire` | Tool schemas and bounded/cancelable protocol engine |
 | `mcp` | Handlers connecting one selected client to the protocol |
-| `rental`, `internal/rentalcli`, `cmd/rental-check` | Independent reconciliation and offline JSON command |
 | `internal/strictjson`, `internal/srp`, `internal/rsaoaep` | Protocol/crypto primitives |
 
-Dependencies flow root/app → bank → auth/transport/session → errors/primitives. Session, transport and auth never import the facade. Authentication uses a verified native HTTP transport. Rental does not import the bank SDK. MCP wire/catalog do not authenticate or read profiles.
+Dependencies flow root/app → bank → auth/transport/session → errors/primitives. Session, transport and auth never import the facade. Authentication uses a verified native HTTP transport. MCP wire/catalog do not authenticate or read profiles.
 
 The bank package is one cohesive resource/lifecycle boundary. Files separate client lifecycle (`client_*`), resource services (`resources_*`), bound entities (`entities_*`), money (`money.go`), models (`models*.go`), deliberate export (`export.go`), dates/time filters and response parsers. Financial export recognizes its own native models without trusting arbitrary caller structs.
 
@@ -31,7 +30,7 @@ Native HTTP, HTTPS, and SOCKS5 connections share the explicit proxy policy.
 The CLI stores proxy settings separately from bank profiles, with enrollment's private directory checks, stable process locking, and atomic replacement.
 Environment proxy selection and direct fallback are disabled.
 
-Private unit tests stay beside implementations and are grouped by behavior. Public-consumer tests live under `tests/sdk`, `tests/mcp`, and `tests/rental`; compiled CLI tests live under `tests/cli`. Explicit live tests live under `tests/integration`. Go examples remain at the root. Fixtures are repository-relative under `testdata`. [DEVELOPMENT.md](DEVELOPMENT.md) gives the layout and check commands. `internal/testutil` is imported only by tests. Constructors perform no bank business request; authentication and selected-profile opening are explicit. History coverage and pagination termination remain separate facts.
+Private unit tests stay beside implementations and are grouped by behavior. Public-consumer tests live under `tests/sdk` and `tests/mcp`; compiled CLI tests live under `tests/cli`. Explicit live tests live under `tests/integration`. Go examples remain at the root. Fixtures are repository-relative under `testdata`. [DEVELOPMENT.md](DEVELOPMENT.md) gives the layout and check commands. `internal/testutil` is imported only by tests. Constructors perform no bank business request; authentication and selected-profile opening are explicit. History coverage and pagination termination remain separate facts.
 
 ## Public API compatibility
 

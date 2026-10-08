@@ -244,7 +244,7 @@ Numbers, units, and dates use the measurement and time category.
 | card | A bank payment product with an associated account. |
 | card ID | The product identifier that the bank API accepts. |
 | card number | The payment card number; it differs from the card ID. |
-| CLI | The command line interface of the `sber` and `rental-check` executables. |
+| CLI | The command line interface of the `sber` executable. |
 | Cobra | The Go library that reads CLI arguments and produces help text. |
 | command | The selected CLI operation, such as `products`. |
 | configuration directory | The operating system location for application settings. |
@@ -344,24 +344,3 @@ For their use as nouns, define separate noun terms.
 
 `read`, `send`, `select`, `start`, `stop`, `use`, and `write` use their approved dictionary meanings.
 The full standard and dictionary remain the authoritative source for word use.
-
-### Rental technical nouns
-
-
-These terms supplement the shared term list for the offline rental preview.
-Use them only for their defined subject meanings.
-
-| Technical noun | Meaning |
-| --- | --- |
-| ASCII | A character encoding that includes the digits 0 through 9. |
-| UTF-8 | A Unicode text encoding. |
-| Unicode surrogate pair | Two Unicode code units that represent one character. |
-| boolean | A value that is either `true` or `false`. |
-| int64 | A signed integer type with 64 bits. |
-| arithmetic overflow | A calculation that gives a value outside the permitted integer range. |
-| context | A runtime state that can cancel a command. |
-| HAR | HTTP Archive. A file that records HTTP requests and responses. |
-| ledger | Records of tenants, rent periods, receipts, and evidence of complete history. |
-| preview | A local evaluation of a supplied ledger. |
-| minor unit | The smallest recorded currency unit. The `Minor` field holds an integer count of these units. |
-| candidate decision | A ledger result that needs owner review before any further action. |
