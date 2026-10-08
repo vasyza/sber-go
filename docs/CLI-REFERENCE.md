@@ -89,7 +89,7 @@ See the [proxy procedure](CLI.md#proxy-settings) for storage and command history
 | `--no-proxy` | `false`. | Authentication and client commands. | Select a direct connection without reading saved settings. |
 | `--ca-bundle PATH` | Embedded CA with available system PEM trust. | Authentication and client commands. | Replace the trust bundle for the selected client. |
 | `--timeout DURATION` | `30s`. | Client commands. | Limit each request to 1 through 120 seconds. |
-| `--no-renew` | `false`. | Data reads and `check-session`. | Disable interactive session restoration. |
+| `--no-renew` | `false`. | Data reads and `check-session`. | Disable session restoration. |
 | `--force-update` | `false`. | `products`, `accounts`, `cards`, `portfolio`. | Get new product data. |
 
 Offline `status` and `inspect-session` accept `--profile` and help options.
@@ -109,12 +109,41 @@ Environment proxy variables do not select a connection.
 | `--remembered-profile PATH` | None. | `login`. | Use a remembered identity for PIN login into a new file. |
 | `--method METHOD` | `login`. | `login`. | Select `login`, `phone`, `card`, or `qr`. |
 | `--qr-output PATH` | None. | QR `login`. | Save the challenge as a new private PNG file. |
+| `--env-file PATH` | None. | Authentication, data reads, and `check-session`. | Read authentication values from an explicit private env file. |
 
 The `--remembered-profile` option requires the default `login` method.
 It selects existing online banking PIN authentication.
 The `--qr-output` option requires `--method qr` and an absolute path.
 Authentication uses native HTTP requests.
 The CLI does not accept browser runtime options.
+
+### Authentication environment
+
+| Variable | Authentication value |
+| --- | --- |
+| `SBER_LOGIN` | Account login. |
+| `SBER_PASSWORD` | Account password. |
+| `SBER_PINCODE` | Existing online banking PIN, or new PIN enrollment and confirmation. |
+| `SBER_PHONE` | Phone number for `login --method phone`. |
+| `SBER_CARD_NUMBER` | Card number for `login --method card`. |
+
+Process environment values override the selected env file.
+Empty or missing values use hidden terminal input.
+An explicit empty environment value overrides the file value.
+SMS codes and financial confirmations always require the terminal.
+No env file is selected automatically.
+
+The file must have mode `0600` in a parent directory with mode `0700`, both owned by the current user.
+Symbolic links, multiple hard links, and files larger than 64 KiB are rejected.
+Values are literal; variable expansion and command execution are not supported.
+See [authentication values](CLI.md#authentication-values) for syntax and input limits.
+
+A configured PIN enables session restoration during a batch read.
+The CLI restores once and retries one read after successful publication.
+`--no-renew` disables restoration with any input source.
+MCP, export, credential inspection, and mutation commands do not restore sessions.
+If a command needs SMS input without a terminal, it returns exit code `3` and preserves the old profile.
+Invalid fixed PIN input or a bank policy rejection does not repeat PIN enrollment.
 
 ## History options
 
@@ -201,7 +230,7 @@ It is not a catalog of all bank APIs.
 
 | SDK method | CLI commands | Route |
 | --- | --- | --- |
-| Primary, phone, card, QR, and PIN authentication | `login`, `refresh-session`, interactive restoration. | Native authentication state machine. |
+| Primary, phone, card, QR, and PIN authentication | `login`, `refresh-session`, read restoration. | Native authentication state machine. |
 | `Products.Get`, `Accounts.List`, `Cards.List`, `Resources.Portfolio` | `products`, `accounts`, `cards`, `portfolio`. | `/main-screen/rest/v2/m1/web/section/meta` |
 | `Cards.Info`, `Cards.Limits` | `card-info`, `card-limits`. | `/ufs-carddetail/rest/card/v1/cardInfo` |
 | `Operations.Collect`, `Operations.Page` | `operations`, `operations-page`. | `/uoh-bh/v1/operations/list` |
@@ -258,6 +287,8 @@ Numbers, units, and dates use the measurement and time category.
 | directory | A location that contains files. |
 | executable | The application file that the operating system starts. |
 | enrollment | Initial authentication, optional PIN creation, and first private profile publication. |
+| env file | A private file with literal authentication variable assignments. |
+| environment variable | A named value supplied to the process by its caller. |
 | exit code | The numeric result that a command gives to its caller. |
 | Go | The language and toolchain that build this repository. |
 | history | The returned list of bank operations. |

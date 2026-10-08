@@ -29,7 +29,7 @@ Requirements:
 
 - Linux or macOS.
 - Go 1.27.1, as specified in `go.mod`.
-- A local terminal for hidden input.
+- A local terminal for missing authentication values and SMS codes.
 - Your own account on the bank website.
 
 1. Open a terminal in the repository directory.
@@ -213,6 +213,74 @@ If the bank shows CAPTCHA or WebAuthn, complete that step in the bank website.
 The CLI stops at these challenges.
 It does not send a password, PIN, or SMS attempt again automatically.
 
+## Authentication values
+
+All login methods and session restoration use the same authentication input rules.
+
+| Variable | Value |
+| --- | --- |
+| `SBER_LOGIN` | Account login for the default login method. |
+| `SBER_PASSWORD` | Account password for login or phone authentication. |
+| `SBER_PINCODE` | Online banking PIN for restoration or new PIN enrollment. |
+| `SBER_PHONE` | Phone number for `--method phone`. |
+| `SBER_CARD_NUMBER` | Card number for `--method card`. |
+
+The CLI first reads the process environment.
+If a variable is absent, it reads the value from the selected env file.
+If the selected value is empty or missing, it shows a hidden terminal prompt.
+An explicit empty environment value selects terminal input instead of a file value.
+The CLI always reads SMS codes and financial confirmations from the terminal.
+
+To use a private env file:
+
+1. Make a credentials file in a directory that you own.
+2. Replace these example values with your authentication values:
+
+   ```dotenv
+   SBER_LOGIN='YOUR_LOGIN'
+   SBER_PASSWORD='YOUR_PASSWORD'
+   SBER_PINCODE='YOUR_ONLINE_BANKING_PIN'
+   ```
+
+3. Set the parent directory mode to `0700`.
+4. Set the file mode to `0600`.
+5. Select the file explicitly:
+
+   ```sh
+   ./bin/sber login --env-file "$HOME/.config/sber-go/credentials.env"
+   ```
+
+6. If the bank requests SMS confirmation, enter the code at the hidden prompt.
+
+For card authentication, supply `SBER_CARD_NUMBER` and select the card method:
+
+```sh
+./bin/sber login --method card --env-file "$HOME/.config/sber-go/credentials.env"
+```
+
+The file must be a regular file that you own, with only one hard link.
+Each path component must be literal and must not be a symbolic link.
+The CLI rejects unsafe files before authentication starts.
+It does not search for `.env` files automatically or change the process environment.
+
+The file supports one `NAME=VALUE` assignment per line, an optional `export` prefix, quotes, and comments.
+Single quotes preserve their contents.
+Double quotes support escaped quotes and backslashes.
+An unquoted hash starts a comment at the start of a value or after a space.
+Values remain literal: the CLI does not expand variables or execute commands.
+Multiline values are not supported.
+
+The file limit is 64 KiB.
+Each authentication value has a limit of 4096 bytes and cannot contain null or newline characters.
+Unrelated variable names are ignored.
+For repeated assignments, the last value applies.
+PIN input must contain 4 through 12 digits and match the bank configuration.
+
+`SBER_PINCODE` also supplies new PIN enrollment and its confirmation when the bank requires enrollment.
+If a configured PIN is invalid or rejected, the command stops without sending the same PIN again.
+Credentials do not become profile fields or command output.
+Keep the environment and credentials file private.
+
 ## Native authentication
 
 All authentication requests use the native Go HTTP transport.
@@ -311,7 +379,7 @@ The PIN must be the PIN that the bank accepts for that identity.
    ./bin/sber refresh-session
    ```
 
-2. At the hidden prompt, enter the online banking PIN.
+2. If a hidden PIN prompt appears, enter the online banking PIN.
 3. If the bank shows an SMS challenge, enter the code from that SMS.
 4. Make sure that the result contains `"session_refreshed":true`.
 5. Do a session check:
@@ -325,12 +393,22 @@ A successful command writes the new session to the same private file.
 The write is atomic.
 If publication status is unknown, examine the profile before another attempt.
 
-An interactive data read can restore an expired session once.
-It shows a PIN prompt and an SMS prompt, if necessary.
+A data read with a terminal or configured PIN can restore an expired session once.
+It reads the configured PIN or shows a PIN prompt.
+It shows an SMS prompt if the bank requires confirmation.
 It saves the validated session before it sends the data request again.
 The `--no-renew` option disables this behavior.
 
-A batch command without terminal input does not show secret prompts.
+A configured PIN lets session restoration run without terminal input:
+
+```sh
+./bin/sber refresh-session --env-file "$HOME/.config/sber-go/credentials.env"
+./bin/sber products --env-file "$HOME/.config/sber-go/credentials.env"
+```
+
+Exported `SBER_PINCODE` also supplies these commands without `--env-file`.
+If the bank requests an SMS code without a terminal, the command stops and keeps the old profile.
+A batch read without a configured PIN does not restore an expired session.
 MCP does not do interactive authentication.
 Commands that change bank data do not restore a session or send a failed operation again.
 
@@ -366,7 +444,7 @@ The source profile remains at its original path.
      --profile "$HOME/.local/share/sber-go/session-next.json"
    ```
 
-2. Enter the PIN at the hidden prompt.
+2. If a hidden PIN prompt appears, enter the PIN.
 3. If the bank shows an SMS challenge, enter the code from that SMS.
 4. Make sure that the result contains `"profile_created":true`.
 
@@ -573,7 +651,9 @@ Data output can contain private financial information.
 
 The CLI shows known error classifications only.
 It does not show remote error text, support IDs, cookies, or secret input.
-It does not read bank secrets from `.env`, environment variables, command options, or MCP arguments.
+Authentication accepts configured environment values or an explicit private env file.
+Secret values are not accepted through command options or MCP arguments.
+SMS codes and financial confirmations require hidden terminal input.
 Proxy login values use the explicit proxy address syntax.
 
 Authentication errors include the local stage.

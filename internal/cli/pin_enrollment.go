@@ -20,7 +20,7 @@ func enrollOwnerPIN(ctx context.Context, a Authentication, auth PINEnrollmentAut
 		if err == nil {
 			return bundle, nil
 		}
-		if attempt >= 2 || !definitePINPolicyRejection(err) {
+		if a.configuredPIN || attempt >= 2 || !definitePINPolicyRejection(err) {
 			return sber.SessionBundle{}, err
 		}
 		// A validated policy rejection did not enroll this PIN. The next

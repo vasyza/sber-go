@@ -1,5 +1,24 @@
 # Verification status
 
+## Configured authentication input — 2026-10-08
+
+All CLI authentication methods accept configured credentials from the process environment or an explicit private env file.
+Missing values use hidden terminal input.
+SMS codes and financial confirmations remain terminal-only.
+A configured PIN permits session restoration and expired-session read renewal without terminal input.
+
+Synthetic tests cover login, phone, card, remembered-device login, PIN enrollment, and session restoration with both credential sources.
+They check environment precedence, literal file parsing, private permissions, cancellation, cleanup, secret redaction, and failed publication.
+Fixed PIN failures stop without repeated input or another PIN enrollment request.
+A required SMS without a terminal stops and preserves the old profile.
+
+The complete local `make check` passed on Linux AMD64 with Go 1.27.1.
+It included formatting, golangci-lint, gopls diagnostics, vet, race tests, builds, and module verification.
+
+These checks use synthetic data and local dependencies.
+Real bank authentication was not repeated for this change.
+The earlier live authentication record remains separate.
+
 ## Open source preparation — 2026-10-08
 
 The command and public Go package are named `sber`.

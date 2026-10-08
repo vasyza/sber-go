@@ -30,19 +30,19 @@ func readClientOptions(command string, args *commandArguments, dependencies *Aut
 		options.AllowMutations = args.execute
 		return options, nil, nil
 	}
-	canRead := term.IsTerminal(int(os.Stdin.Fd()))
 	a := Authentication{}
 	if dependencies != nil {
 		a = *dependencies
-		if a.ReadSecret != nil {
-			canRead = true
-		}
 	}
-	if args.noRenew || command == "mcp" || command == "export-session" || command == "inspect-credentials" || !canRead {
+	if args.noRenew || command == "mcp" || command == "export-session" || command == "inspect-credentials" {
 		return options, nil, nil
 	}
-	if a.ReadSecret == nil {
-		a.ReadSecret = ownerSecret
+	canRead := term.IsTerminal(int(os.Stdin.Fd())) || a.ReadSecret != nil
+	if err := configureSecretInput(&a, args.envFile); err != nil {
+		return options, nil, err
+	}
+	if !canRead && !a.configuredPIN {
+		return options, nil, nil
 	}
 	if a.NewPINFromBundle == nil {
 		a.NewPINFromBundle = func(bundle sber.SessionBundle, options sber.AuthOptions) (PINAuthenticator, error) {
