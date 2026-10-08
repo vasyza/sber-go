@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"syscall"
 	"testing"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func TestSessionStrictSchemaAndFileBoundaries(t *testing.T) {

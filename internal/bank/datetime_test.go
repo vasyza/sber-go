@@ -1073,9 +1073,10 @@ func TestProductsRejectExplicitMalformedCoreMoneyShapes(t *testing.T) {
 					data := map[string]any{}
 					field := "balance"
 					key := section
-					if section == "cardsInWallet" {
+					switch section {
+					case "cardsInWallet":
 						field = "availableLimit"
-					} else if section == "linked_card" {
+					case "linked_card":
 						key, field = "cardsInWallet", "availableTotalLimit"
 						data["ctaccounts"] = map[string]any{"data": []any{map[string]any{"id": "synthetic-account", "number": "synthetic-link"}}}
 					}

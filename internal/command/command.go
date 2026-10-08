@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	ErrArguments = errors.New("The command arguments are not valid.")
-	ErrOutput    = errors.New("The command cannot write the help text.")
+	ErrArguments = errors.New("The command arguments are not valid.")    //nolint:staticcheck // CLI diagnostics are complete sentences under the writing policy.
+	ErrOutput    = errors.New("The command cannot write the help text.") //nolint:staticcheck // CLI diagnostics are complete sentences under the writing policy.
 )
 
 const helpTemplate = `{{with .Long}}{{.}}{{else}}{{.Short}}{{end}}

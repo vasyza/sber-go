@@ -68,7 +68,7 @@ func ReadOwnerSecret(ctx context.Context, prompt Prompt) (*Secret, error) {
 type Secret struct{ value []byte }
 
 // Format intentionally redacts every formatting verb, including value copies.
-func (s Secret) Format(state fmt.State, verb rune) { state.Write([]byte("[REDACTED]")) }
+func (s Secret) Format(state fmt.State, verb rune) { _, _ = state.Write([]byte("[REDACTED]")) }
 func (s Secret) String() string                    { return "[REDACTED]" }
 func (s Secret) GoString() string                  { return "[REDACTED]" }
 

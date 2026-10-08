@@ -20,7 +20,7 @@ func domainInt(value any) int {
 				return -1
 			}
 			if n, ok := domainDigitValue(r); ok {
-				return rune('0' + n)
+				return rune("0123456789"[n])
 			}
 			return r
 		}, strings.TrimSpace(v))

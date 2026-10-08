@@ -70,7 +70,7 @@ func authenticateRemembered(ctx context.Context, read func(context.Context, owne
 	}
 	phase = "pin-login"
 	bundle, err := auth.Login(ctx, pin, sber.CaptchaAnswer{})
-	pin = ""
+	pin = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	var otp *sber.PinOTPRequired
 	if errors.As(err, &otp) {
 		phase = "owner-input"
@@ -80,7 +80,7 @@ func authenticateRemembered(ctx context.Context, read func(context.Context, owne
 		}
 		phase = "sms-confirmation"
 		bundle, err = auth.ConfirmOTP(ctx, code)
-		code = ""
+		code = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	}
 	if err != nil {
 		return validated, err

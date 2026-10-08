@@ -3,11 +3,12 @@ package bank
 import (
 	"context"
 	"errors"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
 	"os"
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	sdkSession "github.com/vasyza/sber-go/internal/session"
 )
 
 type independentRequester struct {
@@ -23,7 +24,7 @@ type independentRequester struct {
 	hook      func(int)
 }
 
-var independentClosed = errors.New("synthetic requester closed")
+var errIndependentClosed = errors.New("synthetic requester closed")
 
 func (r *independentRequester) send(ctx context.Context, c resourceCall) (map[string]any, error) {
 	if err := ctx.Err(); err != nil {
@@ -33,7 +34,7 @@ func (r *independentRequester) send(ctx context.Context, c resourceCall) (map[st
 	r.attempts++
 	if r.closed {
 		r.mu.Unlock()
-		return nil, independentClosed
+		return nil, errIndependentClosed
 	}
 	if c.Kind != "read" && !r.allowed {
 		r.mu.Unlock()
@@ -74,7 +75,7 @@ func (r *independentRequester) MutationSequence(ctx context.Context, f func(func
 	closed, allowed := r.closed, r.allowed
 	r.mu.Unlock()
 	if closed {
-		return independentClosed
+		return errIndependentClosed
 	}
 	if !allowed {
 		return ErrResourceMutationsDisabled
@@ -90,12 +91,12 @@ func (r *independentRequester) MutationSequence(ctx context.Context, f func(func
 	})
 }
 func (r *independentRequester) ExportSession() (sdkSession.SessionBundle, error) {
-	return sdkSession.SessionBundle{}, independentClosed
+	return sdkSession.SessionBundle{}, errIndependentClosed
 }
 func (r *independentRequester) ExportCredentials() (sdkSession.SberCredentials, error) {
-	return sdkSession.SberCredentials{}, independentClosed
+	return sdkSession.SberCredentials{}, errIndependentClosed
 }
-func (r *independentRequester) WarmUp(context.Context, bool) error { return independentClosed }
+func (r *independentRequester) WarmUp(context.Context, bool) error { return errIndependentClosed }
 func (r *independentRequester) Close()                             { r.mu.Lock(); r.closed = true; r.mu.Unlock() }
 
 // Profile fixtures must be private independently of the developer's umask.

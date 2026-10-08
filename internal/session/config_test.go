@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"os"
 	"strings"
 	"testing"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func reviewCycle2AssertFrontend(t *testing.T, parse func(string) (FrontendConfig, error), html string, want FrontendConfig, accepted bool) {

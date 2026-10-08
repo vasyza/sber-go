@@ -48,13 +48,13 @@ func newCandidateDirectory(profile string, parent int, profileName string) (cand
 		}
 		fd, e := unix.Openat(parent, name, unix.O_RDONLY|unix.O_DIRECTORY|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0)
 		if e != nil {
-			unix.Unlinkat(parent, name, unix.AT_REMOVEDIR)
+			_ = unix.Unlinkat(parent, name, unix.AT_REMOVEDIR)
 			return candidateDirectory{}, ErrUnsafe
 		}
 		root, e := os.OpenRoot(candidateRootPath(profile, fd, name))
 		if e != nil {
-			unix.Close(fd)
-			unix.Unlinkat(parent, name, unix.AT_REMOVEDIR)
+			_ = unix.Close(fd)
+			_ = unix.Unlinkat(parent, name, unix.AT_REMOVEDIR)
 			return candidateDirectory{}, ErrUnsafe
 		}
 		// The portable Root and the native descriptor must name the same inode.
@@ -62,12 +62,12 @@ func newCandidateDirectory(profile string, parent int, profileName string) (cand
 		var opened, current unix.Stat_t
 		valid := e == nil && unix.Fstat(fd, &opened) == nil && privateDirectory(opened) && unix.Fstat(int(dir.Fd()), &current) == nil && sameInode(opened, current)
 		if dir != nil {
-			dir.Close()
+			_ = dir.Close()
 		}
 		if !valid {
-			root.Close()
-			unix.Close(fd)
-			unix.Unlinkat(parent, name, unix.AT_REMOVEDIR)
+			_ = root.Close()
+			_ = unix.Close(fd)
+			_ = unix.Unlinkat(parent, name, unix.AT_REMOVEDIR)
 			return candidateDirectory{}, ErrUnsafe
 		}
 		return candidateDirectory{name, fd, root}, nil
@@ -82,7 +82,7 @@ func (c candidateDirectory) cleanup(parent int) error {
 		return ErrCleanup
 	}
 	entries, e := dir.ReadDir(-1)
-	dir.Close()
+	_ = dir.Close()
 	if e != nil {
 		return ErrCleanup
 	}
@@ -111,7 +111,7 @@ func (c candidateDirectory) privateFile() (int, error) {
 	}
 	var state unix.Stat_t
 	if unix.Fstat(fd, &state) != nil || !privateFile(state) {
-		unix.Close(fd)
+		_ = unix.Close(fd)
 		return -1, ErrUnsafe
 	}
 	return fd, nil

@@ -35,7 +35,7 @@ func (a *CardAuth) Login(ctx context.Context, number string, captcha CaptchaAnsw
 		return nil, authFailure("otp_already_pending", nil)
 	}
 	pan, ok := authenticationDigits(number)
-	number = ""
+	number = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if !ok || !validPAN(pan) {
 		return nil, authFailure("invalid_card", nil)
 	}
@@ -51,7 +51,7 @@ func (a *CardAuth) Login(ctx context.Context, number string, captcha CaptchaAnsw
 		return nil, authFailure("missing_card_key", nil)
 	}
 	encrypted, e := rsaoaep.Encrypt(key, pan)
-	pan = ""
+	pan = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		return nil, authFailure("invalid_card_key", nil)
 	}
@@ -86,7 +86,7 @@ func (a *CardAuth) ConfirmOTP(ctx context.Context, code string) (*sdkSession.Ses
 		return nil, authFailure("invalid_otp_code", nil)
 	}
 	p, e := a.postJSON(ctx, *a.config, "/api/v1/cardlogin/confirm", a.withContext(map[string]any{"confirmPassword": code}))
-	code = ""
+	code = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		return nil, e
 	}

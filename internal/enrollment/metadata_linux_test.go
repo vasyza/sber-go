@@ -6,10 +6,11 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"golang.org/x/sys/unix"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"golang.org/x/sys/unix"
 )
 
 func TestSafeProfileExistsMetadataOnly(t *testing.T) {

@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdk "github.com/vasyza/sber-go"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
 	"testing"
+
+	sdk "github.com/vasyza/sber-go"
 )
 
 // Embedding the exported interface legitimately promotes its private marker.
@@ -101,9 +102,10 @@ func TestIndependentClient3ExternalSDKMarkerDoesNotBypassSanitization(t *testing
 				}
 				var c *sdk.SberClient
 				var e error
-				if route == "factory" {
+				switch route {
+				case "factory":
 					_, e = sdk.NewSberClient(b, sdk.ClientOptions{TransportFactory: func(sdk.SessionBundle, sdk.TransportOptions) (sdk.Transport, error) { return nil, injected }})
-				} else if route == "renewal" {
+				case "renewal":
 					p := filepath.Join(testPrivateDir(t), "synthetic-profile.json")
 					if e = b.Save(p); e != nil {
 						t.Fatal(e)
@@ -117,7 +119,7 @@ func TestIndependentClient3ExternalSDKMarkerDoesNotBypassSanitization(t *testing
 					}
 					defer c.Close()
 					_, e = c.PostRead(context.Background(), "/uoh-bh/v1/operations/list", nil)
-				} else {
+				default:
 					c, e = sdk.NewSberClient(b, sdk.ClientOptions{Transport: tr, AllowMutations: true})
 					if e != nil {
 						t.Fatal(e)

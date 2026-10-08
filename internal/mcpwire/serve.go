@@ -14,6 +14,7 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/jsonrpc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+
 	"github.com/vasyza/sber-go/internal/strictjson"
 )
 
@@ -45,8 +46,8 @@ func (server *Server) Serve(ctx context.Context, input io.Reader, output io.Writ
 		defer close(watcherDone)
 		select {
 		case <-ctx.Done():
-			reader.Close()
-			writer.Close()
+			_ = reader.Close()
+			_ = writer.Close()
 		case <-stop:
 		}
 	}()
@@ -194,7 +195,7 @@ func (c *safeConnection) Read(ctx context.Context) (jsonrpc.Message, error) {
 		msg, err := c.Connection.Read(ctx)
 		if err != nil {
 			if err != io.EOF {
-				c.Connection.Close() // Interrupt writes before SDK drains handlers.
+				_ = c.Close() // Interrupt writes before SDK drains handlers; retain the read error.
 			}
 			return nil, err
 		}
@@ -252,7 +253,7 @@ func (c *safeConnection) Read(ctx context.Context) (jsonrpc.Message, error) {
 			c.writeMu.Unlock()
 		}
 		if duplicate || full {
-			c.Connection.Close()
+			_ = c.Close()
 			return nil, ErrInput // Never misattribute a duplicate active ID.
 		}
 		if excessTool {
@@ -306,7 +307,7 @@ func (c *safeConnection) Write(ctx context.Context, msg jsonrpc.Message) error {
 		if state.cancelled {
 			return nil
 		}
-		copy := *response
+		cloned := *response
 		if response.Error != nil {
 			var wireError *jsonrpc.Error
 			failure := jsonrpc.Error{Code: -32603, Message: staticMessage(-32603)}
@@ -317,9 +318,9 @@ func (c *safeConnection) Write(ctx context.Context, msg jsonrpc.Message) error {
 					failure.Data = nil
 				}
 			}
-			copy.Error = &failure
+			cloned.Error = &failure
 		}
-		msg = &copy
+		msg = &cloned
 	}
 	frame, err := jsonrpc.EncodeMessage(msg)
 	if err != nil || len(frame) > MaxFrameBytes || strictjson.Validate(frame) != nil {

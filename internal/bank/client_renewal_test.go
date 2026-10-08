@@ -4,10 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,6 +11,11 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestClientDiscoveredAppOriginIsCachedRatherThanTreatedAsUnknown(t *testing.T) {

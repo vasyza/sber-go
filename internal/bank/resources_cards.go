@@ -76,7 +76,7 @@ func resourceNumericProductID(value any) (int64, error) {
 		if !ok {
 			return 0, NewParseError("card_id")
 		}
-		digits = append(digits, byte('0'+d))
+		digits = append(digits, "0123456789"[d])
 	}
 	id, err := strconv.ParseInt(string(digits), 10, 64)
 	if err != nil || id <= 0 || id > 9007199254740991 {

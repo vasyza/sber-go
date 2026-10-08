@@ -7,9 +7,6 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"github.com/andybalholm/brotli"
-	"github.com/klauspost/compress/zstd"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"io"
 	"log"
 	"net"
@@ -19,6 +16,11 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/andybalholm/brotli"
+	"github.com/klauspost/compress/zstd"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func TestAuthenticationConnectionReuseDoesNotReplayPOST(t *testing.T) {

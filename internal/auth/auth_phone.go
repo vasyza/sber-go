@@ -67,7 +67,10 @@ func (a *PhoneAuth) Login(ctx context.Context, phone, password string, o Primary
 		a.state().store = *o.StoreLogin
 	}
 	channel := a.uapiChannel(&a.state().store)
-	data := channel["data"].(map[string]any)
+	data, ok := channel["data"].(map[string]any)
+	if !ok {
+		return nil, authFailure("invalid_auth_channel", nil)
+	}
 	if o.Captcha.Code != nil {
 		data["captcha_code"] = encodeAuthCaptcha(*o.Captcha.Code)
 	}
@@ -75,7 +78,7 @@ func (a *PhoneAuth) Login(ctx context.Context, phone, password string, o Primary
 		data["audio_captcha_code"] = encodeAuthCaptcha(*o.Captcha.AudioCode)
 	}
 	p, e := a.postUAPI(ctx, "/uapi/v2/authenticate", map[string]any{"identifier": uapiIdentifier("phone_login", phone), "authenticator": map[string]any{"type": "web_sbol_srp_pass", "data": map[string]any{"srp_a": client.PublicHex()}}, "flow": "authcode", "channel": channel})
-	phone = ""
+	phone = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		if phonePasswordTransition(e) {
 			return a.passwordTransition(ctx, p, "", password, channel)
@@ -108,7 +111,7 @@ func (a *PhoneAuth) Login(ctx context.Context, phone, password string, o Primary
 		}
 		return nil, e
 	}
-	password = ""
+	password = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	R, _ := p["srp_r"].(string)
 	valid, _ := client.Verify(R)
 	if !valid {
@@ -147,9 +150,9 @@ func (a *PhoneAuth) passwordTransition(ctx context.Context, p map[string]any, to
 		}
 		typeName, value = "encodedPassword", encrypted
 	}
-	password = ""
+	password = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	p, err := a.postUAPI(ctx, "/uapi/v2/authenticate", map[string]any{"identifier": uapiIdentifier("ouid", token), "authenticator": map[string]any{"type": typeName, "data": map[string]any{"value": value}}, "flow": "authcode", "channel": channel})
-	value = ""
+	value = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +194,7 @@ func (a *PhoneAuth) ConfirmOTP(ctx context.Context, code string) (*sdkSession.Se
 		return nil, authFailure("invalid_otp_code", nil)
 	}
 	p, e := a.postUAPI(ctx, "/uapi/v2/verify", map[string]any{"identifier": uapiIdentifier("ouid", a.state().token), "authenticator": map[string]any{"type": "sms_otp", "data": map[string]any{"value": code}}, "channel": a.uapiChannel(&a.state().store)})
-	code = ""
+	code = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		return nil, e
 	}

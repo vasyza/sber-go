@@ -77,7 +77,7 @@ func ownerSecret(ctx context.Context, prompt ownerinput.Prompt) (string, error) 
 func runLogin(ctx context.Context, args *commandArguments, output, diagnostics io.Writer, dependencies *Authentication) int {
 	profile, caBundle, remembered := args.profile, args.ca, args.remembered
 	if args.qrOutput != "" && filepath.Clean(args.qrOutput) == filepath.Clean(profile) {
-		io.WriteString(diagnostics, "The QR output and profile paths must differ.\n")
+		_, _ = io.WriteString(diagnostics, "The QR output and profile paths must differ.\n")
 		return 2
 	}
 	a := Authentication{}
@@ -310,7 +310,7 @@ func prepareCredentialLogin(ctx context.Context, a Authentication, auth Credenti
 	}
 	phase = loginPhase
 	bundle, err := auth.Login(ctx, login, password, sber.PrimaryLoginOptions{})
-	login, password = "", ""
+	login, password = "", "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	var otp *sber.PinOTPRequired
 	if errors.As(err, &otp) {
 		phase = "owner-input"
@@ -320,7 +320,7 @@ func prepareCredentialLogin(ctx context.Context, a Authentication, auth Credenti
 		}
 		phase = "sms-confirmation"
 		bundle, err = auth.ConfirmOTP(ctx, code)
-		code = ""
+		code = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	}
 	if err != nil {
 		return nil, err
@@ -384,7 +384,7 @@ func readNewPIN(ctx context.Context, a Authentication, auth PINEnrollmentAuthent
 			return "", err
 		}
 		if length != 0 && !pinDigits(pin, length) {
-			pin = ""
+			pin = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 			if diagnostics != nil {
 				if _, err := io.WriteString(diagnostics, "The PIN must contain the specified number of digits.\nEnter the PIN again.\n"); err != nil {
 					return "", enrollment.ErrPrepare
@@ -397,10 +397,10 @@ func readNewPIN(ctx context.Context, a Authentication, auth PINEnrollmentAuthent
 			return "", err
 		}
 		if pin != "" && pin == confirm {
-			confirm = ""
+			confirm = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 			return pin, nil
 		}
-		pin, confirm = "", ""
+		pin, confirm = "", "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 		if length == 0 {
 			return "", enrollment.ErrPrepare
 		}

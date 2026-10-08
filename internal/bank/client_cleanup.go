@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 // ClientCleanupError keeps retryable ownership when a constructor cannot finish
@@ -29,13 +28,6 @@ func (*ClientCleanupError) MarshalJSON() ([]byte, error) {
 func (*ClientCleanupError) SDKError()       {}
 func (e *ClientCleanupError) Unwrap() error { return e.cause }
 func (e *ClientCleanupError) Close() error  { return e.cleanup() }
-func clientDiscardConstruction(tr sdkTransport.Transport, primary error) error {
-	if !clientTransportPresent(tr) {
-		return primary
-	}
-	owned := clientNewOwnedTransport(tr)
-	return clientDiscardOwnedConstruction(owned, primary)
-}
 func clientDiscardOwnedConstruction(owned *clientOwnedTransport, primary error) error {
 	if owned == nil {
 		return primary

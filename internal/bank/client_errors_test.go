@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"log"
 	"log/slog"
 	"net/url"
@@ -19,6 +15,11 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestClientCopiesAuthOptionIdentityBeforeDeferredRenewal(t *testing.T) {
@@ -351,7 +352,7 @@ type reviewValueTransport struct {
 }
 
 func (v reviewValueTransport) Post(ctx context.Context, target string, payload map[string]any, o sdkTransport.RequestOptions) (*sdkTransport.Response, error) {
-	_, _, closed := v.clientFakeTransport.counts()
+	_, _, closed := v.counts()
 	if closed > 0 {
 		v.blockedRetries.Add(1)
 		return nil, sdkErrs.ErrClosed

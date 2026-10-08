@@ -16,7 +16,7 @@ func enrollOwnerPIN(ctx context.Context, a Authentication, auth PINEnrollmentAut
 			return sber.SessionBundle{}, err
 		}
 		bundle, err := auth.CreatePIN(ctx, pin)
-		pin = ""
+		pin = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 		if err == nil {
 			return bundle, nil
 		}

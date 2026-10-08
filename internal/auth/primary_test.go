@@ -9,12 +9,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"net/url"
 	"strings"
 	"testing"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestAuthPINOTPContinuation(t *testing.T) {
@@ -71,7 +72,7 @@ func TestAuthPINCaptchaRetryKeepsEphemeral(t *testing.T) {
 	steps, _, _ := pinNativeSteps(t, "")
 	firstA := ""
 	captcha := authJSON(400, map[string]any{"error": map[string]any{"code": "need_captcha"}, "captcha": map[string]any{"imageUrl": "/captcha.png"}})
-	captcha.Headers.Set("X-CSRF-Token", "captcha-csrf")
+	captcha.Headers.Set("X-Csrf-Token", "captcha-csrf")
 	retryInspect := steps[1].inspect
 	steps[1].inspect = func(b map[string]any, f map[string]string, o sdkTransport.RequestOptions) {
 		if b["srp_A"] != firstA || b["captchaCode"] != "ABCD" || authHeader(o, "X-CSRF-Token") != "captcha-csrf" {

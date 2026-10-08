@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"os"
 	"path/filepath"
 	"reflect"
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func clientPrivatePath(t *testing.T) string {
@@ -325,13 +326,14 @@ func TestClientCycle3DefaultAuthRejectsBorrowedClosingOwners(t *testing.T) {
 				if route == "runtime-noncomparable" {
 					candidate = clientCycle3InterfaceValue{old, []byte{1}}
 				}
-				if route == "direct" {
+				switch route {
+				case "direct":
 					opts.AuthOptions.Transport = candidate
-				} else if route == "inherited-business-factory" {
+				case "inherited-business-factory":
 					opts.TransportFactory = func(sdkSession.SessionBundle, sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
 						return candidate, nil
 					}
-				} else {
+				default:
 					opts.AuthOptions.TransportFactory = func(sdkSession.SessionBundle, sdkTransport.TransportOptions) (sdkTransport.Transport, error) {
 						if route == "factory-error" {
 							return candidate, errors.New("synthetic-private-factory-canary")

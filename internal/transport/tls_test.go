@@ -13,7 +13,6 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"io"
 	"log"
 	"math/big"
@@ -25,6 +24,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func bundledRootForTest(t *testing.T) *x509.Certificate {

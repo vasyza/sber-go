@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func resourceDoneOutput() map[string]any {

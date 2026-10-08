@@ -6,7 +6,7 @@ package rsaoaep
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
+	"crypto/sha1" // #nosec G505 -- The bank's RSA-OAEP protocol requires SHA-1.
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
@@ -40,7 +40,7 @@ func Encrypt(publicDERBody, plaintext string) (string, error) {
 	if key.N == nil || key.N.BitLen() < 2048 || key.E < 3 || key.E%2 == 0 {
 		return "", ErrPublicKey
 	}
-	cipher, err := rsa.EncryptOAEP(sha1.New(), rand.Reader, key, []byte(plaintext), nil)
+	cipher, err := rsa.EncryptOAEP(sha1.New(), rand.Reader, key, []byte(plaintext), nil) // #nosec G401 -- The bank requires OAEP with SHA-1; the key is at least 2048 bits.
 	if err != nil {
 		return "", ErrEncryption
 	}

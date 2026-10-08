@@ -8,7 +8,6 @@ import (
 	jsonv2 "encoding/json/v2"
 	"errors"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"io"
 	"math"
 	"os"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"testing"
 	"unicode/utf8"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 const independentID = "4111111111111111"
@@ -224,6 +225,7 @@ func TestIndependentCycle3ReachedFinancialContainers(t *testing.T) {
 	wa.Name, wc.Name = independentMasked, independentMasked
 	want := sber.Products{Accounts: []sber.Account{wa}, Cards: []sber.Card{wc}}
 	rawBefore, _ := json.Marshal(raw)
+	var alias independentAlias = a //nolint:staticcheck // Keep the alias type explicit to verify encoder compatibility.
 	for _, tc := range []struct {
 		name     string
 		in, want any
@@ -243,7 +245,7 @@ func TestIndependentCycle3ReachedFinancialContainers(t *testing.T) {
 		{"typed_nil_money", (*sber.Money)(nil), nil}, {"nil_decimal", (*sber.Decimal)(nil), nil},
 		{"nil_portfolio_lists", sber.NewBankPortfolio(sber.Products{}, r), sber.Products{}},
 		{"empty_portfolio_lists", sber.NewBankPortfolio(sber.Products{Accounts: []sber.Account{}, Cards: []sber.Card{}}, r), sber.Products{Accounts: []sber.Account{}, Cards: []sber.Card{}}},
-		{"alias_exact_schema", independentAlias(a), wa},
+		{"alias_exact_schema", alias, wa},
 		{"derived_not_exact_schema", independentDerived(a), map[string]any{"id": "•••• 1111", "name": independentMasked, "last4": "1111", "state": "OPEN", "hidden": true, "arrested": false, "balance": m, "kind": "ctaccount"}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -256,9 +258,9 @@ func TestIndependentCycle3ReachedFinancialContainers(t *testing.T) {
 	if !bytes.Equal(rawBefore, after) || r.MarshalCalls != 0 || len(r.Reads) != 0 || bc.Account() != ba || ba.Cards()[0] != bc {
 		t.Fatal("export mutated snapshot or reached private binding/requester")
 	}
-	copy := ba.Snapshot()
-	copy.Balance.Currency = "mutated"
-	copy.Balance.Amount = sber.Decimal{}
+	cloned := ba.Snapshot()
+	cloned.Balance.Currency = "mutated"
+	cloned.Balance.Amount = sber.Decimal{}
 	cc := bc.Snapshot()
 	*cc.AccountID = "changed"
 	*cc.BalanceSource = "changed"

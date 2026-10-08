@@ -6,10 +6,11 @@ import (
 	"encoding/json/jsontext"
 	jsonv2 "encoding/json/v2"
 	"errors"
-	"github.com/vasyza/sber-go/internal/strictjson"
 	"reflect"
 	"testing"
 	"unicode/utf8"
+
+	"github.com/vasyza/sber-go/internal/strictjson"
 )
 
 func TestModelCycle3LiteralNativeTextIntegrity(t *testing.T) {

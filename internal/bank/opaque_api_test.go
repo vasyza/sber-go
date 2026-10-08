@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
 	"log"
 	"reflect"
 	"strings"
 	"testing"
+
+	sdkSession "github.com/vasyza/sber-go/internal/session"
 )
 
 // Exercise actual fmt fallbacks, including private wrapper fields where fmt
@@ -207,7 +208,7 @@ func TestOpaqueTransferDraftDefensiveSlicesAndFields(t *testing.T) {
 		t.Fatal("accessors exposed backing slice aliases")
 	}
 	copied := draft
-	draft = TransferDraft{}
+	draft = TransferDraft{} //nolint:wastedassign // Mutate the original value before checking that its retained copy stays unchanged.
 	read, ok := any(copied).(interface {
 		PID() string
 		Flow() string
@@ -275,7 +276,7 @@ func TestOpaquePreparedTransferFieldsAndExactMoneyCopies(t *testing.T) {
 			got := read.Amount()
 			got.Amount, got.Currency = Decimal{}, "changed-getter"
 			copied := prepared
-			prepared = PreparedTransfer{}
+			prepared = PreparedTransfer{} //nolint:ineffassign,wastedassign // Mutate the original value before checking that its retained copy stays unchanged.
 			copyRead := any(copied).(interface{ Amount() Money })
 			if copyRead.Amount() != (Money{Amount: d, Currency: "RUB"}) {
 				t.Fatal("Money getter/caller wrapper alias mutated immutable prepared copy")
@@ -321,7 +322,7 @@ func TestOpaqueTransferResultDefensiveDocumentAndFields(t *testing.T) {
 	}
 	*first, *second = "changed-getter-1", "changed-getter-2"
 	copied := result
-	result = TransferResult{}
+	result = TransferResult{} //nolint:wastedassign // Mutate the original value before checking that its retained copy stays unchanged.
 	read, ok := any(copied).(interface {
 		PID() string
 		Flow() string
@@ -505,5 +506,5 @@ func TestOpaqueConcurrentGetterCopies(t *testing.T) {
 		})
 	}
 	// Deferred parallel readers see retained snapshots, not the mutated inputs.
-	sources[0], document, money = TransferResource{}, "changed-caller", Money{}
+	sources[0], document, money = TransferResource{}, "changed-caller", Money{} //nolint:ineffassign,wastedassign // Mutate the original value before checking that its retained copy stays unchanged.
 }

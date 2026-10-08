@@ -30,7 +30,11 @@ func (c *SberClient) MutationSequence(ctx context.Context, callback func(func(co
 	var active atomic.Bool
 	active.Store(true)
 	var failed error
-	defer func() { active.Store(false); sendMu.Lock(); sendMu.Unlock() }()
+	defer func() {
+		active.Store(false)
+		sendMu.Lock()
+		sendMu.Unlock() //nolint:staticcheck // Wait for an in-flight sender before returning from the sequence.
+	}()
 	send := func(requestCtx context.Context, path string, payload map[string]any, query map[string]string, pageID string, workflow bool) (map[string]any, error) {
 		sendMu.Lock()
 		defer sendMu.Unlock()

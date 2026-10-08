@@ -3,14 +3,15 @@ package bank
 import (
 	"context"
 	"errors"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"sync"
 	"testing"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
 )
 
 func TestResourceAnalyticsAmountsExactDefaultFilter(t *testing.T) {
@@ -79,7 +80,7 @@ func TestResourceCardsLimitsReturnsFirstOrUnknown(t *testing.T) {
 func TestResourceCardsInfoRejectsMalformedIDBeforeCanonicalizing(t *testing.T) {
 	r := &resourceScript{t: t}
 	api := NewCardsAPI(r)
-	invalid := []any{nil, true, false, 1.0, -1, 0, "", " 1", "1 ", "+1", "1.0", "１\n", "abc", strings.Repeat("0", 17) + "1", int64(9007199254740992), uint64(^uint64(0)), "²"}
+	invalid := []any{nil, true, false, 1.0, -1, 0, "", " 1", "1 ", "+1", "1.0", "１\n", "abc", strings.Repeat("0", 17) + "1", int64(9007199254740992), ^uint64(0), "²"}
 	if _, err := api.Info(context.Background()); err == nil {
 		t.Fatal("empty ID list")
 	}
@@ -344,7 +345,7 @@ func TestResourceSessionExportMemoryAndExplicitSyntheticPath(t *testing.T) {
 		t.Fatal("export aliases requester")
 	}
 	path := filepath.Join(testPrivateDir(t), "synthetic-session.json")
-	got, err = a.Export(path)
+	_, err = a.Export(path)
 	if err != nil {
 		t.Fatal(err)
 	}

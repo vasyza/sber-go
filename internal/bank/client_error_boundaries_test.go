@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"log"
 	"log/slog"
 	"math"
@@ -23,6 +19,11 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 // A fresh independent fixture: no socket/client, no credential form path.
@@ -331,15 +332,16 @@ func TestIndependentClient3CallbackFailureControlAndPoisoning(t *testing.T) {
 			}
 			var u *sdkErrs.MutationUncertain
 			wantPosts := 1
-			if mode == "success" {
+			switch mode {
+			case "success":
 				if errors.As(e, &u) {
 					t.Fatal("successful send acquired fabricated uncertainty")
 				}
-			} else if mode == "transport-failure" {
+			case "transport-failure":
 				if e != first || !errors.As(e, &u) || !errors.Is(e, context.Canceled) {
 					t.Fatal("after-send outcome lost")
 				}
-			} else {
+			default:
 				wantPosts = 0
 				if e != first || errors.As(e, &u) || !errors.Is(e, context.Canceled) {
 					t.Fatal("pre-send cancellation mislabeled")
@@ -532,12 +534,12 @@ func TestIndependentClient3CachedPortfolioRenewalAndCopyClose(t *testing.T) {
 	}
 	defer c.Close()
 	getters := []any{c.Products(), c.Operations(), c.Accounts(), c.Cards(), c.Transfers(), c.Analytics(), c.Session()}
-	copy := *c
+	cloned := *c
 	first, e := c.Portfolio(context.Background(), false)
 	if e != nil {
 		t.Fatal(e)
 	}
-	later, e := copy.Portfolio(context.Background(), true)
+	later, e := cloned.Portfolio(context.Background(), true)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -547,11 +549,11 @@ func TestIndependentClient3CachedPortfolioRenewalAndCopyClose(t *testing.T) {
 	if first.Cards()[0].Account() != first.Accounts()[0] || first.Cards()[0].Balance().Amount.String() != "2.50" {
 		t.Fatal("typed balance or relations lost")
 	}
-	now := []any{copy.Products(), copy.Operations(), copy.Accounts(), copy.Cards(), copy.Transfers(), copy.Analytics(), copy.Session()}
+	now := []any{cloned.Products(), cloned.Operations(), cloned.Accounts(), cloned.Cards(), cloned.Transfers(), cloned.Analytics(), cloned.Session()}
 	if !reflect.DeepEqual(getters, now) || renewals.Load() != 1 {
 		t.Fatal("cached resource lifetime changed")
 	}
-	if e = copy.Close(); e != nil {
+	if e = cloned.Close(); e != nil {
 		t.Fatal(e)
 	}
 	if _, e = first.Cards()[0].Operations(context.Background()); !errors.Is(e, sdkErrs.ErrClosed) {
@@ -713,7 +715,7 @@ func TestIndependentClient3BoundWorkflowPreservesCancellationIdentity(t *testing
 				b := i3Bundle(t, "bound-cancellation")
 				tr := i3NewTransport(t, b)
 				var financial atomic.Int32
-				cause := error(context.Canceled)
+				cause := context.Canceled
 				if kind == "deadline" {
 					cause = context.DeadlineExceeded
 				}

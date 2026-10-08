@@ -6,14 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"math/big"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestAuthPrimaryCaptchaTokenAndFormChoices(t *testing.T) {
@@ -131,7 +132,7 @@ func TestAuthTrustedFinishNavigationBounds(t *testing.T) {
 				expected = "missing_ufs_host"
 			case "unsafe-effective":
 				r := authPage(`{"ufs.block.root.url":"https://web-node2.online.sberbank.ru"}`)
-				r.Headers.Set("X-Response-URL", "https://example.invalid/main")
+				r.Headers.Set("X-Response-Url", "https://example.invalid/main")
 				s.steps = []authStep{{method: "POST", target: sdkSession.AppOrigin + "/finish", response: r}}
 				expected = "unsafe_redirect"
 			}

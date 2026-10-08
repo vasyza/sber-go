@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"syscall"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"golang.org/x/sys/unix"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func saveSessionFile(path string, raw []byte) error {
@@ -24,7 +25,8 @@ func saveSessionFile(path string, raw []byte) error {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	owner, ok := dirInfo.Sys().(*syscall.Stat_t)
-	if !ok || owner.Uid != uint32(os.Getuid()) {
+	uid := os.Getuid()
+	if !ok || uid < 0 || uint64(owner.Uid) != uint64(uid) {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	name := filepath.Base(path)
@@ -48,7 +50,7 @@ func saveSessionFile(path string, raw []byte) error {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	tmp := filepath.Base(f.Name())
-	defer unix.Unlinkat(dfd, tmp, 0)
+	defer func() { _ = unix.Unlinkat(dfd, tmp, 0) }()
 	defer f.Close()
 	if err = f.Chmod(0600); err != nil {
 		return &sdkErrs.InsecureSessionFile{}
@@ -81,20 +83,21 @@ func saveSessionFile(path string, raw []byte) error {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	stageName := filepath.Base(stagePath)
-	defer unix.Unlinkat(dfd, stageName, unix.AT_REMOVEDIR)
+	defer func() { _ = unix.Unlinkat(dfd, stageName, unix.AT_REMOVEDIR) }()
 	stageFD, err := unix.Openat(dfd, stageName, unix.O_RDONLY|unix.O_CLOEXEC|unix.O_DIRECTORY|unix.O_NOFOLLOW, 0)
 	if err != nil {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	stage := os.NewFile(uintptr(stageFD), "private-session-publication")
 	defer stage.Close()
-	defer unix.Unlinkat(stageFD, "payload", 0)
+	defer func() { _ = unix.Unlinkat(stageFD, "payload", 0) }()
 	stageInfo, err := stage.Stat()
 	if err != nil || !stageInfo.IsDir() || stageInfo.Mode().Perm()&0077 != 0 {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	stageOwner, ok := stageInfo.Sys().(*syscall.Stat_t)
-	if !ok || stageOwner.Uid != uint32(os.Getuid()) {
+	stageUID := os.Getuid()
+	if !ok || stageUID < 0 || uint64(stageOwner.Uid) != uint64(stageUID) {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	if err = unix.Linkat(unix.AT_FDCWD, "/proc/self/fd/"+strconv.Itoa(int(f.Fd())), stageFD, "payload", unix.AT_SYMLINK_FOLLOW); err != nil {

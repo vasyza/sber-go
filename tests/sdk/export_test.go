@@ -9,10 +9,11 @@ import (
 	jsonv2 "encoding/json/v2"
 	"errors"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"reflect"
 	"testing"
 	"unicode/utf8"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 // A comparable private credential layout: its key-facing serializer is authoritative.
@@ -292,7 +293,7 @@ func TestModelsReviewCycle4MapKeyAuthority(t *testing.T) {
 		{"append_over_text", map[cycle4AppendKey]int{{k}: 1}},
 		{"all_methods_key_priority", map[cycle4AllKeyMethods]int{{cycle4AppendKey{k}}: 1}},
 		{"named_string", map[cycle4StringTextKey]int{"synthetic-private": 1}},
-		{"pointer", map[*cycle4PointerTextKey]int{&cycle4PointerTextKey{"synthetic-private\xff"}: 1}},
+		{"pointer", map[*cycle4PointerTextKey]int{{"synthetic-private\xff"}: 1}},
 		{"nil_text_pointer", map[*cycle4PointerTextKey]int{nil: 1}},
 		{"interface_key", map[any]int{k: 1}},
 	} {
@@ -387,8 +388,8 @@ func TestModelsReviewCycle4OmitEmptyEncoderSemantics(t *testing.T) {
 		Zero           int                    `json:"zero,omitempty"`
 		ZeroFloat      float64                `json:"zero_float,omitempty"`
 		EmptyText      string                 `json:"empty_text,omitempty"`
-		FakeOption     string                 `json:"fake_option,notomitempty"`
-		FakeSuffix     string                 `json:"fake_suffix,omitempty_suffix"`
+		FakeOption     string                 `json:"fake_option,notomitempty"`     //nolint:staticcheck // Verify that the encoder ignores unknown tag options.
+		FakeSuffix     string                 `json:"fake_suffix,omitempty_suffix"` //nolint:staticcheck // Verify that only the exact omitempty option changes output.
 	}{Cards: []*sber.BankCard{}, Accounts: map[string]*sber.BankAccount{}, KeptEmpty: []any{}, EmptyCustom: cycle4EmptyCustomSlice{}, TypedNil: (*sber.BankAccount)(nil), Pointer: &zero}
 	expected := map[string]any{
 		"kept_empty": []any{}, "kept_nil": nil, "zero_struct": map[string]any{"n": 0}, "zero_array": []int{0},

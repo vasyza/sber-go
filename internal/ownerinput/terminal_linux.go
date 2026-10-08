@@ -20,5 +20,5 @@ func openOwnerTerminal(fd int) (int, error) {
 }
 
 func flushOwnerInput(fd int) {
-	unix.IoctlSetInt(fd, unix.TCFLSH, unix.TCIFLUSH)
+	_ = unix.IoctlSetInt(fd, unix.TCFLSH, unix.TCIFLUSH) // Flush only queued input after a failed read.
 }

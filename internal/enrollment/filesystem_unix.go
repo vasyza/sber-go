@@ -40,7 +40,7 @@ func privateParent(profile string, create bool) (fd int, name string, err error)
 				next, e = unix.Openat(fd, part, unix.O_RDONLY|unix.O_DIRECTORY|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0)
 			}
 		}
-		unix.Close(fd)
+		_ = unix.Close(fd)
 		if e != nil {
 			return -1, "", e
 		}
@@ -48,16 +48,18 @@ func privateParent(profile string, create bool) (fd int, name string, err error)
 	}
 	var state unix.Stat_t
 	if unix.Fstat(fd, &state) != nil || !privateDirectory(state) {
-		unix.Close(fd)
+		_ = unix.Close(fd)
 		return -1, "", ErrUnsafe
 	}
 	return fd, name, nil
 }
 func privateDirectory(s unix.Stat_t) bool {
-	return s.Mode&unix.S_IFMT == unix.S_IFDIR && s.Mode&07777 == 0700 && s.Uid == uint32(unix.Getuid())
+	uid := unix.Getuid()
+	return uid >= 0 && s.Mode&unix.S_IFMT == unix.S_IFDIR && s.Mode&07777 == 0700 && uint64(s.Uid) == uint64(uid)
 }
 func privateFile(s unix.Stat_t) bool {
-	return s.Mode&unix.S_IFMT == unix.S_IFREG && s.Mode&07777 == 0600 && s.Uid == uint32(unix.Getuid()) && s.Nlink == 1
+	uid := unix.Getuid()
+	return uid >= 0 && s.Mode&unix.S_IFMT == unix.S_IFREG && s.Mode&07777 == 0600 && uint64(s.Uid) == uint64(uid) && s.Nlink == 1
 }
 func sameInode(a, b unix.Stat_t) bool { return a.Dev == b.Dev && a.Ino == b.Ino }
 
@@ -76,7 +78,7 @@ func acquireLock(parent int, name string) (int, error) {
 	ok := false
 	defer func() {
 		if !ok {
-			unix.Close(fd)
+			_ = unix.Close(fd)
 		}
 	}()
 	if e = checkLock(parent, name, fd); e != nil {

@@ -4,6 +4,7 @@ package ownerinput
 
 import (
 	"context"
+	"math"
 	"os"
 	"sync"
 
@@ -50,6 +51,9 @@ func readSecret(ctx context.Context, input, output *os.File, prompt Prompt, call
 		return nil, ErrTerminal
 	}
 	defer unix.Close(fd)
+	if fd < 0 || fd > math.MaxInt32 {
+		return nil, ErrTerminal
+	}
 	var original, current unix.Stat_t
 	if unix.Fstat(originalFD, &original) != nil || unix.Fstat(fd, &current) != nil || original.Dev != current.Dev || original.Ino != current.Ino || original.Rdev != current.Rdev {
 		return nil, ErrTerminal

@@ -25,12 +25,13 @@ type Stats struct {
 func tunnel(a net.Conn, reader io.Reader, b net.Conn) {
 	defer a.Close()
 	defer b.Close()
-	a.SetDeadline(time.Now().Add(5 * time.Second))
-	b.SetDeadline(time.Now().Add(5 * time.Second))
+	if a.SetDeadline(time.Now().Add(5*time.Second)) != nil || b.SetDeadline(time.Now().Add(5*time.Second)) != nil {
+		return
+	}
 	done := make(chan struct{})
-	go func() { io.Copy(b, reader); b.Close(); close(done) }()
-	io.Copy(a, b)
-	a.Close()
+	go func() { _, _ = io.Copy(b, reader); _ = b.Close(); close(done) }()
+	_, _ = io.Copy(a, b)
+	_ = a.Close()
 	<-done
 }
 
@@ -71,21 +72,27 @@ func httpProxy(t testing.TB, secure bool, config *tls.Config, username, password
 			w.WriteHeader(http.StatusBadGateway)
 			return
 		}
-		client, buffered, err := w.(http.Hijacker).Hijack()
+		hijacker, ok := w.(http.Hijacker)
+		if !ok {
+			_ = upstream.Close()
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		client, buffered, err := hijacker.Hijack()
 		if err != nil {
-			upstream.Close()
+			_ = upstream.Close()
 			return
 		}
 		workers.Add(1)
 		defer workers.Done()
 		if _, err := buffered.WriteString("HTTP/1.1 200 Connection Established\r\n\r\n"); err != nil {
-			client.Close()
-			upstream.Close()
+			_ = client.Close()
+			_ = upstream.Close()
 			return
 		}
 		if err := buffered.Flush(); err != nil {
-			client.Close()
-			upstream.Close()
+			_ = client.Close()
+			_ = upstream.Close()
 			return
 		}
 		tunnel(client, buffered, upstream)
@@ -125,13 +132,15 @@ func SOCKS5(t testing.TB, username, password, destination string) (string, *Stat
 			go func() { defer workers.Done(); serveSOCKS(client, stats, username, password, destination) }()
 		}
 	}()
-	t.Cleanup(func() { listener.Close(); <-done; workers.Wait() })
+	t.Cleanup(func() { _ = listener.Close(); <-done; workers.Wait() })
 	return listener.Addr().String(), stats
 }
 
 func serveSOCKS(client net.Conn, stats *Stats, username, password, destination string) {
 	defer client.Close()
-	client.SetDeadline(time.Now().Add(5 * time.Second))
+	if client.SetDeadline(time.Now().Add(5*time.Second)) != nil {
+		return
+	}
 	stats.Connections.Add(1)
 	reader := bufio.NewReader(client)
 	header := make([]byte, 2)
@@ -153,7 +162,7 @@ func serveSOCKS(client net.Conn, stats *Stats, username, password, destination s
 		}
 	}
 	if !accepted {
-		client.Write([]byte{5, 255})
+		_, _ = client.Write([]byte{5, 255})
 		return
 	}
 	if _, err := client.Write([]byte{5, want}); err != nil {
@@ -176,7 +185,7 @@ func serveSOCKS(client net.Conn, stats *Stats, username, password, destination s
 			return
 		}
 		if string(u) != username || string(p) != password {
-			client.Write([]byte{1, 1})
+			_, _ = client.Write([]byte{1, 1})
 			return
 		}
 		if _, err := client.Write([]byte{1, 0}); err != nil {
@@ -221,16 +230,16 @@ func serveSOCKS(client net.Conn, stats *Stats, username, password, destination s
 	}
 	address := net.JoinHostPort(host, strconv.Itoa(int(binary.BigEndian.Uint16(port))))
 	if address != destination {
-		client.Write([]byte{5, 2, 0, 1, 0, 0, 0, 0, 0, 0})
+		_, _ = client.Write([]byte{5, 2, 0, 1, 0, 0, 0, 0, 0, 0})
 		return
 	}
 	upstream, err := net.DialTimeout("tcp", destination, time.Second)
 	if err != nil {
-		client.Write([]byte{5, 5, 0, 1, 0, 0, 0, 0, 0, 0})
+		_, _ = client.Write([]byte{5, 5, 0, 1, 0, 0, 0, 0, 0, 0})
 		return
 	}
 	if _, err := client.Write([]byte{5, 0, 0, 1, 127, 0, 0, 1, 0, 1}); err != nil {
-		upstream.Close()
+		_ = upstream.Close()
 		return
 	}
 	tunnel(client, reader, upstream)

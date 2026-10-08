@@ -384,13 +384,14 @@ func domainJSONValue(v reflect.Value, visits map[domainJSONVisit]bool) (any, err
 			}
 			return out, nil
 		}
-		if _, legacy := custom.(json.Marshaler); !legacy {
+		legacy, ok := custom.(json.Marshaler)
+		if !ok {
 			// Use the official text-interface precedence/UTF-8 checks too.
 			// Text failures do not acquire the streaming-float-only deferred
 			// compatibility marker or expose private implementation fields.
 			return domainJSONStreaming(custom, visits)
 		}
-		data, err := custom.(json.Marshaler).MarshalJSON()
+		data, err := legacy.MarshalJSON()
 		if err != nil || strictjson.Validate(data) != nil {
 			return nil, NewParseError("json_export")
 		}

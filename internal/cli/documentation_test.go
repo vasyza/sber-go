@@ -1,12 +1,13 @@
 package cli
 
 import (
-	"github.com/spf13/pflag"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/spf13/pflag"
 )
 
 var docInline = regexp.MustCompile("`[^`]+`")

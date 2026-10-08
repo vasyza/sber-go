@@ -4,10 +4,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"strings"
 	"testing"
 	"unicode/utf8"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 // Minimal end-to-end tracer for the remaining cycle-1 comment-closure finding.
@@ -310,7 +311,7 @@ func TestRuntimeOriginDiscovery(t *testing.T) {
 		{"ufsHost", UFSHostFromAppShell}, {"ufs.block.root.url", APIBaseFromMainHTML},
 	} {
 		literal := `"` + discover.key + `": "https:\/\/web-fixture.online.sberbank.ru\/"`
-		for _, text := range []string{"<script>{" + literal + "}</script>", literal + "," + literal, strings.Replace(literal, `\/`, `/`, -1), strings.Replace(literal, `": "`, "\"\u00a0:\u2003\"", 1)} {
+		for _, text := range []string{"<script>{" + literal + "}</script>", literal + "," + literal, strings.ReplaceAll(literal, `\/`, `/`), strings.Replace(literal, `": "`, "\"\u00a0:\u2003\"", 1)} {
 			value, ok := discover.parse(text)
 			if !ok || value != "https://web-fixture.online.sberbank.ru" {
 				t.Fatal("valid runtime origin not extracted")

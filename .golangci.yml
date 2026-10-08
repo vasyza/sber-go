@@ -1,0 +1,71 @@
+# Adapted from https://gist.github.com/maratori/47a4d00457a92aa426dbd48a18776322.
+# Copyright (c) 2021-2025 Marat Reymers. MIT license.
+version: "2"
+
+run:
+  timeout: 5m
+  relative-path-mode: gomod
+  tests: true
+  build-tags:
+    - live
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/vasyza/sber-go
+
+linters:
+  # Keep the checks explicit so an upgrade cannot silently change the policy.
+  # Private unit tests use their implementation package by design.
+  default: none
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - copyloopvar
+    - durationcheck
+    - errcheck
+    - gocheckcompilerdirectives
+    - gomoddirectives
+    - gosec
+    - govet
+    - ineffassign
+    - makezero
+    - nilnesserr
+    - nolintlint
+    - nosprintfhostport
+    - predeclared
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - testableexamples
+    - unconvert
+    - unused
+    - wastedassign
+  settings:
+    errcheck:
+      check-type-assertions: true
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    presets:
+      - common-false-positives
+      - std-error-handling
+    rules:
+      # Synthetic fixtures deliberately exercise invalid data and failed I/O.
+      - path: '_test\.go$'
+        linters:
+          - bodyclose
+          - errcheck
+          - gosec

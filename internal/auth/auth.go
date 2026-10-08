@@ -238,7 +238,6 @@ func (f *authFlow) loadConfig(ctx context.Context) (sdkSession.FrontendConfig, e
 	} else {
 		c, err = sdkSession.ParsePINConfig(html)
 	}
-	html = ""
 	if err != nil {
 		return sdkSession.FrontendConfig{}, authFailure("invalid_frontend_config", nil)
 	}

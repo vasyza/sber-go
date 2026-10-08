@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"os"
 	"reflect"
 	"strings"
@@ -17,6 +13,11 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestClientBindingCycleDoesNotExpandFormattingOrExportPrivateState(t *testing.T) {
@@ -124,7 +125,10 @@ func TestClientBindingConcurrentGettersAndReadsKeepOneIssuer(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			if c.Products() != c.Products() || c.Operations() != c.Operations() || c.Accounts() != c.Accounts() || c.Cards() != c.Cards() || c.Transfers() != c.Transfers() || c.Analytics() != c.Analytics() || c.Session() != c.Session() {
+			products, operations, accounts := c.Products(), c.Operations(), c.Accounts()
+			cards, transfers, analytics := c.Cards(), c.Transfers(), c.Analytics()
+			sessionAPI := c.Session()
+			if products != c.Products() || operations != c.Operations() || accounts != c.Accounts() || cards != c.Cards() || transfers != c.Transfers() || analytics != c.Analytics() || sessionAPI != c.Session() {
 				t.Error("getter cache unstable")
 			}
 			p, err := c.Portfolio(context.Background(), false)
@@ -135,8 +139,8 @@ func TestClientBindingConcurrentGettersAndReadsKeepOneIssuer(t *testing.T) {
 			if p.Transfers() != c.Transfers() || p.Cards()[0].bankBinding() != c.Accounts().binding || p.Cards()[0].Account().Cards()[0] != p.Cards()[0] {
 				t.Error("concurrent snapshot detached")
 			}
-			copy := p.Raw()
-			copy.Cards[0].Name = "caller-edit"
+			cloned := p.Raw()
+			cloned.Cards[0].Name = "caller-edit"
 		}()
 	}
 	wg.Wait()

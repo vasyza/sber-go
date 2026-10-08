@@ -38,8 +38,8 @@ func TestReviewDeviceprintDiagnosticRedaction(t *testing.T) {
 		{"encoded", encoded, "synthetic-device-secret-guard"},
 		{"generated", generated, "version=5.3.0"},
 	} {
-		copy := device.value
-		if copy.Value() != device.value.Value() || (Deviceprint{}).Value() != "" {
+		cloned := device.value
+		if cloned.Value() != device.value.Value() || (Deviceprint{}).Value() != "" {
 			t.Fatal("copy or zero-value explicit deviceprint access changed")
 		}
 		for _, shape := range []struct {
@@ -47,7 +47,7 @@ func TestReviewDeviceprintDiagnosticRedaction(t *testing.T) {
 			value any
 		}{
 			{"value", device.value},
-			{"pointer", &copy},
+			{"pointer", &cloned},
 			{"slice", []Deviceprint{device.value}},
 			{"map", map[string]Deviceprint{"device": device.value}},
 			{"nested", struct{ Device any }{device.value}},

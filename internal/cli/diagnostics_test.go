@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	sber "github.com/vasyza/sber-go"
 	"github.com/vasyza/sber-go/internal/enrollment"
 	"github.com/vasyza/sber-go/internal/ownerinput"
 	"github.com/vasyza/sber-go/internal/testutil"
 	"github.com/vasyza/sber-go/mcp"
-	"os"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 type rejectedPrimary struct {

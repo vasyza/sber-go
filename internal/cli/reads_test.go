@@ -5,16 +5,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/ownerinput"
-	"github.com/vasyza/sber-go/internal/testutil"
-	"github.com/vasyza/sber-go/mcp"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
+
+	sber "github.com/vasyza/sber-go"
+	"github.com/vasyza/sber-go/internal/ownerinput"
+	"github.com/vasyza/sber-go/internal/testutil"
+	"github.com/vasyza/sber-go/mcp"
 )
 
 func TestNativeReadCommandsUseSelectedClientAndClose(t *testing.T) {

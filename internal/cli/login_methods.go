@@ -8,6 +8,7 @@ import (
 	"time"
 
 	qrcode "github.com/skip2/go-qrcode"
+
 	sber "github.com/vasyza/sber-go"
 	"github.com/vasyza/sber-go/internal/enrollment"
 	"github.com/vasyza/sber-go/internal/ownerinput"

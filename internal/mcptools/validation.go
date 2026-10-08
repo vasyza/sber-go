@@ -24,8 +24,8 @@ func ValidateArguments(name string, raw []byte, allowWrites bool) error {
 	var selected *contract
 	for _, c := range sourceContracts() {
 		if c.name == name {
-			copy := c
-			selected = &copy
+			cloned := c
+			selected = &cloned
 			break
 		}
 	}

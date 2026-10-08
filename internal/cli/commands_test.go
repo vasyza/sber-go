@@ -5,13 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/mcp"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/vasyza/sber-go"
+	"github.com/vasyza/sber-go/mcp"
 )
 
 func TestCLIHelpDoesNotInspectProfile(t *testing.T) {

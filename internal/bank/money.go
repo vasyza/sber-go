@@ -91,7 +91,7 @@ func ParseDecimal(value any) (Decimal, error) {
 			return '.'
 		}
 		if n, ok := domainDigitValue(r); ok {
-			return rune('0' + n)
+			return rune("0123456789"[n])
 		}
 		return r
 	}, strings.TrimSpace(text))
@@ -290,17 +290,19 @@ func domainTruthy(v any) bool {
 
 // Decimal's reference parser accepts Unicode decimal digits, not just ASCII.
 func domainDigitValue(r rune) (int, bool) {
+	if r < 0 || r > unicode.MaxRune {
+		return 0, false
+	}
 	if r >= '0' && r <= '9' {
 		return int(r - '0'), true
 	}
+	n := uint32(r)
 	for _, span := range unicode.Nd.R16 {
-		n := uint32(r)
 		if n >= uint32(span.Lo) && n <= uint32(span.Hi) && (n-uint32(span.Lo))%uint32(span.Stride) == 0 {
 			return int((n - uint32(span.Lo)) / uint32(span.Stride) % 10), true
 		}
 	}
 	for _, span := range unicode.Nd.R32 {
-		n := uint32(r)
 		if n >= span.Lo && n <= span.Hi && (n-span.Lo)%span.Stride == 0 {
 			return int((n - span.Lo) / span.Stride % 10), true
 		}

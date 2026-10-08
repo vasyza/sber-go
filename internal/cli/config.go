@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	sber "github.com/vasyza/sber-go"
 	cliCommand "github.com/vasyza/sber-go/internal/command"
 	"github.com/vasyza/sber-go/internal/enrollment"

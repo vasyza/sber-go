@@ -90,12 +90,6 @@ func (c *SberClient) claimAuthTransport(tr sdkTransport.Transport) (*clientOwned
 	return owner, nil
 }
 
-// Before a client exists, an explicitly supplied business transport is only
-// reserved/borrowed, not acquired or closed by a failed PIN constructor.
-func clientInitialAuthClaim(reserved sdkTransport.Transport) func(sdkTransport.Transport) (*clientOwnedTransport, error) {
-	return clientNewInitialOwners(reserved).claim
-}
-
 // A constructor-local ledger survives auth Close and is consumed by first
 // business adoption. Reserved injections are borrowed, never cleanup owners.
 // The final adoption seals the auth capability and transfers actual acquired

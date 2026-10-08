@@ -57,7 +57,7 @@ func confirmAction(ctx context.Context, diagnostics io.Writer, dependencies *Aut
 	}
 	response, err := read(ctx, ownerinput.ConfirmAction)
 	confirmed := err == nil && response == "CONFIRM"
-	response = ""
+	response = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if !confirmed {
 		if ctx.Err() != nil {
 			return 130

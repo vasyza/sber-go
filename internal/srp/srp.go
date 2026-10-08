@@ -166,7 +166,7 @@ func hexInteger(text string) (*big.Int, error) {
 		return nil, ErrInput
 	}
 	for _, r := range text {
-		if !(r >= '0' && r <= '9' || r >= 'a' && r <= 'f' || r >= 'A' && r <= 'F') {
+		if (r < '0' || r > '9') && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
 			return nil, ErrInput
 		}
 	}

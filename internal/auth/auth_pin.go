@@ -29,8 +29,8 @@ func (c CaptchaAnswer) validate() error {
 	}
 	return nil
 }
-func authInput(s string, max int) bool {
-	return utf8.ValidString(s) && utf8.RuneCountInString(s) > 0 && utf8.RuneCountInString(s) <= max && !sdkSession.HasControls(s)
+func authInput(s string, limit int) bool {
+	return utf8.ValidString(s) && utf8.RuneCountInString(s) > 0 && utf8.RuneCountInString(s) <= limit && !sdkSession.HasControls(s)
 }
 func validateAuthPIN(pin string, length int) error {
 	if len(pin) != length {
@@ -88,7 +88,7 @@ func (a *PINAuth) Login(ctx context.Context, pin string, answer CaptchaAnswer) (
 		return sdkSession.SessionBundle{}, authFailure("invalid_srp_challenge", nil)
 	}
 	M, err := a.srp.Process(pin, salt, B)
-	pin = ""
+	pin = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if err != nil {
 		return sdkSession.SessionBundle{}, authFailure("invalid_srp_challenge", nil)
 	}

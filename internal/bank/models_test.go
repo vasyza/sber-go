@@ -7,7 +7,6 @@ import (
 	jsonv2 "encoding/json/v2"
 	"errors"
 	"fmt"
-	"github.com/vasyza/sber-go/internal/strictjson"
 	"math"
 	"os"
 	"path/filepath"
@@ -15,6 +14,8 @@ import (
 	"strings"
 	"testing"
 	"unicode/utf8"
+
+	"github.com/vasyza/sber-go/internal/strictjson"
 )
 
 // All values in this file are synthetic. Integrity is checked on the original

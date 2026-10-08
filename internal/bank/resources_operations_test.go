@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func TestResourceCollectionExplicitEmptyWindowIsNotBankCompletenessProof(t *testing.T) {

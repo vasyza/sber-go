@@ -20,7 +20,10 @@ func TestNativeCommandOfflineStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 	binary := filepath.Join(dir, "sber")
-	goBinary := filepath.Join(runtime.GOROOT(), "bin", "go")
+	goBinary, err := exec.LookPath("go")
+	if err != nil {
+		t.Fatal(err)
+	}
 	build := exec.CommandContext(context.Background(), goBinary, "build", "-o", binary, "../../cmd/sber")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("native command unavailable: %v: %s", err, output)

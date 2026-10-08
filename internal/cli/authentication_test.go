@@ -5,13 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	"github.com/vasyza/sber-go/internal/ownerinput"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	sber "github.com/vasyza/sber-go"
+	"github.com/vasyza/sber-go/internal/enrollment"
+	"github.com/vasyza/sber-go/internal/ownerinput"
 )
 
 type preparingPrimary struct {
@@ -50,9 +51,10 @@ func TestAuthenticationPreparesPublicConfigurationBeforeSecretInput(t *testing.T
 			primary := &preparingPrimary{failure: failure}
 			pin := &preparingPIN{failure: failure}
 			args := []string{"login", "--profile", profile}
-			if mode == "remembered" {
+			switch mode {
+			case "remembered":
 				args = append(args, "--remembered-profile", "synthetic-identity")
-			} else if mode == "refresh" {
+			case "refresh":
 				args[0] = "refresh-session"
 			}
 			var output, diagnostics bytes.Buffer

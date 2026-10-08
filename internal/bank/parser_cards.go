@@ -1,8 +1,6 @@
 // Domain contracts ported from the MIT-licensed sber-mcp reference.
 package bank
 
-import ()
-
 func domainCreditInfo(value any) *CreditInfo {
 	raw := domainOptionalMapping(value)
 	if len(raw) == 0 {

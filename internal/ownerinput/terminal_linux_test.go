@@ -6,13 +6,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"golang.org/x/sys/unix"
 	"os"
 	"os/exec"
 	"runtime"
 	"testing"
 	"time"
 	"unsafe"
+
+	"golang.org/x/sys/unix"
 )
 
 // Deny actual TCGETS/TCSETS ioctls in a helper thread, not a fake terminal.

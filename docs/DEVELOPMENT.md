@@ -31,12 +31,30 @@ Preserve test cases and platform build constraints when you combine test files.
    make check
    ```
 
-The checks examine formatting, run vet and race tests, build the commands, and verify module checksums.
+The checks examine formatting, run golangci-lint, vet and race tests, build the commands, and verify module checksums.
 The default suite uses synthetic data and local servers.
 It needs no bank account or installed browser.
 
 GitHub Actions runs the same native checks on Ubuntu and macOS.
 Transport and proxy tests use synthetic local TLS servers.
+
+The Makefile sets the golangci-lint version for local checks and CI.
+The first lint run downloads the release to `bin/` and verifies its checksum.
+This download needs `curl` and an internet connection.
+Later runs use the installed release.
+The lint checks include files with the `live` build tag.
+
+Run the lint checks separately:
+
+```sh
+make lint
+```
+
+Apply the configured formatters:
+
+```sh
+make fmt
+```
 
 Use a package path to select a smaller test group:
 

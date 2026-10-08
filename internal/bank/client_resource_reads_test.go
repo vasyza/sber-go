@@ -3,9 +3,10 @@ package bank
 import (
 	"context"
 	"encoding/json"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"reflect"
 	"testing"
+
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestClientBindingAccountsFunctionalAccess(t *testing.T) {

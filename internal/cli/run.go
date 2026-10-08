@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+
 	sber "github.com/vasyza/sber-go"
 	cliCommand "github.com/vasyza/sber-go/internal/command"
 	"github.com/vasyza/sber-go/internal/enrollment"
@@ -87,7 +88,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 }
 
 func runValidated(ctx context.Context, command string, a *commandArguments, output, diagnostics io.Writer, o Options) int {
-	if a.defaultProfile && command != "login" && command != "status" && !(isMutationCommand(command) && !a.execute) {
+	if a.defaultProfile && command != "login" && command != "status" && (!isMutationCommand(command) || a.execute) {
 		exists, err := enrollment.SafeProfileExists(a.profile)
 		if err != nil {
 			return fail(diagnostics, 3, "The profile file properties are not safe.")
@@ -96,7 +97,7 @@ func runValidated(ctx context.Context, command string, a *commandArguments, outp
 			return fail(diagnostics, 3, "The CLI has no saved profile.\nUse sber login to make a profile.")
 		}
 	}
-	if command != "status" && command != "inspect-session" && !(isMutationCommand(command) && !a.execute) {
+	if command != "status" && command != "inspect-session" && (!isMutationCommand(command) || a.execute) {
 		if err := selectProxy(a, o.DefaultConfigPath); err != nil {
 			return fail(diagnostics, 3, "The command cannot read the CLI settings.\nUse --proxy ADDRESS or --no-proxy to select a connection.")
 		}

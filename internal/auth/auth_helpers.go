@@ -192,7 +192,7 @@ func (f *authFlow) finishRedirect(ctx context.Context, c sdkSession.FrontendConf
 		}
 	}
 	api, found := sdkSession.APIBaseFromMainHTML(r.Text())
-	web := ""
+	var web string
 	if found {
 		web = authOrigin(effective)
 	} else {

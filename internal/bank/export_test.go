@@ -8,12 +8,13 @@ import (
 	"encoding/json/jsontext"
 	jsonv2 "encoding/json/v2"
 	"errors"
-	"github.com/vasyza/sber-go/internal/strictjson"
 	"math"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/vasyza/sber-go/internal/strictjson"
 )
 
 // Synthetic financial-export seam probe; parent owns the generic model walker.
@@ -349,8 +350,8 @@ func TestModelCycle3BoundFinancialProvenancePreservesContainerShape(t *testing.T
 	if !reflect.DeepEqual(p.Raw(), raw) || requester.MarshalCalls != 0 || c.Account() != a || a.Cards()[0] != c {
 		t.Fatal("financial export traversed requester or changed snapshots/relations")
 	}
-	copy := a.Snapshot()
-	copy.Balance.Currency = "USD"
+	cloned := a.Snapshot()
+	cloned.Balance.Currency = "USD"
 	if a.Balance().Currency != "RUB" {
 		t.Fatal("financial export damaged defensive copy semantics")
 	}

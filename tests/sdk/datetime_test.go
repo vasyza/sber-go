@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 var _ func(string) (sber.SourceDateTime, error) = sber.ParseSourceDateTime
@@ -241,11 +242,6 @@ func (r *cycle4Offline) WarmUp(context.Context, bool) error {
 	return errors.New("forbidden")
 }
 
-type cycle4DateRow struct {
-	ID, Text, DateISO, DatetimeISO, SourceISO, FromRequest, ToRequest string
-	DateValid, DatetimeValid, BoundsValid                             bool
-}
-
 func TestCycle4IndependentDateInference(t *testing.T) {
 	raw, e := os.ReadFile("../../testdata/datetime/dates.json")
 	if e != nil {
@@ -411,10 +407,10 @@ func TestCycle4SourceRequestWallApplication(t *testing.T) {
 							t.Fatal("final empty fixture is not independent coverage proof")
 						}
 						if r.Valid {
-							if m.RequestedFrom != r.Body["from"] && !(r.Body["from"] == nil && m.RequestedFrom == "") {
+							if m.RequestedFrom != r.Body["from"] && (r.Body["from"] != nil || m.RequestedFrom != "") {
 								t.Fatal("from metadata differs")
 							}
-							if m.RequestedTo != r.Body["to"] && !(r.Body["to"] == nil && m.RequestedTo == "") {
+							if m.RequestedTo != r.Body["to"] && (r.Body["to"] != nil || m.RequestedTo != "") {
 								t.Fatal("to metadata differs")
 							}
 							if m.PagesRead != 1 || !m.PaginationExhausted {

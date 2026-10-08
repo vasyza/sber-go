@@ -16,7 +16,7 @@ func validName(name string) bool {
 		return false
 	}
 	for _, c := range []byte(name) {
-		if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-' || c == '.') {
+		if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '_' && c != '-' && c != '.' {
 			return false
 		}
 	}

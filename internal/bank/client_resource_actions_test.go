@@ -4,16 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"net/url"
 	"reflect"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func clientBindingRenameCall(name string) resourceCall {
@@ -266,7 +267,7 @@ func TestClientBindingConcurrentConfirmAcrossSnapshotsIsOneShot(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			issuer := c.Transfers()
+			var issuer *TransfersAPI
 			if i%2 == 0 {
 				issuer = first.Transfers()
 			} else {

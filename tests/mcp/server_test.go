@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"github.com/vasyza/sber-go/internal/testutil"
-	"github.com/vasyza/sber-go/mcp"
 	"io"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/vasyza/sber-go/internal/testutil"
+	"github.com/vasyza/sber-go/mcp"
 )
 
 const meta = `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}`

@@ -7,15 +7,15 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 // TestLiveCLIReadOnly exercises the actual command binary. The opt-in guard
@@ -30,7 +30,11 @@ func TestLiveCLIReadOnly(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Minute)
 	defer cancel()
 	binary := filepath.Join(t.TempDir(), "sber")
-	build := exec.CommandContext(ctx, filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/sber")
+	goBinary, err := exec.LookPath("go")
+	if err != nil {
+		t.Fatal("cannot locate the Go compiler")
+	}
+	build := exec.CommandContext(ctx, goBinary, "build", "-o", binary, "../../cmd/sber")
 	if build.Run() != nil {
 		t.Fatal("cannot build the native CLI")
 	}

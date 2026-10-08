@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"golang.org/x/sys/unix"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 // WriteEnrollmentCandidate accepts the enrollment module's pinned directory
@@ -32,7 +33,8 @@ func WriteEnrollmentCandidate(path string, bundle SessionBundle) error {
 	}
 	defer unix.Close(parent)
 	var state unix.Stat_t
-	if unix.Fstat(parent, &state) != nil || state.Mode&unix.S_IFMT != unix.S_IFDIR || state.Mode&07777 != 0700 || state.Uid != uint32(os.Getuid()) {
+	uid := os.Getuid()
+	if unix.Fstat(parent, &state) != nil || state.Mode&unix.S_IFMT != unix.S_IFDIR || state.Mode&07777 != 0700 || uid < 0 || uint64(state.Uid) != uint64(uid) {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	raw, err := encodeSessionFile(bundle)

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/spf13/pflag"
+
 	sber "github.com/vasyza/sber-go"
 	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
 )

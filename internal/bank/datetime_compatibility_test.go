@@ -428,20 +428,20 @@ func TestReviewCycle3SourceDateTimeExactValue(t *testing.T) {
 				t.Fatal(err)
 			}
 			before := source
-			copy := source
-			civil := copy.CivilTime()
+			cloned := source
+			civil := cloned.CivilTime()
 			want := row.Key
-			if !copy.Valid() || civil.Location() != time.UTC || civil.Year() != want.Year || int(civil.Month()) != want.Month || civil.Day() != want.Day || civil.Hour() != want.Hour || civil.Minute() != want.Minute || civil.Second() != want.Second || civil.Nanosecond()/1000 != want.Microsecond || copy.UTCOffset().Microseconds() != want.OffsetMicroseconds || copy.ISOFormat() != row.SourceISO {
-				t.Fatalf("source metadata changed: %+v / %s; want %s", copy, copy.ISOFormat(), row.SourceISO)
+			if !cloned.Valid() || civil.Location() != time.UTC || civil.Year() != want.Year || int(civil.Month()) != want.Month || civil.Day() != want.Day || civil.Hour() != want.Hour || civil.Minute() != want.Minute || civil.Second() != want.Second || civil.Nanosecond()/1000 != want.Microsecond || cloned.UTCOffset().Microseconds() != want.OffsetMicroseconds || cloned.ISOFormat() != row.SourceISO {
+				t.Fatalf("source metadata changed: %+v / %s; want %s", cloned, cloned.ISOFormat(), row.SourceISO)
 			}
-			native := copy.Native()
+			native := cloned.Native()
 			if native.Unix() != want.UnixSecond || native.Nanosecond()/1000 != want.InstantMicrosecond || !native.Equal(OperationSortKey(row.Text)) {
 				t.Fatal("exact source instant lost")
 			}
 			if want.OffsetMicroseconds%1000000 != 0 && native.Location() != time.UTC {
 				t.Fatal("fractional offset was faked as an integral native zone")
 			}
-			if source != before || copy != source {
+			if source != before || cloned != source {
 				t.Fatal("value copies lost metadata or getters mutated source")
 			}
 		})

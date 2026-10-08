@@ -586,11 +586,12 @@ func skipFrontendString(source string, i int) (int, bool) {
 	quote := source[i]
 	i++
 	for i < len(source) {
-		if source[i] == '\\' {
+		switch source[i] {
+		case '\\':
 			i += 2
-		} else if source[i] == quote {
+		case quote:
 			return i + 1, true
-		} else {
+		default:
 			i++
 		}
 	}

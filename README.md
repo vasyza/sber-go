@@ -262,7 +262,7 @@ make check
 ./bin/sber --help
 ```
 
-`make check` checks formatting, runs vet and the complete race suite, builds all packages and the Sber CLI, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs.
+`make check` checks formatting, runs golangci-lint, vet and the complete race suite, builds all packages and the Sber CLI, and verifies module checksums. Tests use synthetic data and localhost; they need no bank account, Python or installed browser. GitHub Actions contains equivalent Linux/macOS jobs. See the [development guide](docs/DEVELOPMENT.md#local-checks) for lint and formatter commands.
 
 ## Architecture and verification boundary
 

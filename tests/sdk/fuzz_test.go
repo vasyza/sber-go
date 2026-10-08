@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	sber "github.com/vasyza/sber-go"
 	"os"
 	"reflect"
 	"testing"
 	"time"
 	"unicode/utf8"
+
+	sber "github.com/vasyza/sber-go"
 )
 
 func FuzzModelsReviewCycle4AuthoritativeKey(f *testing.F) {

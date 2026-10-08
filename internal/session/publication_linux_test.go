@@ -6,14 +6,16 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	"golang.org/x/sys/unix"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/sys/unix"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 func TestEnrollmentCandidatePreservesExistingFileAndRejectsSymlinks(t *testing.T) {

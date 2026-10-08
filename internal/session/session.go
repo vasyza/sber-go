@@ -179,7 +179,8 @@ func validateSessionStat(info os.FileInfo, private bool) error {
 	}
 	if private {
 		st, ok := info.Sys().(*syscall.Stat_t)
-		if !ok || uint32(os.Getuid()) != st.Uid || info.Mode().Perm()&0077 != 0 {
+		uid := os.Getuid()
+		if !ok || uid < 0 || uint64(uid) != uint64(st.Uid) || info.Mode().Perm()&0077 != 0 {
 			return &sdkErrs.InsecureSessionFile{}
 		}
 	}

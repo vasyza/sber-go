@@ -101,7 +101,7 @@ func (a *PrimaryAuth) Login(ctx context.Context, login, password string, o Prima
 	B, _ := info["srp_B"].(string)
 	salt, _ := info["srp_s"].(string)
 	M, e := client.Process(password, salt, B)
-	password = ""
+	password = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		return nil, authFailure("invalid_srp_challenge", nil)
 	}
@@ -114,7 +114,7 @@ func (a *PrimaryAuth) Login(ctx context.Context, login, password string, o Prima
 	body["srp_M"] = M
 	body["token"] = token
 	proof, e := a.postPrimary(ctx, c, body)
-	login = ""
+	login = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		return nil, e
 	}
@@ -194,7 +194,7 @@ func (a *PrimaryAuth) CreatePIN(ctx context.Context, pin string) (sdkSession.Ses
 		return sdkSession.SessionBundle{}, e
 	}
 	ciphertext, e := rsaoaep.Encrypt(a.pinPublicKey, pin)
-	pin = ""
+	pin = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
 	if e != nil {
 		return sdkSession.SessionBundle{}, authFailure("invalid_pin_public_key", nil)
 	}

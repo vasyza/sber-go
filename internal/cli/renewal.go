@@ -4,10 +4,11 @@ import (
 	"context"
 	"os"
 
+	"golang.org/x/term"
+
 	sber "github.com/vasyza/sber-go"
 	"github.com/vasyza/sber-go/internal/ownerinput"
 	"github.com/vasyza/sber-go/mcp"
-	"golang.org/x/term"
 )
 
 func openReadClient(ctx context.Context, path string, options sber.ClientOptions, provider sber.PINProvider) (mcp.Client, error) {

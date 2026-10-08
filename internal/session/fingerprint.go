@@ -76,7 +76,7 @@ func GenerateAntifraudDeviceprint(source ...string) (Deviceprint, error) {
 	if len(source) > 1 {
 		return Deviceprint{}, &sdkErrs.MissingSession{Message: "invalid device identity source"}
 	}
-	value := ""
+	var value string
 	if len(source) == 0 {
 		generated, err := GenerateDeviceprint()
 		if err != nil {

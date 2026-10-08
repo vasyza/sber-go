@@ -2,14 +2,15 @@ package bank
 
 import (
 	"encoding/json"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"math"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
+
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestClientHARCookieNumericExpiryAndStringMaxAgeFollowSource(t *testing.T) {

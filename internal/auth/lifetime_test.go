@@ -4,24 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+	"testing"
+
 	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	sdkSession "github.com/vasyza/sber-go/internal/session"
 	sdkTransport "github.com/vasyza/sber-go/internal/transport"
-	"strings"
-	"sync"
-	"testing"
 )
-
-type authBlockingClose struct {
-	*authScript
-	started, release chan struct{}
-	once             sync.Once
-}
-
-func (s *authBlockingClose) Close() error {
-	s.once.Do(func() { close(s.started); <-s.release })
-	return s.authScript.Close()
-}
 
 type authFlakyClose struct{ *authScript }
 

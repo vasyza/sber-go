@@ -142,8 +142,8 @@ func TestCookieJarRoutingAndAuthority(t *testing.T) {
 	if len(records) != 2 || records[1].Path != "/CSAFront" || !records[1].HostOnly || !records[1].HTTPOnly || *records[1].SameSite != "None" {
 		t.Fatal("default path or metadata lost")
 	}
-	copy := jar.Snapshot()
-	copy[0].Value = "mutated"
+	cloned := jar.Snapshot()
+	cloned[0].Value = "mutated"
 	if jar.Snapshot()[0].Value == "mutated" {
 		t.Fatal("snapshot aliases live jar")
 	}

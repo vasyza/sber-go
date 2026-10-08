@@ -117,7 +117,7 @@ func (s *Server) arguments(raw json.RawMessage) (map[string]any, error) {
 }
 func text(args map[string]any, name string) string  { v, _ := args[name].(string); return v }
 func boolean(args map[string]any, name string) bool { v, _ := args[name].(bool); return v }
-func integer(args map[string]any, name string, fallback, min, max int) (int, error) {
+func integer(args map[string]any, name string, fallback, minimum, maximum int) (int, error) {
 	value, present := args[name]
 	if !present {
 		return fallback, nil
@@ -127,7 +127,7 @@ func integer(args map[string]any, name string, fallback, min, max int) (int, err
 		return 0, ErrArguments
 	}
 	f, err := number.Float64()
-	if err != nil || math.IsInf(f, 0) || math.IsNaN(f) || f < float64(min) || f > float64(max) || math.Trunc(f) != f {
+	if err != nil || math.IsInf(f, 0) || math.IsNaN(f) || f < float64(minimum) || f > float64(maximum) || math.Trunc(f) != f {
 		return 0, ErrArguments
 	}
 	return int(f), nil

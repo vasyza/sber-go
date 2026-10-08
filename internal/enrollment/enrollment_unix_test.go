@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang.org/x/sys/unix"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,6 +14,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 func TestConcurrentForeignPublicationPreservesExactBytes(t *testing.T) {

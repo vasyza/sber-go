@@ -8,8 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 	"golang.org/x/sys/unix"
+
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
 )
 
 // A private staging directory pins the publication namespace on macOS, where
@@ -22,7 +23,8 @@ func saveSessionFile(path string, raw []byte) error {
 	}
 	defer unix.Close(parent)
 	var directory unix.Stat_t
-	if unix.Fstat(parent, &directory) != nil || directory.Mode&unix.S_IFMT != unix.S_IFDIR || directory.Mode&0777 != 0700 || directory.Uid != uint32(os.Getuid()) {
+	uid := os.Getuid()
+	if unix.Fstat(parent, &directory) != nil || directory.Mode&unix.S_IFMT != unix.S_IFDIR || directory.Mode&0777 != 0700 || uid < 0 || uint64(directory.Uid) != uint64(uid) {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	name := filepath.Base(path)
@@ -48,13 +50,13 @@ func saveSessionFile(path string, raw []byte) error {
 	if unix.Mkdirat(parent, stageName, 0700) != nil {
 		return &sdkErrs.InsecureSessionFile{}
 	}
-	defer unix.Unlinkat(parent, stageName, unix.AT_REMOVEDIR)
+	defer func() { _ = unix.Unlinkat(parent, stageName, unix.AT_REMOVEDIR) }()
 	stage, err := unix.Openat(parent, stageName, unix.O_RDONLY|unix.O_DIRECTORY|unix.O_CLOEXEC|unix.O_NOFOLLOW, 0)
 	if err != nil {
 		return &sdkErrs.InsecureSessionFile{}
 	}
 	defer unix.Close(stage)
-	defer unix.Unlinkat(stage, "payload", 0)
+	defer func() { _ = unix.Unlinkat(stage, "payload", 0) }()
 	fd, err := unix.Openat(stage, "payload", unix.O_WRONLY|unix.O_CREAT|unix.O_EXCL|unix.O_CLOEXEC|unix.O_NOFOLLOW, 0600)
 	if err != nil {
 		return &sdkErrs.InsecureSessionFile{}

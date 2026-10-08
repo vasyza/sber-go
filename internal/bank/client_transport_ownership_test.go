@@ -5,10 +5,6 @@ import (
 	"context"
 	"encoding/pem"
 	"errors"
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 	"io"
 	"net"
 	"net/http"
@@ -19,6 +15,11 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkTransport "github.com/vasyza/sber-go/internal/transport"
 )
 
 func TestClientDefaultRenewalUsesAuthenticationConnectionPolicy(t *testing.T) {
@@ -142,11 +143,11 @@ func TestClientCycle3OpaqueCopiesShareCloseAndCachedWorkflowLifetime(t *testing.
 		t.Fatal(err)
 	}
 	defer c.Close()
-	copy := reflect.ValueOf(c).Elem().Interface().(SberClient)
-	if copy.Products() != c.Products() || copy.Transfers() != c.Transfers() {
+	cloned := reflect.ValueOf(c).Elem().Interface().(SberClient)
+	if cloned.Products() != c.Products() || cloned.Transfers() != c.Transfers() {
 		t.Fatal("handle copy rebuilt Resources/workflow issuer")
 	}
-	if err = copy.Close(); err != nil {
+	if err = cloned.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = c.ExportSession(); !errors.Is(err, sdkErrs.ErrClosed) {

@@ -7,14 +7,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/creack/pty"
-	"golang.org/x/sys/unix"
-	"golang.org/x/term"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/creack/pty"
+	"golang.org/x/sys/unix"
+	"golang.org/x/term"
 )
 
 func TestSecretExplicitStringViewsAndNilSafety(t *testing.T) {

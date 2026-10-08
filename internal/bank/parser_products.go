@@ -1,8 +1,6 @@
 // Domain contracts ported from the MIT-licensed sber-mcp reference.
 package bank
 
-import ()
-
 // ParseProducts parses pure products JSON. Ambiguous current-account numbers
 // never link a card; plain savings accounts do not become current parents.
 func ParseProducts(payload map[string]any) (Products, error) {

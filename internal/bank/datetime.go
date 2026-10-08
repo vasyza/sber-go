@@ -439,7 +439,7 @@ func ParseSourceDateTime(value string) (SourceDateTime, error) {
 		_, seconds := moment.Zone()
 		offset = time.Duration(seconds) * time.Second
 	} else {
-		if zoneText != "Z" && !(zoneText[0] == 'Z' && domainISOByte(zoneText, 1) == 0) {
+		if zoneText != "Z" && (zoneText[0] != 'Z' || domainISOByte(zoneText, 1) != 0) {
 			if len(zoneText) < 3 || (zoneText[0] != '+' && zoneText[0] != '-') {
 				return invalid()
 			}
