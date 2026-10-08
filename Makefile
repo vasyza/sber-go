@@ -1,8 +1,11 @@
 GOLANGCI_LINT_VERSION := v2.14.0
 GOLANGCI_LINT_DIR := $(CURDIR)/bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
 GOLANGCI_LINT := $(GOLANGCI_LINT_DIR)/golangci-lint
+GOPLS_VERSION := v0.23.0
+GOPLS_DIR := $(CURDIR)/bin/gopls-$(GOPLS_VERSION)
+GOPLS := $(GOPLS_DIR)/gopls
 
-.PHONY: build test race vet fmt fmt-check lint lint-install check
+.PHONY: build test race vet fmt fmt-check lint lint-install gopls-check gopls-install check
 
 build:
 	go build ./...
@@ -36,5 +39,14 @@ lint: $(GOLANGCI_LINT)
 	"$(GOLANGCI_LINT)" config verify
 	"$(GOLANGCI_LINT)" run
 
-check: fmt-check lint vet race build
+$(GOPLS):
+	mkdir -p "$(GOPLS_DIR)"
+	GOBIN="$(GOPLS_DIR)" go install golang.org/x/tools/gopls@$(GOPLS_VERSION)
+
+gopls-install: $(GOPLS)
+
+gopls-check: $(GOPLS)
+	sh scripts/check-gopls.sh "$(GOPLS)"
+
+check: fmt-check lint gopls-check vet race build
 	go mod verify

@@ -179,7 +179,12 @@ func (a *PhoneAuth) acceptPassword(ctx context.Context, p map[string]any, token 
 	}
 	a.state().token = token
 	a.otpPending = true
-	return nil, &sdkErrs.PinOTPRequired{Lifetime: authNonnegative(ch["lifetime"], true), RemainingAttempts: authNonnegative(ch["attempts_remaining"], false)}
+	return nil, &sdkErrs.PinOTPRequired{
+		PinAuthError: sdkErrs.PinAuthError{
+			RemainingAttempts: authNonnegative(ch["attempts_remaining"], false),
+		},
+		Lifetime: authNonnegative(ch["lifetime"], true),
+	}
 }
 func (a *PhoneAuth) ConfirmOTP(ctx context.Context, code string) (*sdkSession.SessionBundle, error) {
 	ctx, done, e := a.enter(ctx)

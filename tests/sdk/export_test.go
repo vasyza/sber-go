@@ -197,15 +197,15 @@ func FuzzIndependentCycle3OriginalNegativeDocuments(f *testing.F) {
 		var raw []byte
 		switch mode % 6 {
 		case 0:
-			raw = []byte(fmt.Sprintf(`{"ignored":{"x":1,"\u0078":2},"seed":%s}`, encoded))
+			raw = fmt.Appendf(nil, `{"ignored":{"x":1,"\u0078":2},"seed":%s}`, encoded)
 		case 1:
-			raw = []byte(fmt.Sprintf(`{"ignored":[{"x":1,"x":2}],"seed":%s}`, encoded))
+			raw = fmt.Appendf(nil, `{"ignored":[{"x":1,"x":2}],"seed":%s}`, encoded)
 		case 2:
-			raw = []byte(fmt.Sprintf(`{"id":"\ud800","seed":%s}`, encoded))
+			raw = fmt.Appendf(nil, `{"id":"\ud800","seed":%s}`, encoded)
 		case 3:
 			raw = append(append([]byte(`{"seed":`), encoded...), []byte(`} true`)...)
 		case 4:
-			raw = []byte(fmt.Sprintf(`{"bad":01,"seed":%s}`, encoded))
+			raw = fmt.Appendf(nil, `{"bad":01,"seed":%s}`, encoded)
 		case 5:
 			raw = append([]byte(`{"bad":"`), 0xff)
 			raw = append(raw, []byte(`"}`)...)
@@ -388,20 +388,34 @@ func TestModelsReviewCycle4OmitEmptyEncoderSemantics(t *testing.T) {
 		Zero           int                    `json:"zero,omitempty"`
 		ZeroFloat      float64                `json:"zero_float,omitempty"`
 		EmptyText      string                 `json:"empty_text,omitempty"`
-		FakeOption     string                 `json:"fake_option,notomitempty"`     //nolint:staticcheck // Verify that the encoder ignores unknown tag options.
-		FakeSuffix     string                 `json:"fake_suffix,omitempty_suffix"` //nolint:staticcheck // Verify that only the exact omitempty option changes output.
+		FakeOption     string                 `json:"fake_option"`
+		FakeSuffix     string                 `json:"fake_suffix"`
 	}{Cards: []*sber.BankCard{}, Accounts: map[string]*sber.BankAccount{}, KeptEmpty: []any{}, EmptyCustom: cycle4EmptyCustomSlice{}, TypedNil: (*sber.BankAccount)(nil), Pointer: &zero}
+	// Construct the intentionally unknown tag options as runtime test data.
+	fields := reflect.VisibleFields(reflect.TypeOf(input))
+	for i := range fields {
+		switch fields[i].Name {
+		case "FakeOption":
+			fields[i].Tag = `json:"fake_option,notomitempty"`
+		case "FakeSuffix":
+			fields[i].Tag = `json:"fake_suffix,omitempty_suffix"`
+		}
+	}
+	taggedType := reflect.StructOf(fields)
+	tagged := reflect.ValueOf(input).Convert(taggedType)
+	taggedPointer := reflect.New(taggedType)
+	taggedPointer.Elem().Set(tagged)
 	expected := map[string]any{
 		"kept_empty": []any{}, "kept_nil": nil, "zero_struct": map[string]any{"n": 0}, "zero_array": []int{0},
 		"zero_custom": "<zero-struct-retained>", "typed_nil": nil, "pointer": 0, "fake_option": "", "fake_suffix": "",
 	}
 	// The actual selected encoder, as well as legacy json.Marshal, agree.
-	official, _ := json.Marshal(input)
+	official, _ := json.Marshal(tagged.Interface())
 	independentAssert(t, independentRaw(official), expected)
-	independentAssert(t, independentFallback{Payload: input}, map[string]any{"payload": expected})
+	independentAssert(t, independentFallback{Payload: tagged.Interface()}, map[string]any{"payload": expected})
 	cycle4EmptySliceCalls = 0
-	independentAssert(t, input, expected)
-	independentAssert(t, &input, expected)
+	independentAssert(t, tagged.Interface(), expected)
+	independentAssert(t, taggedPointer.Interface(), expected)
 	if cycle4EmptySliceCalls != 0 {
 		t.Fatal("omitempty called a custom serializer on an empty slice")
 	}

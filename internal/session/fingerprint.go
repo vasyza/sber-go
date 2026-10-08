@@ -63,7 +63,15 @@ func generateDeviceprint(entropy io.Reader) (Deviceprint, error) {
 	uuid[8] = (uuid[8] & 0x3f) | 0x80
 	encoded := hex.EncodeToString(uuid)
 	result.WriteString("&uuid=")
-	result.WriteString(encoded[:8] + "-" + encoded[8:12] + "-" + encoded[12:16] + "-" + encoded[16:20] + "-" + encoded[20:])
+	result.WriteString(encoded[:8])
+	result.WriteByte('-')
+	result.WriteString(encoded[8:12])
+	result.WriteByte('-')
+	result.WriteString(encoded[12:16])
+	result.WriteByte('-')
+	result.WriteString(encoded[16:20])
+	result.WriteByte('-')
+	result.WriteString(encoded[20:])
 	value := result.String()
 	return Deviceprint{value: &value}, nil
 }

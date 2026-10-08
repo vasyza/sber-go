@@ -30,6 +30,8 @@ jobs:
         run: make fmt-check
       - name: Lint
         run: make lint
+      - name: Gopls diagnostics
+        run: make gopls-check
       - name: Vet
         run: go vet ./...
       - name: Race tests

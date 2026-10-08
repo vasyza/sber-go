@@ -71,7 +71,12 @@ func (a *CardAuth) Login(ctx context.Context, number string, captcha CaptchaAnsw
 		return nil, authFailure("invalid_otp_challenge", nil)
 	}
 	a.otpPending = true
-	return nil, &sdkErrs.PinOTPRequired{Lifetime: authNonnegative(info["lifetime"], true), RemainingAttempts: authNonnegative(info["remainingAttempts"], false)}
+	return nil, &sdkErrs.PinOTPRequired{
+		PinAuthError: sdkErrs.PinAuthError{
+			RemainingAttempts: authNonnegative(info["remainingAttempts"], false),
+		},
+		Lifetime: authNonnegative(info["lifetime"], true),
+	}
 }
 func (a *CardAuth) ConfirmOTP(ctx context.Context, code string) (*sdkSession.SessionBundle, error) {
 	ctx, done, e := a.enter(ctx)
@@ -127,7 +132,12 @@ func (a *CardAuth) RetryOTP(ctx context.Context) (*sdkErrs.PinOTPRequired, error
 	if !ok {
 		return nil, authFailure("invalid_otp_challenge", nil)
 	}
-	return &sdkErrs.PinOTPRequired{Lifetime: authNonnegative(i["lifetime"], true), RemainingAttempts: authNonnegative(i["remainingAttempts"], false)}, nil
+	return &sdkErrs.PinOTPRequired{
+		PinAuthError: sdkErrs.PinAuthError{
+			RemainingAttempts: authNonnegative(i["remainingAttempts"], false),
+		},
+		Lifetime: authNonnegative(i["lifetime"], true),
+	}, nil
 }
 func validPAN(pan string) bool {
 	if len(pan) < 12 || len(pan) > 19 {

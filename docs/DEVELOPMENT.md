@@ -31,7 +31,7 @@ Preserve test cases and platform build constraints when you combine test files.
    make check
    ```
 
-The checks examine formatting, run golangci-lint, vet and race tests, build the commands, and verify module checksums.
+The checks examine formatting, run golangci-lint, gopls, vet and race tests, build the commands, and verify module checksums.
 The default suite uses synthetic data and local servers.
 It needs no bank account or installed browser.
 
@@ -49,6 +49,19 @@ Run the lint checks separately:
 ```sh
 make lint
 ```
+
+Run the gopls checks separately:
+
+```sh
+make gopls-check
+```
+
+The Makefile sets the gopls version for local checks and CI.
+The first run installs that version in `bin/` with `go install`.
+This installation needs an internet connection.
+The checks include source and test files for the current platform, with the `live` build tag.
+They do not run live tests.
+Warnings, errors, or a failed command stop the checks, even when gopls returns exit code zero.
 
 Apply the configured formatters:
 

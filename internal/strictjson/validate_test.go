@@ -110,7 +110,7 @@ func FuzzRejectCorruptions(f *testing.F) {
 		quoted, _ := json.Marshal(key)
 		alias := `"\u006b` + key[1:] + `"`
 		duplicate := []byte(`{"body":[{` + string(quoted) + `:0,` + alias + `:1}]}`)
-		unpaired := []byte(fmt.Sprintf(`{"id":"\u%04x"}`, uint16(0xd800)|(code&0x7ff)))
+		unpaired := fmt.Appendf(nil, `{"id":"\u%04x"}`, uint16(0xd800)|(code&0x7ff))
 		for _, raw := range [][]byte{duplicate, unpaired} {
 			original := append([]byte{}, raw...)
 			if err := Validate(raw); err != ErrInvalidJSON {
@@ -120,7 +120,7 @@ func FuzzRejectCorruptions(f *testing.F) {
 				t.Fatal("rejected input mutated")
 			}
 		}
-		paired := []byte(fmt.Sprintf(`{"id":"\u%04x\u%04x"}`, uint16(0xd800)|(code&0x3ff), uint16(0xdc00)|(code&0x3ff)))
+		paired := fmt.Appendf(nil, `{"id":"\u%04x\u%04x"}`, uint16(0xd800)|(code&0x3ff), uint16(0xdc00)|(code&0x3ff))
 		original := append([]byte{}, paired...)
 		if err := Validate(paired); err != nil {
 			t.Fatal("valid generated pair rejected")
