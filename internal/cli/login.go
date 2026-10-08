@@ -30,18 +30,21 @@ type PrimaryAuthenticator interface {
 	PINEnrollmentAuthenticator
 }
 
-// Authentication injects synthetic dependencies into application tests. The
-// command's production defaults accept no alternative credential input channel.
+// Authentication injects synthetic dependencies into application tests.
+// ReadSecret replaces all input; ReadTerminalSecret replaces only the terminal
+// fallback after the production environment and credential-file selection.
 type Authentication struct {
-	NewPrimary       func() (PrimaryAuthenticator, error)
-	NewPhone         func() (CredentialAuthenticator, error)
-	NewCard          func() (CardAuthenticator, error)
-	NewQR            func() (QRAuthenticator, error)
-	DisplayQR        func(sber.QRCode) error
-	NewPIN           func(string, sber.AuthOptions) (PINAuthenticator, error)
-	NewPINFromBundle func(sber.SessionBundle, sber.AuthOptions) (PINAuthenticator, error)
-	ReadSecret       func(context.Context, ownerinput.Prompt) (string, error)
-	Enroll           func(context.Context, string, enrollment.Prepare) error
+	NewPrimary         func() (PrimaryAuthenticator, error)
+	NewPhone           func() (CredentialAuthenticator, error)
+	NewCard            func() (CardAuthenticator, error)
+	NewQR              func() (QRAuthenticator, error)
+	DisplayQR          func(sber.QRCode) error
+	NewPIN             func(string, sber.AuthOptions) (PINAuthenticator, error)
+	NewPINFromBundle   func(sber.SessionBundle, sber.AuthOptions) (PINAuthenticator, error)
+	ReadSecret         func(context.Context, ownerinput.Prompt) (string, error)
+	ReadTerminalSecret func(context.Context, ownerinput.Prompt) (string, error)
+	Enroll             func(context.Context, string, enrollment.Prepare) error
+	configuredPIN      bool
 }
 
 func primaryWithOptions(options sber.AuthOptions) (PrimaryAuthenticator, error) {
@@ -99,8 +102,8 @@ func runLogin(ctx context.Context, args *commandArguments, output, diagnostics i
 		}
 	}
 	configureLoginMethods(&a, args, diagnostics)
-	if a.ReadSecret == nil {
-		a.ReadSecret = ownerSecret
+	if err := configureSecretInput(&a, args.envFile); err != nil {
+		return fail(diagnostics, 3, loginFailureMessage(err))
 	}
 	if a.Enroll == nil {
 		a.Enroll = enrollment.Enroll
@@ -164,6 +167,9 @@ func loginFailureMessage(err error) (message string) {
 		}
 	}()
 	var captcha *sber.PinCaptchaRequired
+	if message := credentialFailureMessage(err); message != "" {
+		return message + "\nThe command did not publish the profile."
+	}
 	if errors.As(err, &captcha) {
 		return "CAPTCHA requires owner interaction.\nUse the bank website or the explicit SDK challenge API.\nThe command did not publish the profile."
 	}
@@ -385,6 +391,9 @@ func readNewPIN(ctx context.Context, a Authentication, auth PINEnrollmentAuthent
 		}
 		if length != 0 && !pinDigits(pin, length) {
 			pin = "" //nolint:ineffassign,wastedassign // Explicitly mark the end of the transient credential lifetime; strings cannot be zeroed in place.
+			if a.configuredPIN {
+				return "", &sber.PinAuthError{Code: "invalid_pin"}
+			}
 			if diagnostics != nil {
 				if _, err := io.WriteString(diagnostics, "The PIN must contain the specified number of digits.\nEnter the PIN again.\n"); err != nil {
 					return "", enrollment.ErrPrepare

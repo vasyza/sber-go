@@ -1,5 +1,6 @@
 // Package cli is the owner-operated native command boundary. Each command uses
-// --profile or the user default. Secrets are read only from a local terminal.
+// --profile or the user default. Authentication uses configured credentials or
+// hidden terminal input; SMS codes and financial confirmations require a terminal.
 package cli
 
 import (

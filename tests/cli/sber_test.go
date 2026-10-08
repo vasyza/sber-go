@@ -151,6 +151,9 @@ func TestNativeCommandOfflineStatus(t *testing.T) {
 	}{
 		{[]string{"--help"}, 0},
 		{[]string{"help", "inspect-session"}, 0},
+		{[]string{"login", "--env-file", canary, "--help"}, 0},
+		{[]string{"refresh-session", "--env-file", canary, "--help"}, 0},
+		{[]string{"login", "--env-file="}, 2},
 		{[]string{"status", "--password=" + canary}, 2},
 		{[]string{"help", canary}, 2},
 		{[]string{"__complete", "status", "--password=" + canary, ""}, 2},

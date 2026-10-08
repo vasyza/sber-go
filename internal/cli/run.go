@@ -46,7 +46,8 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 		Short: "Read bank data or manage a private profile.",
 		Long: "Use the saved profile for the current user.\n" +
 			"Use --profile PATH to select a different profile.\n" +
-			"Enter bank login values only at hidden terminal prompts.\n" +
+			"Supply authentication values through the environment or hidden terminal prompts.\n" +
+			"Use --env-file PATH to read a private credential file.\n" +
 			"The bank root CA is part of the application.",
 		RunE: func(*cobra.Command, []string) error { return cliCommand.ErrArguments },
 	}
@@ -56,7 +57,7 @@ func RunWithOptions(ctx context.Context, args []string, output, diagnostics io.W
 			Use:   definition.name + " [options]",
 			Short: definition.description,
 			Args: func(cmd *cobra.Command, args []string) error {
-				if len(args) != 0 || cmd.Flags().Changed("profile") && a.profile == "" || cmd.Flags().Changed("proxy") && a.proxy == "" || !validateCommand(definition.name, a) {
+				if len(args) != 0 || cmd.Flags().Changed("profile") && a.profile == "" || cmd.Flags().Changed("proxy") && a.proxy == "" || cmd.Flags().Changed("env-file") && a.envFile == "" || !validateCommand(definition.name, a) {
 					return cliCommand.ErrArguments
 				}
 				return nil
@@ -121,6 +122,9 @@ func runValidated(ctx context.Context, command string, a *commandArguments, outp
 	if o.OpenClient == nil {
 		options, provider, err := readClientOptions(command, a, o.Authentication)
 		if err != nil {
+			if message := credentialFailureMessage(err); message != "" {
+				return fail(diagnostics, 3, message)
+			}
 			return fail(diagnostics, 3, "The command cannot prepare authentication.")
 		}
 		open := o.OpenClientWithOptions
@@ -133,6 +137,9 @@ func runValidated(ctx context.Context, command string, a *commandArguments, outp
 	if err != nil || client == nil {
 		if err != nil && ctx.Err() != nil {
 			return 130
+		}
+		if message := credentialFailureMessage(err); message != "" {
+			return fail(diagnostics, 3, message)
 		}
 		if message := transportFailureMessage(err, "bank"); message != "" {
 			return fail(diagnostics, 3, message)
@@ -269,6 +276,9 @@ func requestFailure(ctx context.Context, diagnostics io.Writer, err error, args 
 	}
 	if errors.Is(err, context.Canceled) || ctx.Err() != nil {
 		return 130
+	}
+	if message := credentialFailureMessage(err); message != "" {
+		return fail(diagnostics, 3, message+"\nNo complete result is available.")
 	}
 	var expired *sber.AuthenticationExpired
 	if errors.As(err, &expired) {

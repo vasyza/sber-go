@@ -18,7 +18,7 @@ type commandDefinition struct{ name, description string }
 
 var commands = []commandDefinition{
 	{"login", "Make a private profile through bank authentication."},
-	{"refresh-session", "Restore the selected session with hidden PIN input."},
+	{"refresh-session", "Restore the selected session through PIN authentication."},
 	{"status", "Get file metadata without a bank request."},
 	{"inspect-session", "Read profile metadata with secret values removed."},
 	{"products", "Read accounts and cards."},
@@ -61,6 +61,7 @@ type commandArguments struct {
 	defaultProfile                                                        bool
 	remembered                                                            string
 	method, qrOutput                                                      string
+	envFile                                                               string
 	force, noRenew                                                        bool
 	betweenOwn, openBanking, showCategories, showProducts                 bool
 	limit, pages, offset                                                  int
@@ -83,6 +84,7 @@ func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
 	f.BoolVar(&a.noProxy, "no-proxy", false, "Use a direct connection for this command.")
 	f.StringVar(&a.ca, "ca-bundle", "", "Use a different PEM trust bundle `PATH`.")
 	if name == "login" || name == "refresh-session" {
+		f.StringVar(&a.envFile, "env-file", "", "Read authentication values from a private env file `PATH`.")
 		if name == "login" {
 			f.StringVar(&a.remembered, "remembered-profile", "", "Use an existing profile `PATH` for PIN login.")
 			f.StringVar(&a.method, "method", "login", "Select login, phone, card, or qr authentication.")
@@ -92,7 +94,8 @@ func commandFlags(name string) (*pflag.FlagSet, *commandArguments) {
 	}
 	f.DurationVar(&a.timeout, "timeout", 30*time.Second, "Set the maximum time for each request (1s to 120s).")
 	if name != "mcp" && name != "export-session" && name != "inspect-credentials" && !isMutationCommand(name) {
-		f.BoolVar(&a.noRenew, "no-renew", false, "Do not request a PIN if the session expires.")
+		f.StringVar(&a.envFile, "env-file", "", "Read authentication values from a private env file `PATH`.")
+		f.BoolVar(&a.noRenew, "no-renew", false, "Do not restore an expired session during this read.")
 	}
 	switch name {
 	case "card-rename":

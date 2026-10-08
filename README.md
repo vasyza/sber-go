@@ -112,7 +112,7 @@ Use `--help` or `-h` to show help without profile access or bank requests.
 Run `sber login` once in your local Linux or macOS terminal.
 The CLI saves a default profile for the current user.
 Later commands select that profile automatically.
-Enter the login, password, SMS code, and any new online banking PIN at the hidden prompts.
+Enter missing authentication values and the SMS code at the hidden prompts.
 
 ```sh
 sber login
@@ -129,8 +129,43 @@ Use `--profile PATH` to select a different profile for one command.
 An existing profile requires a private parent directory with mode `0700` and a regular private file with mode `0600`.
 The `login` command makes missing private directories and refuses to replace an existing profile.
 Authentication prepares public configuration before secret prompts.
-Bank credentials are not accepted through arguments, environment variables, or MCP.
+Authentication values can come from the process environment or an explicit private env file.
+Bank secret values are not accepted through command arguments or MCP.
 The [operator manual](docs/CLI.md), [command reference](docs/CLI-REFERENCE.md), and [technical terms](docs/CLI-REFERENCE.md#technical-terms) use the [ASD-STE100 Issue 9 writing policy](docs/DEVELOPMENT.md#cli-writing-policy).
+
+### Authentication values
+
+The same input rules apply to primary login, phone login, card login, remembered-device login, and session restoration.
+
+| Environment variable | Value |
+| --- | --- |
+| `SBER_LOGIN` | Account login. |
+| `SBER_PASSWORD` | Account password. |
+| `SBER_PINCODE` | Online banking PIN for restoration or new PIN enrollment. |
+| `SBER_PHONE` | Phone number for `login --method phone`. |
+| `SBER_CARD_NUMBER` | Card number for `login --method card`. |
+
+Export the required variables before running the command, or select a private env file:
+
+```sh
+sber login --env-file "$HOME/.config/sber-go/credentials.env"
+sber login --method card --env-file "$HOME/.config/sber-go/credentials.env"
+sber refresh-session --env-file "$HOME/.config/sber-go/credentials.env"
+sber products --env-file "$HOME/.config/sber-go/credentials.env"
+```
+
+Environment values take priority over file values.
+Missing or empty values use hidden terminal input.
+An explicit empty environment value overrides the corresponding file value.
+SMS codes always use hidden terminal input.
+With a configured PIN, restoration and expired-session read renewal can run without a terminal.
+If the bank requires SMS confirmation, a command without a terminal stops and keeps the old profile.
+
+The env file must be an owner-controlled regular file with mode `0600` in a directory with mode `0700`.
+Paths must have literal, symlink-free components; files with multiple hard links are rejected.
+The CLI reads only the selected file, supports literal dotenv assignments, and does not execute or expand its contents.
+It does not search for `.env` automatically.
+See [authentication values](docs/CLI.md#authentication-values) for file syntax and limits.
 
 ### Proxy settings
 
@@ -178,17 +213,17 @@ TLS validates the certificate chain and the hostname.
 Use `--ca-bundle PATH` to replace default trust for one client.
 Read the [certificate source and update instructions](internal/transport/certificates/README.md).
 
-Remembered device login uses a hidden PIN.
+Remembered device login uses a configured PIN or hidden PIN input.
 Use `login --remembered-profile EXISTING_PATH --profile NEW_PATH` to make a new profile from an existing identity.
 Authentication uses native Go HTTP requests.
 No browser or driver installation is required.
 Use `login --method phone`, `login --method card`, or `login --method qr` for another login method.
 Read the [authentication instructions](docs/AUTH.md).
 
-The `refresh-session` command restores an existing profile through hidden PIN input and optional SMS confirmation.
-Interactive reads can restore an expired session once, save it, and repeat the read.
-Use `--no-renew` for a read without secret prompts.
-Batch commands and MCP require separate terminal restoration.
+The `refresh-session` command restores an existing profile through configured or hidden PIN input and optional terminal SMS confirmation.
+Reads with a terminal or configured PIN can restore an expired session once, save it, and repeat the read.
+Use `--no-renew` to disable restoration during a read.
+MCP requires separate session restoration.
 The bank controls session lifetime.
 A session file does not promise access for a year.
 

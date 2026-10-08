@@ -27,8 +27,8 @@ func runRefresh(ctx context.Context, args *commandArguments, output, diagnostics
 			return sber.NewPINAuthFromProfile(path, options)
 		}
 	}
-	if a.ReadSecret == nil {
-		a.ReadSecret = ownerSecret
+	if err := configureSecretInput(&a, args.envFile); err != nil {
+		return fail(diagnostics, 3, credentialFailureMessage(err)+"\nThe saved profile did not change.")
 	}
 	bundle, err := authenticateRemembered(ctx, a.ReadSecret, func() (PINAuthenticator, error) {
 		return a.NewPIN(profile, options)
