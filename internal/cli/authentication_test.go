@@ -47,7 +47,7 @@ func TestAuthenticationPreparesPublicConfigurationBeforeSecretInput(t *testing.T
 				}
 			}
 			before, _ := os.ReadFile(profile)
-			failure := errors.New("synthetic-private-browser-detail")
+			failure := &sber.PinAuthError{Code: "login_page_rejected", StatusCode: 200, Message: "synthetic-private-support-id"}
 			primary := &preparingPrimary{failure: failure}
 			pin := &preparingPIN{failure: failure}
 			args := []string{"login", "--profile", profile}
@@ -66,7 +66,7 @@ func TestAuthenticationPreparesPublicConfigurationBeforeSecretInput(t *testing.T
 					return "", nil
 				},
 			}})
-			if code != 3 || output.Len() != 0 || bytes.Contains(diagnostics.Bytes(), []byte("synthetic-private")) {
+			if code != 3 || output.Len() != 0 || bytes.Contains(diagnostics.Bytes(), []byte("synthetic-private")) || !strings.Contains(diagnostics.String(), "Authentication stage=public-configuration.") || !strings.Contains(diagnostics.String(), "bank rejected the login page for this connection") || !strings.Contains(diagnostics.String(), "--proxy") {
 				t.Fatal("public preparation failure escaped the CLI boundary")
 			}
 			after, _ := os.ReadFile(profile)

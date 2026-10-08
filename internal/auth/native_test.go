@@ -72,3 +72,41 @@ func TestNativeConfigCannotResurrectAfterClose(t *testing.T) {
 		t.Fatal("closed auth exported session")
 	}
 }
+
+func TestAllNativeMethodsStopBeforeAuthenticationWhenPublicPageIsRejected(t *testing.T) {
+	for _, method := range []string{"login", "phone", "card", "qr"} {
+		t.Run(method, func(t *testing.T) {
+			s := newAuthScript(t, authStep{method: "GET", target: sdkTransport.PublicBootstrapURL, response: authPage(`<html><title>Нельзя войти в СберБанк Онлайн в этом браузере.</title><body>synthetic-private-support-id</body></html>`)})
+			opts := methodOptions(s)
+			var a interface {
+				LoadConfig(context.Context) (sdkSession.FrontendConfig, error)
+				Stage() AuthStage
+				Close() error
+			}
+			var err error
+			switch method {
+			case "login":
+				a, err = NewPrimaryAuth(opts)
+			case "phone":
+				a, err = NewPhoneAuth(opts)
+			case "card":
+				a, err = NewCardAuth(opts)
+			case "qr":
+				a, err = NewQRAuth(opts)
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer a.Close()
+			config, err := a.LoadConfig(context.Background())
+			authErrorCode(t, err, "login_page_rejected")
+			var failure *sdkErrs.PinAuthError
+			if !errors.As(err, &failure) || failure.StatusCode != 200 || config != (sdkSession.FrontendConfig{}) || a.Stage() != AuthStageBootstrap || s.calls != 1 {
+				t.Fatal("rejected public page advanced authentication")
+			}
+			if strings.Contains(err.Error(), "synthetic-private") {
+				t.Fatal("public rejection exposed response details")
+			}
+		})
+	}
+}

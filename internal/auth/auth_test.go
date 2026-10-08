@@ -253,7 +253,7 @@ func setAuthCookies(t *testing.T, j *sdkSession.CookieJar) {
 }
 
 func TestAuthBootstrapStrictDefault(t *testing.T) {
-	for _, tc := range []struct{ html, code string }{{authHTML(false), ""}, {"<html>malformed anonymous page</html>", "invalid_frontend_config"}, {`<script src="/TSPD/a.js"></script>Enable JavaScript`, "browser_check_required"}} {
+	for _, tc := range []struct{ html, code string }{{authHTML(false), ""}, {"<html>malformed anonymous page</html>", "invalid_frontend_config"}, {`<script src="/TSPD/a.js"></script>Enable JavaScript`, "browser_check_required"}, {`<html><title>Нельзя войти в СберБанк Онлайн в этом браузере.</title></html>`, "login_page_rejected"}} {
 		t.Run(tc.code, func(t *testing.T) {
 			s := newAuthScript(t, authStep{method: "GET", target: sdkTransport.PublicBootstrapURL, response: authPage(tc.html), inspect: func(_ map[string]any, _ map[string]string, o sdkTransport.RequestOptions) {
 				if authHeader(o, "Sec-Fetch-Site") != "none" || o.Headers["Content-Type"] != nil || o.Headers["Origin"] != nil {

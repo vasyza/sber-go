@@ -191,6 +191,8 @@ func loginFailureMessage(err error) (message string) {
 			}
 		case "invalid_frontend_config":
 			return "The bank login page configuration is not supported.\nThe command did not publish the profile."
+		case "login_page_rejected":
+			return "The bank rejected the login page for this connection.\nCheck the connection or select a proxy with --proxy.\nThe command did not publish the profile."
 		case "browser_check_required":
 			return "The bank requires an interactive browser security check.\nNative authentication cannot continue.\nThe command did not publish the profile."
 		case "browser_bootstrap_unavailable":
@@ -253,6 +255,8 @@ func transportFailureMessage(err error, request string) string {
 		return "The proxy rejected its login values."
 	case "proxy_connect", "proxy_failed":
 		return "The command cannot connect through the proxy."
+	case "proxy_tls_closed":
+		return "The TLS connection through the proxy closed before the bank request.\nSelect a different connection or proxy."
 	case "invalid_ca_bundle":
 		return "The command cannot load trusted PEM certificates.\nCheck --ca-bundle PATH."
 	case "tls_untrusted":

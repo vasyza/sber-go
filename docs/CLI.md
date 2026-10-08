@@ -97,6 +97,7 @@ Use `sber login` to make the default profile.
 The CLI supports HTTP, HTTPS, and SOCKS5 proxies.
 Each type supports connections with or without proxy authentication.
 The saved setting applies to login, session restoration, network reads, and MCP.
+Use `sber config` to show the configuration command help.
 
 1. Save the proxy address and its login values:
 
@@ -644,6 +645,8 @@ Data output can contain private financial information.
 | Untrusted TLS certificate | Update the application or select a verified CA bundle. |
 | TLS hostname or validity error | Make sure that the destination and system time are correct. |
 | Interactive security check | Complete bank access in the website. Native authentication cannot continue through this check. |
+| TLS connection closed through a proxy | Select a different connection. Proxy authentication can succeed while bank TLS access fails. |
+| Rejected login page | Check the connection or select an available proxy with `--proxy`. |
 | HTTP error or bank rejection | Read the verification record before another attempt. |
 | Unsupported response format | Update the application for the bank protocol. |
 | Authentication attempt limit | Stop login attempts and use the bank website. |
@@ -658,6 +661,35 @@ Proxy login values use the explicit proxy address syntax.
 
 Authentication errors include the local stage.
 The stage identifies public configuration, owner input, credentials, PIN login, SMS confirmation, PIN enrollment, session validation, or cleanup.
+
+### Rejected public login page
+
+The bank can return a rejection page with HTTP 200.
+This page has no authentication configuration.
+The command stops before it requests login values, a card number, or a PIN.
+Changing the login method cannot resolve this connection failure.
+
+1. Select a proxy that can open the bank website.
+2. Replace the example address below with your proxy address:
+
+   ```sh
+   sber login --proxy socks5://127.0.0.1:1080
+   ```
+
+3. To save this connection for later commands, use `sber config set proxy ADDRESS`.
+
+Environment proxy variables do not configure this CLI.
+The bank does not supply the cause of this rejection.
+The command does not change its identity or bypass a security check.
+
+### TLS connection closed through a proxy
+
+This diagnostic means that the TLS handshake closed before the bank request.
+The proxy can accept its login values and still fail to connect to the bank.
+Access to another HTTPS website does not verify access to the bank.
+Select a different connection or ask the proxy provider to check bank access.
+
+The command does not disable certificate checks or repeat the bank request.
 
 ## Select TLS trust
 

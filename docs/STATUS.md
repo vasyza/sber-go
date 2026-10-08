@@ -19,6 +19,66 @@ These checks use synthetic data and local dependencies.
 Real bank authentication was not repeated for this change.
 The earlier live authentication record remains separate.
 
+## Domain routing through a VPN — 2026-10-08
+
+An isolated local Xray service routes bank domains through a VLESS/REALITY connection selected by the owner.
+The HTTP and SOCKS5 interfaces loaded the public bank login configuration through the native SDK on Linux.
+Requests to other domains kept direct access.
+The existing proxy service remained unchanged.
+
+The saved CLI proxy was replaced with the local HTTP interface.
+The unchanged `login` command then reached owner input.
+The new service has automatic startup and listens only on loopback addresses.
+No bank credentials or authentication POST requests were sent during this verification.
+Complete account login and private data access remain unverified for this connection.
+Xray is an external connection option; it is not a new SDK runtime dependency.
+
+## Public configuration rejection — 2026-10-08
+
+The current Linux CLI received a bank rejection page during direct access from a netcup server.
+The response was HTTP 200 and contained no authentication configuration.
+The previous diagnostic classified this as an unsupported configuration.
+Authentication now reports `login_page_rejected` for the recognized refusal page.
+The CLI recommends checking the connection or selecting an explicit proxy.
+
+The same native client loaded valid configuration on macOS.
+The Linux client also loaded valid configuration through a temporary connection via that Mac.
+The unchanged Linux CLI then reached the owner input stage through the selected proxy.
+The temporary connection was closed after the public probes.
+No login secrets, authentication POST requests, or financial operations were sent.
+The bank did not give the cause of its direct connection rejection.
+
+The updated Linux binary reported the specific refusal on the same server.
+The saved HTTP proxy accepted CONNECT, but the destination TLS handshake ended before HTTP transmission.
+An independent verified TLS client reproduced that closure.
+The saved proxy at that stage was not accepted as a working bank connection.
+
+The complete local `make check` passed, including golangci-lint and gopls.
+Synthetic regressions cover each native login method, PIN restoration, redaction, and secret input ordering.
+The Linux AMD64 build and its installed CLI metadata check passed.
+No complete account login was performed for this correction.
+
+## Proxy TLS diagnostics — 2026-10-08
+
+Two owner-selected HTTP proxies accepted CONNECT and completed verified TLS with GitHub from the Linux server.
+Both closed TLS establishment with the bank before sending an HTTP request.
+An independent client reproduced each closure with default TLS settings and with TLS 1.2.
+The second proxy also failed on macOS, while direct native configuration loading succeeded there.
+The cause of the route rejection remains unknown.
+The saved proxy was not replaced by the failed candidate.
+
+The SDK now reports `proxy_tls_closed` when a trace identifies a TLS establishment closure through a proxy.
+Successful TLS, certificate failures, and later HTTP closures keep their separate classifications.
+The diagnostic adds no retry or direct connection fallback.
+Synthetic tests cover HTTP, HTTPS, SOCKS5, trace composition, and the absence of authentication POST replay.
+
+`sber config` without a subcommand now shows help without reading private settings.
+Unknown configuration commands still fail with their argument values removed.
+
+The complete local `make check` passed, including golangci-lint, gopls, vet, race tests, and builds.
+The Linux AMD64 build also passed.
+These checks did not complete bank account authentication or read private bank data.
+
 ## Open source preparation — 2026-10-08
 
 The command and public Go package are named `sber`.

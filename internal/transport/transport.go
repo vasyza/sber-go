@@ -13,10 +13,12 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/http/httptrace"
 	"net/url"
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 	"unicode/utf8"
 
@@ -294,6 +296,16 @@ func (tr *HTTPTransport) request(ctx context.Context, method, target string, bod
 	requestContext, requestCancel := context.WithTimeout(child, tr.client.Timeout)
 	defer requestCancel()
 	requestContext = context.WithValue(requestContext, tlsRequestContextKey{}, requestContext)
+	// Only a handshake closure can identify this phase. An EOF after successful
+	// TLS must retain its HTTP failure classification; trace hooks can run concurrently.
+	var proxyTLSClosed atomic.Bool
+	if tr.proxyEnabled {
+		requestContext = httptrace.WithClientTrace(requestContext, &httptrace.ClientTrace{
+			TLSHandshakeDone: func(_ tls.ConnectionState, err error) {
+				proxyTLSClosed.Store(retryableTLSClosure(err))
+			},
+		})
+	}
 	req, err := http.NewRequestWithContext(requestContext, method, target, body)
 	if err != nil {
 		return nil, &sdkErrs.TransportError{Code: "unsafe_request"}
@@ -347,6 +359,9 @@ func (tr *HTTPTransport) request(ctx context.Context, method, target string, bod
 		failure := TransportFailure(err)
 		if tr.proxyEnabled && failure.Code == "request_failed" {
 			failure.Code = "proxy_failed"
+			if proxyTLSClosed.Load() {
+				failure.Code = "proxy_tls_closed"
+			}
 		}
 		return nil, failure
 	}
@@ -441,6 +456,16 @@ func TransportFailure(err error) *sdkErrs.TransportError {
 const PublicBootstrapURL = sdkSession.AppOrigin + "/CSAFront/index.do"
 
 var configAssignmentPattern = regexp.MustCompile(`\bwindow\s*\.\s*config\s*=`)
+
+// IsLoginPageRejected identifies the bank's connection rejection page. A real
+// configuration can contain the same text as a translation, so it takes priority.
+// This classification makes no claim about the bank's reason for rejection.
+func IsLoginPageRejected(html string) bool {
+	if utf8.RuneCountInString(html) > 4*1024*1024 || configAssignmentPattern.MatchString(html) {
+		return false
+	}
+	return strings.Contains(strings.ToLower(html), "нельзя войти в сбербанк онлайн в этом браузере")
+}
 
 func IsBrowserCheck(html string) bool {
 	if utf8.RuneCountInString(html) > 4*1024*1024 {

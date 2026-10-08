@@ -30,6 +30,30 @@ func TestRecognizableBrowserCheckOnly(t *testing.T) {
 	}
 }
 
+func TestLoginPageRejectionIsSeparateFromConfigurationAndSecurityCheck(t *testing.T) {
+	rejected := `<html><head><title>Нельзя войти в СберБанк Онлайн в этом браузере.</title></head><body>Попробуйте другой браузер. Synthetic support ID: fixture-only</body></html>`
+	for _, tt := range []struct {
+		name string
+		html string
+		want bool
+	}{
+		{"bank rejection", rejected, true},
+		{"case insensitive", strings.ToUpper(rejected), true},
+		{"configuration with rejection translation", rejected + `<script>window.config = {};</script>`, false},
+		{"spaced configuration", rejected + `<script>window . config = {};</script>`, false},
+		{"security check", `<script src="/TSPD/synthetic.js"></script>Enable JavaScript`, false},
+		{"unknown page", `<html><title>Unknown response</title></html>`, false},
+		{"empty", "", false},
+		{"oversized", rejected + strings.Repeat("x", 4*1024*1024), false},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsLoginPageRejected(tt.html); got != tt.want {
+				t.Fatalf("login page rejection = %t, want %t", got, tt.want)
+			}
+		})
+	}
+}
+
 func stringPtr(s string) *string { return &s }
 
 // Profile fixtures must be private independently of the developer's umask.

@@ -2,12 +2,16 @@ package transport
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httptrace"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -16,6 +20,70 @@ import (
 	"github.com/vasyza/sber-go/internal/errs"
 	"github.com/vasyza/sber-go/internal/testproxy"
 )
+
+func TestProxyTLSClosureIsClassifiedBeforeSendingHTTP(t *testing.T) {
+	for _, scheme := range []string{"http", "https", "socks5"} {
+		t.Run(scheme, func(t *testing.T) {
+			var requests atomic.Int32
+			origin := httptest.NewUnstartedServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) { requests.Add(1) }))
+			listener := &handshakeDropListener{Listener: origin.Listener, drops: 100}
+			origin.Listener = listener
+			origin.Config.ErrorLog = log.New(io.Discard, "", 0)
+			origin.StartTLS()
+			defer origin.Close()
+			destination := strings.TrimPrefix(origin.URL, "https://")
+			var address string
+			var stats *testproxy.Stats
+			if scheme == "socks5" {
+				host, counters := testproxy.SOCKS5(t, "", "", destination)
+				address, stats = "socks5://"+host, counters
+			} else {
+				server, counters := testproxy.HTTP(t, scheme == "https", "", "", destination)
+				address, stats = server.URL, counters
+			}
+			tr, err := NewAuthenticationTransport(unreadyBundle(), TransportOptions{AllowUnready: true, CABundle: serverCA(t, origin), Timeout: time.Second, Proxy: ProxyOptions{URL: address}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer tr.Close()
+			var callerTrace atomic.Bool
+			ctx := httptrace.WithClientTrace(context.Background(), &httptrace.ClientTrace{TLSHandshakeDone: func(tls.ConnectionState, error) { callerTrace.Store(true) }})
+			_, err = tr.Post(ctx, origin.URL, map[string]any{"synthetic": "proof"}, RequestOptions{})
+			var failure *errs.TransportError
+			if !errors.As(err, &failure) || failure.Code != "proxy_tls_closed" || !callerTrace.Load() {
+				t.Fatal("TLS closure lost its phase or the caller trace")
+			}
+			if requests.Load() != 0 || stats.Connections.Load() != 1 || listener.accepted.Load() != 1 {
+				t.Fatal("TLS diagnostic sent or replayed HTTP")
+			}
+		})
+	}
+}
+
+func TestProxyClosureAfterHTTPIsNotReportedAsTLSFailure(t *testing.T) {
+	var requests atomic.Int32
+	origin := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests.Add(1)
+		connection, _, err := w.(http.Hijacker).Hijack()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		connection.Close()
+	}))
+	defer origin.Close()
+	server, stats := testproxy.HTTP(t, false, "", "", strings.TrimPrefix(origin.URL, "https://"))
+	tr, err := NewAuthenticationTransport(unreadyBundle(), TransportOptions{AllowUnready: true, CABundle: serverCA(t, origin), Timeout: time.Second, Proxy: ProxyOptions{URL: server.URL}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tr.Close()
+	_, err = tr.Post(context.Background(), origin.URL, map[string]any{"synthetic": "proof"}, RequestOptions{})
+	var failure *errs.TransportError
+	if !errors.As(err, &failure) || failure.Code != "proxy_failed" || requests.Load() != 1 || stats.Connections.Load() != 1 {
+		t.Fatal("HTTP closure was confused with TLS establishment or replayed")
+	}
+}
 
 func TestVerifiedNativeRequestsThroughExplicitProxies(t *testing.T) {
 	for _, scheme := range []string{"http", "https", "socks5"} {

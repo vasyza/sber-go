@@ -102,7 +102,17 @@ func validateConfigCommand(command string, args []string) bool {
 }
 
 func configCommand(output, diagnostics io.Writer, o Options, code *int) *cobra.Command {
-	command := &cobra.Command{Use: "config COMMAND", Short: "Read or change the saved CLI settings.", RunE: func(*cobra.Command, []string) error { return cliCommand.ErrArguments }}
+	command := &cobra.Command{
+		Use:   "config COMMAND",
+		Short: "Read or change the saved CLI settings.",
+		Args: func(_ *cobra.Command, args []string) error {
+			if len(args) != 0 {
+				return cliCommand.ErrArguments
+			}
+			return nil
+		},
+		RunE: func(cmd *cobra.Command, _ []string) error { return cmd.Help() },
+	}
 	for _, definition := range []commandDefinition{{"set", "Save a proxy address and its optional login values."}, {"get", "Read the proxy address with login values removed."}, {"list", "Read the saved settings with login values removed."}, {"unset", "Remove the saved proxy and its login values."}} {
 		usage := definition.name
 		if definition.name == "set" {

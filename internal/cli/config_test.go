@@ -41,6 +41,28 @@ func configTestOptions(t *testing.T) Options {
 	}, OpenClient: func(string) (mcp.Client, error) { t.Fatal("config opened a bank client"); return nil, nil }}
 }
 
+func TestConfigWithoutSubcommandShowsHelpWithoutReadingPrivateState(t *testing.T) {
+	o := configTestOptions(t)
+	o.DefaultConfigPath = func() (string, error) {
+		t.Fatal("config help read private proxy settings")
+		return "", nil
+	}
+	var output, diagnostics bytes.Buffer
+	if code := RunWithOptions(context.Background(), []string{"config"}, &output, &diagnostics, o); code != 0 || diagnostics.Len() != 0 {
+		t.Fatalf("config help failed with code %d", code)
+	}
+	for _, text := range []string{"sber config COMMAND", "Commands:", "get", "list", "set", "unset"} {
+		if !strings.Contains(output.String(), text) {
+			t.Fatalf("config help omitted %q", text)
+		}
+	}
+	output.Reset()
+	diagnostics.Reset()
+	if code := RunWithOptions(context.Background(), []string{"config", "synthetic-private-argument"}, &output, &diagnostics, o); code != 2 || output.Len() != 0 || strings.Contains(diagnostics.String(), "synthetic-private") {
+		t.Fatal("unknown config command did not fail safely")
+	}
+}
+
 func TestCLIConfigProxyLifecycleAndRedaction(t *testing.T) {
 	o := configTestOptions(t)
 	run := func(args ...string) (int, string, string) {

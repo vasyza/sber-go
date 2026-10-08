@@ -854,6 +854,14 @@ func TestClientCycle4ConcreteErrorsAreOwnedSafeCopies(t *testing.T) {
 			var x *sdkErrs.TransportError
 			return errors.As(e, &x) && x.Code == "request_failed" && x.ContextCause() == nil
 		}},
+		{"proxy TLS closure", sdkErrs.NewTransportError("proxy_tls_closed", rawCause), func(e error) bool {
+			var x *sdkErrs.TransportError
+			return errors.As(e, &x) && x.Code == "proxy_tls_closed" && x.ContextCause() == nil
+		}},
+		{"rejected login page", &sdkErrs.PinAuthError{Code: "login_page_rejected", Message: marker, StatusCode: 200}, func(e error) bool {
+			var x *sdkErrs.PinAuthError
+			return errors.As(e, &x) && x.Code == "login_page_rejected" && x.Message == "" && x.StatusCode == 200
+		}},
 		{"pin", &sdkErrs.PinAuthError{Message: marker, Code: marker, StatusCode: 403, ResetCookies: true}, func(e error) bool {
 			var x *sdkErrs.PinAuthError
 			return errors.As(e, &x) && x.Message == "" && x.Code == "" && x.StatusCode == 403 && x.ResetCookies

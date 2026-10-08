@@ -231,6 +231,9 @@ func (f *authFlow) loadConfig(ctx context.Context) (sdkSession.FrontendConfig, e
 	if sdkTransport.IsBrowserCheck(html) {
 		return sdkSession.FrontendConfig{}, authFailure("browser_check_required", r)
 	}
+	if sdkTransport.IsLoginPageRejected(html) {
+		return sdkSession.FrontendConfig{}, authFailure("login_page_rejected", r)
+	}
 	var c sdkSession.FrontendConfig
 	var err error
 	if f.primary {
