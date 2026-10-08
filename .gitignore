@@ -4,6 +4,12 @@
 /private/
 /browsers/
 /.env
+/.env.*
+!/.env.example
+.DS_Store
+*.key
+*.p12
+*.pfx
 *.har
 *.trace
 *.log

@@ -1,5 +1,28 @@
 # Verification status
 
+## Open source preparation — 2026-10-08
+
+The command and public Go package are named `sber`.
+The module path remains `github.com/vasyza/sber-go`.
+The README supplies public installation and update commands.
+
+The audited source baseline was commit `7cccdbe`.
+Gitleaks 8.30.1 checked all 29 existing commits, including merges and both remote branch histories.
+It found no secrets.
+The scan also covered the 19 available Actions logs, the closed pull request, and its comments.
+The other two Actions runs had no jobs or logs.
+Local environment files, profiles, HAR files, and APK files were not tracked.
+
+Govulncheck 1.8.0 reported no vulnerabilities for the checked macOS build with Go 1.27.1.
+Runtime dependency license files declare MIT, BSD, or Apache-2.0 terms.
+The project retains upstream MIT attribution and the adapted CPython PSF notices.
+The bundled CA is a public certificate.
+
+The complete local `make check` passed.
+It included golangci-lint, gopls diagnostics, vet, race tests, builds, and module verification.
+The baseline also passed the GitHub Linux and macOS jobs.
+Bank authentication and financial execution were not repeated for this publication audit.
+
 ## SDK repository scope — 2026-10-08
 
 The repository supplies the Sber SDK, its CLI, and local MCP integration.

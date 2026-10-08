@@ -1,40 +1,37 @@
-# sber-go
+# sber
 
-Native Go SDK for the unofficial Sber online-banking protocol: session persistence, primary/PIN/OTP authentication, typed bank resources, exact decimal amounts, a native CLI, and a local MCP server.
+Unofficial Go SDK and CLI for SberBank Online: native HTTP authentication, session persistence, typed bank resources, exact decimal amounts, proxy support, and a local MCP server.
 
-Go **1.27.1**, Linux and macOS, including hidden terminal login and first-time private profile enrollment.
+The CLI command and public Go package are named `sber`.
+The Go module is `github.com/vasyza/sber-go`.
+This independent community project is not affiliated with or endorsed by Sberbank.
+
+Go **1.27.1 or later**, Linux and macOS, including hidden terminal login and first-time private profile enrollment.
 
 ## Install the CLI
 
-Requirements: Linux or macOS, Git, and [Go 1.27.1](https://go.dev/doc/install).
-Git must have access to this repository.
-These commands install the current `main` branch from source.
+Requirements: Linux or macOS and [Go 1.27.1 or later](https://go.dev/doc/install).
+You do not need a GitHub account or a source checkout.
 
-1. Get the source:
-
-   ```sh
-   git clone --branch main https://github.com/vasyza/sber-go.git
-   cd sber-go
-   ```
-
-2. Install `sber` in your user directory:
+1. Install the `sber` command:
 
    ```sh
-   GOBIN="$HOME/.local/bin" go install ./cmd/sber
+   mkdir -p "$HOME/.local/bin"
+   GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@latest
    ```
 
-3. Add that directory to the command search path:
+2. Add its directory to the command search path:
 
    ```sh
    export PATH="$HOME/.local/bin:$PATH"
    ```
 
-4. Add the same export line to your shell startup file.
+   Add the same export line to your shell startup file.
 
    Use `~/.bashrc` for Bash or `~/.zshrc` for Zsh.
    For a Bash login shell, use `~/.bash_profile`.
 
-5. Check the installed command:
+3. Check the installed command:
 
    ```sh
    command -v sber
@@ -45,24 +42,17 @@ These commands install the current `main` branch from source.
 `PATH` lists the directories that the shell searches for commands.
 The command is available from any working directory.
 Use `sber login` for the first authentication, as described below.
+`@latest` selects the latest release, or the default branch when no release tag exists.
 
 ## Update the CLI
 
-1. Open a terminal in the source checkout.
-2. Get the current `main` branch:
+1. Replace the installed executable:
 
    ```sh
-   git switch main
-   git pull --ff-only
+   GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@latest
    ```
 
-3. Replace the installed executable:
-
-   ```sh
-   GOBIN="$HOME/.local/bin" go install ./cmd/sber
-   ```
-
-4. Check the command location and help:
+2. Check the command location and help:
 
    ```sh
    command -v sber
@@ -78,22 +68,24 @@ The update replaces the executable and keeps the saved profile.
 If the bank session has expired, use `sber refresh-session`.
 If an MCP client keeps `sber` running, restart that client after the update.
 
-### Direct installation or update
+### Install the current development version
 
-If Git can read the repository through HTTPS, you can install without a source checkout:
+Use `@main` to select the current development branch:
 
 ```sh
 GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@main
 ```
 
-Use the same command for later updates.
-For a private repository, configure Git HTTPS authentication with repository access.
-Also supply the private module setting:
+### Install from a source checkout
 
 ```sh
-GOPRIVATE=github.com/vasyza/sber-go GOBIN="$HOME/.local/bin" \
-  go install github.com/vasyza/sber-go/cmd/sber@main
+git clone https://github.com/vasyza/sber-go.git
+cd sber-go
+GOBIN="$HOME/.local/bin" go install ./cmd/sber
 ```
+
+This procedure also needs Git.
+The installed executable is still named `sber`.
 
 ### Update a local build
 
@@ -225,6 +217,12 @@ An error or page cap gives a nonzero exit code without a successful partial resu
 
 ## Go API
 
+Add the SDK to your Go module:
+
+```sh
+go get github.com/vasyza/sber-go@latest
+```
+
 ```go
 client, err := sber.NewSberClientFromSessionFile(profilePath, sber.ClientOptions{})
 if err != nil {
@@ -239,7 +237,7 @@ if err != nil {
 encoded, err := sber.ExportJSON(products)
 ```
 
-Import `github.com/vasyza/sber-go` as `sber`. Root aliases and forwards preserve the previous source API while implementations live in separate internal layers. [The runnable example](examples/read/main.go) includes cancellation, cleanup and deliberate JSON export. [Authentication usage](docs/AUTH.md) explains primary login, OTP and remembered-device renewal.
+Import `github.com/vasyza/sber-go`; its package name is `sber`. Implementations live in separate internal layers. [The runnable example](examples/read/main.go) includes cancellation, cleanup and deliberate JSON export. [Authentication usage](docs/AUTH.md) explains primary login, OTP and remembered-device renewal.
 
 `Decimal` preserves values such as `9007199254740993.10`. Decode response JSON with `sber.DecodeJSON` to retain number lexemes. `ExportJSON` preserves financial quantities and masks card numbers in display text. Diagnostic formatting of session/auth/client values is redacted; explicit credential and financial exports have separate APIs.
 
@@ -269,3 +267,15 @@ make check
 Core error, session, transport, authentication and bank-resource packages have separate responsibilities. MCP connects the SDK to local tools through the Sber CLI. See [package responsibilities](docs/ARCHITECTURE.md), [SDK contracts](docs/SDK.md) and [current verification](docs/STATUS.md).
 
 Authentication now uses native Go HTTP requests for login/password, phone/password, card number, QR confirmation, and remembered PIN. The application does not need Playwright, Firefox, Chrome, or a JavaScript runtime. On 2026-10-08, all four initial login methods and PIN restoration completed on the real owner account. The QR session passed all 15 CLI read and local profile commands and the SDK authorization, products, and bounded history checks. See the [verification record](docs/STATUS.md) for current results and limits. Financial mutations, complete history coverage, and independent production review remain outside this evidence. Earlier reports in Git history describe their original snapshots.
+
+## Contribute and report security issues
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local checks and contribution rules.
+Report vulnerabilities through the private channel in [SECURITY.md](SECURITY.md).
+Use synthetic data in issues, tests, and pull requests.
+
+## License
+
+The project uses the [MIT license](LICENSE).
+[NOTICE](NOTICE) records upstream attribution.
+The adapted CPython behavior retains its [PSF and historical notices](third_party/cpython/LICENSE).
