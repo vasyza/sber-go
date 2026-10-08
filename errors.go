@@ -1,4 +1,4 @@
-// Compatibility facade; implementation lives in internal/errs.
+// Public error API; implementation lives in internal/errs.
 package sber
 
 import (

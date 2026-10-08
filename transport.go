@@ -1,4 +1,4 @@
-// Compatibility facade; implementation lives in internal/transport.
+// Public transport API; implementation lives in internal/transport.
 package sber
 
 import (

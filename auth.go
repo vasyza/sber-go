@@ -1,4 +1,4 @@
-// Compatibility facade; implementation lives in internal/auth.
+// Public authentication API; implementation lives in internal/auth.
 package sber
 
 import (

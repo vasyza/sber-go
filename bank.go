@@ -1,4 +1,4 @@
-// Compatibility facade; implementation lives in internal/bank.
+// Public bank API; implementation lives in internal/bank.
 package sber
 
 import (

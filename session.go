@@ -1,4 +1,4 @@
-// Compatibility facade; implementation lives in internal/session.
+// Public session API; implementation lives in internal/session.
 package sber
 
 import (
