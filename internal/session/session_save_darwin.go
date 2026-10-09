@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // A private staging directory pins the publication namespace on macOS, where

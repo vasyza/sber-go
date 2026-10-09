@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	"github.com/vasyza/sber-go/internal/rsaoaep"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	"github.com/vasyza/sber-sdk/internal/rsaoaep"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 // CardAuth encrypts a PAN, confirms bank SMS, and optionally enrolls a web PIN.

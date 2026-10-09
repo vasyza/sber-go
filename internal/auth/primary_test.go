@@ -13,9 +13,9 @@ import (
 	"strings"
 	"testing"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 func TestAuthPINOTPContinuation(t *testing.T) {

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 func TestModelCycle3LiteralNativeTextIntegrity(t *testing.T) {

@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"testing"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 func TestSessionStrictSchemaAndFileBoundaries(t *testing.T) {

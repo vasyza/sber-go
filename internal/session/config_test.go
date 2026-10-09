@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 func reviewCycle2AssertFrontend(t *testing.T, parse func(string) (FrontendConfig, error), html string, want FrontendConfig, accepted bool) {

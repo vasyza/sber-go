@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // MaxAuthRedirects is the audited auth navigation bound. A caller must count

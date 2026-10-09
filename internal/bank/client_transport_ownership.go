@@ -3,7 +3,7 @@ package bank
 import (
 	"reflect"
 
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 // ClientTransportOwner is an optional closing-ownership contract for injected

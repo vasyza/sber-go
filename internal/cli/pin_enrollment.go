@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
 )
 
 func enrollOwnerPIN(ctx context.Context, a Authentication, auth PINEnrollmentAuthenticator, diagnostics io.Writer) (sber.SessionBundle, error) {

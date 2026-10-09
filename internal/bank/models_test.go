@@ -15,7 +15,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 // All values in this file are synthetic. Integrity is checked on the original

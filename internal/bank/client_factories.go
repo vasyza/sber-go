@@ -1,8 +1,8 @@
 package bank
 
 import (
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 // NewSberClientFromCredentials holds the observed minimum cookie pair in memory.

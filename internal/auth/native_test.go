@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 func TestNativeAuthOptionsHaveNoBrowserRuntime(t *testing.T) {
@@ -35,7 +35,7 @@ func TestNativeAuthSendsDeclaredSDKIdentityAndPreservesExplicitHeaders(t *testin
 					if ua != "synthetic-explicit-agent" {
 						t.Error("explicit client identity changed")
 					}
-				} else if !strings.Contains(ua, "compatible; sber-go/") || strings.Contains(ua, "Chrome/") || strings.Contains(ua, "Firefox/") {
+				} else if !strings.Contains(ua, "compatible; sber-sdk/") || strings.Contains(ua, "Chrome/") || strings.Contains(ua, "Firefox/") {
 					t.Error("native client identity missing or claims a browser engine")
 				}
 				return s, nil

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 func TestNativeCommandOfflineStatus(t *testing.T) {
@@ -41,9 +41,9 @@ func TestNativeCommandOfflineStatus(t *testing.T) {
 	}
 	t.Run("default profile", func(t *testing.T) {
 		configuration := filepath.Join(dir, "configuration")
-		profile := filepath.Join(configuration, "sber-go", "profile.json")
+		profile := filepath.Join(configuration, "sber-sdk", "profile.json")
 		if runtime.GOOS == "darwin" {
-			profile = filepath.Join(dir, "Library", "Application Support", "sber-go", "profile.json")
+			profile = filepath.Join(dir, "Library", "Application Support", "sber-sdk", "profile.json")
 		}
 		run := func(args ...string) (bytes.Buffer, bytes.Buffer, error) {
 			var out, diagnostics bytes.Buffer

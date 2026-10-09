@@ -16,7 +16,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 const independentID = "4111111111111111"

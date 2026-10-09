@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkAuth "github.com/vasyza/sber-sdk/internal/auth"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 func clientNormalizeOptions(o ClientOptions) (ClientOptions, error) {

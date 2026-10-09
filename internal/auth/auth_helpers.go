@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"strings"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 func (f *authFlow) withContext(body map[string]any) map[string]any {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 func FuzzArgumentsOriginalIntegrity(f *testing.F) {

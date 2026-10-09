@@ -2,7 +2,7 @@
 package sber
 
 import (
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 type SberError = sdkErrs.SberError

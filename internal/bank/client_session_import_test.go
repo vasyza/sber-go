@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 func TestClientHARCookieNumericExpiryAndStringMaxAgeFollowSource(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 // Account is a parsed account snapshot; Kind distinguishes current from savings.

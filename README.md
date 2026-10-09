@@ -3,7 +3,7 @@
 Unofficial Go SDK and CLI for SberBank Online: native HTTP authentication, session persistence, typed bank resources, exact decimal amounts, proxy support, and a local MCP server.
 
 The CLI command and public Go package are named `sber`.
-The Go module is `github.com/vasyza/sber-go`.
+The Go module is `github.com/vasyza/sber-sdk`.
 This independent community project is not affiliated with or endorsed by Sberbank.
 
 Go **1.27.1 or later**, Linux and macOS, including hidden terminal login and first-time private profile enrollment.
@@ -17,7 +17,7 @@ You do not need a GitHub account or a source checkout.
 
    ```sh
    mkdir -p "$HOME/.local/bin"
-   GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@latest
+   GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-sdk/cmd/sber@latest
    ```
 
 2. Add its directory to the command search path:
@@ -49,7 +49,7 @@ Use `sber login` for the first authentication, as described below.
 1. Replace the installed executable:
 
    ```sh
-   GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@latest
+   GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-sdk/cmd/sber@latest
    ```
 
 2. Check the command location and help:
@@ -73,14 +73,14 @@ If an MCP client keeps `sber` running, restart that client after the update.
 Use `@main` to select the current development branch:
 
 ```sh
-GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-go/cmd/sber@main
+GOBIN="$HOME/.local/bin" go install github.com/vasyza/sber-sdk/cmd/sber@main
 ```
 
 ### Install from a source checkout
 
 ```sh
-git clone https://github.com/vasyza/sber-go.git
-cd sber-go
+git clone https://github.com/vasyza/sber-sdk.git
+cd sber-sdk
 GOBIN="$HOME/.local/bin" go install ./cmd/sber
 ```
 
@@ -148,10 +148,10 @@ The same input rules apply to primary login, phone login, card login, remembered
 Export the required variables before running the command, or select a private env file:
 
 ```sh
-sber login --env-file "$HOME/.config/sber-go/credentials.env"
-sber login --method card --env-file "$HOME/.config/sber-go/credentials.env"
-sber refresh-session --env-file "$HOME/.config/sber-go/credentials.env"
-sber products --env-file "$HOME/.config/sber-go/credentials.env"
+sber login --env-file "$HOME/.config/sber-sdk/credentials.env"
+sber login --method card --env-file "$HOME/.config/sber-sdk/credentials.env"
+sber refresh-session --env-file "$HOME/.config/sber-sdk/credentials.env"
+sber products --env-file "$HOME/.config/sber-sdk/credentials.env"
 ```
 
 Environment values take priority over file values.
@@ -255,7 +255,7 @@ An error or page cap gives a nonzero exit code without a successful partial resu
 Add the SDK to your Go module:
 
 ```sh
-go get github.com/vasyza/sber-go@latest
+go get github.com/vasyza/sber-sdk@latest
 ```
 
 ```go
@@ -272,7 +272,7 @@ if err != nil {
 encoded, err := sber.ExportJSON(products)
 ```
 
-Import `github.com/vasyza/sber-go`; its package name is `sber`. Implementations live in separate internal layers. [The runnable example](examples/read/main.go) includes cancellation, cleanup and deliberate JSON export. [Authentication usage](docs/AUTH.md) explains primary login, OTP and remembered-device renewal.
+Import `github.com/vasyza/sber-sdk`; its package name is `sber`. Implementations live in separate internal layers. [The runnable example](examples/read/main.go) includes cancellation, cleanup and deliberate JSON export. [Authentication usage](docs/AUTH.md) explains primary login, OTP and remembered-device renewal.
 
 `Decimal` preserves values such as `9007199254740993.10`. Decode response JSON with `sber.DecodeJSON` to retain number lexemes. `ExportJSON` preserves financial quantities and masks card numbers in display text. Diagnostic formatting of session/auth/client values is redacted; explicit credential and financial exports have separate APIs.
 

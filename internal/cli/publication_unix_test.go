@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/ownerinput"
-	"github.com/vasyza/sber-go/internal/testutil"
-	"github.com/vasyza/sber-go/mcp"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
+	"github.com/vasyza/sber-sdk/internal/testutil"
+	"github.com/vasyza/sber-sdk/mcp"
 )
 
 func TestOwnerLoginUsesRealEnrollmentWithSDKSessionWriter(t *testing.T) {
@@ -50,7 +50,7 @@ func TestOwnerLoginUsesRealEnrollmentWithSDKSessionWriter(t *testing.T) {
 }
 
 func TestDefaultProfileLoginReuseAndRestoration(t *testing.T) {
-	profile := filepath.Join(testPrivateDir(t), "configuration", "sber-go", "profile.json")
+	profile := filepath.Join(testPrivateDir(t), "configuration", "sber-sdk", "profile.json")
 	primary := &syntheticPrimary{}
 	client := &testutil.Client{}
 	options := Options{

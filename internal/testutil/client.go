@@ -7,7 +7,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 type Request struct {

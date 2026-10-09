@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 func main() {

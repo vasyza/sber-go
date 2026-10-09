@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/vasyza/sber-go/internal/cli"
+	"github.com/vasyza/sber-sdk/internal/cli"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 // Native authentication loads only public configuration here, before any

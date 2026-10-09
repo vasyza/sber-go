@@ -52,7 +52,7 @@ It reads the configured online-banking PIN or asks for it at a hidden prompt, an
 
 All authentication paths now use native Go HTTP requests. No Playwright, Firefox, Chrome or JavaScript runtime is linked or launched. The SDK exposes separate `PhoneAuth`, `CardAuth`, and `QRAuth` state machines. The old `browser` package, browser bootstrap options, and CLI browser flags have been removed. Existing HTTP session profiles retain their cookie and device metadata.
 
-Native authentication declares `Mozilla/5.0 (compatible; sber-go/1.0; +https://github.com/vasyza/sber-go)` as its default User-Agent. The compatibility prefix is required by the bank web-session handoff. This header identifies the SDK and contains no browser-engine claim. Explicit supplied User-Agent headers remain unchanged. The successful session stores this header for subsequent native requests.
+Native authentication declares `Mozilla/5.0 (compatible; sber-sdk/1.0; +https://github.com/vasyza/sber-sdk)` as its default User-Agent. The compatibility prefix is required by the bank web-session handoff. This header identifies the SDK and contains no browser-engine claim. Explicit supplied User-Agent headers remain unchanged. The successful session stores this header for subsequent native requests.
 
 Phone authentication uses `/uapi/v2/authenticate` for SRP identification and `/uapi/v2/verify` for the client proof and optional SMS. It checks the server SRP proof before accepting a challenge or redirect. An explicit `password_bypass` response can request the bank-defined password transition. The client uses the returned OUID and RSA-OAEP key for `encodedPassword`, or the TLS password method when the bank omits a key. A false SRP proof or an uncertain response never triggers this transition. The returned host must pass the same HTTPS bank-origin policy as primary and PIN authentication. `AuthToken` is encoded once in the final redirect.
 
@@ -72,7 +72,7 @@ After owner login, the separately enabled integration test checks authorization,
 
 ```sh
 go test -tags=live -run '^TestLive(CLIReadOnly|ReadOnly)$' -count=1 -v ./tests/integration \
-  -args -sber-live -sber-profile "$HOME/.local/share/sber-go/profile.json"
+  -args -sber-live -sber-profile "$HOME/.local/share/sber-sdk/profile.json"
 ```
 
 The native CLI test additionally covers all data-read commands, offline metadata, credential metadata, and private session export. It supplies `--no-renew`, holds identifiers/results in transient memory, and removes the temporary private export. Running `go test -tags=live ./tests/integration` without `-sber-live` compiles and skips both tests before opening a profile, building a temporary binary, or contacting the bank. Session cookies may rotate and be saved back to the explicitly selected private profile during authenticated reads.

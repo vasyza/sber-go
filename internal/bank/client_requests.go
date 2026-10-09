@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 const clientWarmUpPath = "/api/warmUpSession"

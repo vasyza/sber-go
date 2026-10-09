@@ -15,7 +15,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/jsonrpc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 var ErrCancelled = errors.New("MCP service cancelled")

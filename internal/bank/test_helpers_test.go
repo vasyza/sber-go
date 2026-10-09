@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 type independentRequester struct {

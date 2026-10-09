@@ -15,7 +15,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/jsonrpc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/vasyza/sber-go/internal/mcptools"
+	"github.com/vasyza/sber-sdk/internal/mcptools"
 )
 
 func TestMixedRequestResponseEnvelopesNeverDispatch(t *testing.T) {

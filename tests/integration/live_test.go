@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 // TestLiveCLIReadOnly exercises the actual command binary. The opt-in guard

@@ -25,9 +25,9 @@ import (
 	"github.com/andybalholm/brotli"
 	"github.com/klauspost/compress/zstd"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkProxy "github.com/vasyza/sber-sdk/internal/proxy"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 // HeaderOverrides uses nil to remove a default header, just like Python None.

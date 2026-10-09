@@ -82,7 +82,7 @@ These checks did not complete bank account authentication or read private bank d
 ## Open source preparation — 2026-10-08
 
 The command and public Go package are named `sber`.
-The module path remains `github.com/vasyza/sber-go`.
+The module path remains `github.com/vasyza/sber-sdk`.
 The README supplies public installation and update commands.
 
 The audited source baseline was commit `7cccdbe`.
@@ -309,7 +309,7 @@ Private credentials, identifiers, and response bodies remain outside repository 
 
    ```sh
    go test -tags=live -run '^TestLive(CLIReadOnly|ReadOnly)$' -count=1 -v ./tests/integration \
-     -args -sber-live -sber-profile "$HOME/.local/share/sber-go/session.json"
+     -args -sber-live -sber-profile "$HOME/.local/share/sber-sdk/session.json"
    ```
 
 Without `-sber-live`, these tests skip before profile access, builds, or bank requests.
@@ -331,9 +331,9 @@ Full upstream parity and external STE certification remain unverified.
 ## Historical records
 
 Old review logs, repair receipts, and handoff notes are available in
-[Git history](https://github.com/vasyza/sber-go/tree/71cd6ccc3ba2a3a2780810e655b21ea7494ec4b6/docs).
+[Git history](https://github.com/vasyza/sber-sdk/tree/71cd6ccc3ba2a3a2780810e655b21ea7494ec4b6/docs).
 The old root migration log is also available in
-[Git history](https://github.com/vasyza/sber-go/blob/71cd6ccc3ba2a3a2780810e655b21ea7494ec4b6/MIGRATION.md).
+[Git history](https://github.com/vasyza/sber-sdk/blob/71cd6ccc3ba2a3a2780810e655b21ea7494ec4b6/MIGRATION.md).
 Their failures and review decisions apply to the original snapshots.
 Removing duplicate documents does not change those decisions.
 The frozen upstream inventory remains reference evidence in `testdata/compat/parity.json`.

@@ -3,7 +3,7 @@ package sber_test
 import (
 	"fmt"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 func ExampleParseDecimal() {

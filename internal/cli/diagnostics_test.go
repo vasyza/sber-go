@@ -9,11 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	"github.com/vasyza/sber-go/internal/ownerinput"
-	"github.com/vasyza/sber-go/internal/testutil"
-	"github.com/vasyza/sber-go/mcp"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
+	"github.com/vasyza/sber-sdk/internal/testutil"
+	"github.com/vasyza/sber-sdk/mcp"
 )
 
 type rejectedPrimary struct {

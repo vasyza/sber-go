@@ -5,7 +5,7 @@ Build with `make build`, create a profile through owner login or the SDK, then c
 ```json
 {
   "mcpServers": {
-    "sber-go": {
+    "sber-sdk": {
       "command": "/absolute/path/to/bin/sber",
       "args": ["mcp"]
     }

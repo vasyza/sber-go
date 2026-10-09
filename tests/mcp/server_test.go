@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/vasyza/sber-go/internal/testutil"
-	"github.com/vasyza/sber-go/mcp"
+	"github.com/vasyza/sber-sdk/internal/testutil"
+	"github.com/vasyza/sber-sdk/mcp"
 )
 
 const meta = `"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}`

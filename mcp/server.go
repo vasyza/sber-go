@@ -13,9 +13,9 @@ import (
 	"reflect"
 	"sync"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/mcptools"
-	"github.com/vasyza/sber-go/internal/mcpwire"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/mcptools"
+	"github.com/vasyza/sber-sdk/internal/mcpwire"
 )
 
 // Client is owned by Server until Close. SDK clients satisfy this interface.
@@ -75,7 +75,7 @@ func New(o Options) (*Server, error) {
 			},
 		})
 	}
-	wire, err := mcpwire.New(mcpwire.Options{Info: mcpwire.Implementation{Name: "sber-go", Version: "dev"}, Tools: tools})
+	wire, err := mcpwire.New(mcpwire.Options{Info: mcpwire.Implementation{Name: "sber-sdk", Version: "dev"}, Tools: tools})
 	if err != nil {
 		return nil, err
 	}

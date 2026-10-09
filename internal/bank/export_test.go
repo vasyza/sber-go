@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 // Synthetic financial-export seam probe; parent owns the generic model walker.

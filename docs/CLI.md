@@ -80,11 +80,11 @@ The command directory does not affect this selection.
 
 | Platform | Default profile |
 | --- | --- |
-| Linux | `~/.config/sber-go/profile.json`. |
-| macOS | `~/Library/Application Support/sber-go/profile.json`. |
+| Linux | `~/.config/sber-sdk/profile.json`. |
+| macOS | `~/Library/Application Support/sber-sdk/profile.json`. |
 
 On Linux, an absolute `XDG_CONFIG_HOME` value replaces `~/.config`.
-The remaining path is `sber-go/profile.json`.
+The remaining path is `sber-sdk/profile.json`.
 The CLI makes missing private directories during login.
 Help and status do not make profile directories.
 
@@ -248,7 +248,7 @@ To use a private env file:
 5. Select the file explicitly:
 
    ```sh
-   ./bin/sber login --env-file "$HOME/.config/sber-go/credentials.env"
+   ./bin/sber login --env-file "$HOME/.config/sber-sdk/credentials.env"
    ```
 
 6. If the bank requests SMS confirmation, enter the code at the hidden prompt.
@@ -256,7 +256,7 @@ To use a private env file:
 For card authentication, supply `SBER_CARD_NUMBER` and select the card method:
 
 ```sh
-./bin/sber login --method card --env-file "$HOME/.config/sber-go/credentials.env"
+./bin/sber login --method card --env-file "$HOME/.config/sber-sdk/credentials.env"
 ```
 
 The file must be a regular file that you own, with only one hard link.
@@ -300,7 +300,7 @@ The CLI does not replace an existing profile during login.
 1. Start phone authentication:
 
    ```sh
-   ./bin/sber login --method phone --profile "$HOME/.config/sber-go/phone.json"
+   ./bin/sber login --method phone --profile "$HOME/.config/sber-sdk/phone.json"
    ```
 
 2. Enter the bank phone number at the hidden prompt.
@@ -320,7 +320,7 @@ If the bank supplies an RSA key, the CLI encrypts the password with that key.
 1. Start card authentication:
 
    ```sh
-   ./bin/sber login --method card --profile "$HOME/.config/sber-go/card.json"
+   ./bin/sber login --method card --profile "$HOME/.config/sber-sdk/card.json"
    ```
 
 2. Enter the complete card number at the hidden prompt.
@@ -338,7 +338,7 @@ The CLI does not reset a login or password as part of card authentication.
 1. Start QR authentication:
 
    ```sh
-   ./bin/sber login --method qr --profile "$HOME/.config/sber-go/qr.json"
+   ./bin/sber login --method qr --profile "$HOME/.config/sber-sdk/qr.json"
    ```
 
 2. Open the bank application on your phone.
@@ -355,8 +355,8 @@ Do not share it or record the terminal output.
 For a PNG image, select a new absolute private file path:
 
 ```sh
-./bin/sber login --method qr --qr-output "$HOME/.config/sber-go/login-qr.png" \
-  --profile "$HOME/.config/sber-go/qr.json"
+./bin/sber login --method qr --qr-output "$HOME/.config/sber-sdk/login-qr.png" \
+  --profile "$HOME/.config/sber-sdk/qr.json"
 ```
 
 The parent directory must be private.
@@ -403,8 +403,8 @@ The `--no-renew` option disables this behavior.
 A configured PIN lets session restoration run without terminal input:
 
 ```sh
-./bin/sber refresh-session --env-file "$HOME/.config/sber-go/credentials.env"
-./bin/sber products --env-file "$HOME/.config/sber-go/credentials.env"
+./bin/sber refresh-session --env-file "$HOME/.config/sber-sdk/credentials.env"
+./bin/sber products --env-file "$HOME/.config/sber-sdk/credentials.env"
 ```
 
 Exported `SBER_PINCODE` also supplies these commands without `--env-file`.
@@ -441,8 +441,8 @@ The source profile remains at its original path.
 
    ```sh
    ./bin/sber login \
-     --remembered-profile "$HOME/.local/share/sber-go/session.json" \
-     --profile "$HOME/.local/share/sber-go/session-next.json"
+     --remembered-profile "$HOME/.local/share/sber-sdk/session.json" \
+     --profile "$HOME/.local/share/sber-sdk/session-next.json"
    ```
 
 2. If a hidden PIN prompt appears, enter the PIN.
@@ -550,7 +550,7 @@ The command reference gives the inclusion and display options.
 
    ```sh
    ./bin/sber export-session \
-     --destination "$HOME/.local/share/sber-go/session-copy.json"
+     --destination "$HOME/.local/share/sber-sdk/session-copy.json"
    ```
 
 `status` does not read the profile contents or make directories.

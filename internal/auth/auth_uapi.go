@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 // uapiChannel uses the native client identity. It does not claim a rendered

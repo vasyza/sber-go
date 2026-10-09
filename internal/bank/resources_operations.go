@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"time"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 const OperationsPath = "/uoh-bh/v1/operations/list"

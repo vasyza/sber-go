@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 func resourceDoneOutput() map[string]any {

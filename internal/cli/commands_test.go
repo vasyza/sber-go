@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/mcp"
+	"github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/mcp"
 )
 
 func TestCLIHelpDoesNotInspectProfile(t *testing.T) {
@@ -258,9 +258,9 @@ func TestDefaultProfileUsesUserConfigurationDirectory(t *testing.T) {
 	configuration := filepath.Join(home, "configuration")
 	t.Setenv("HOME", home)
 	t.Setenv("XDG_CONFIG_HOME", configuration)
-	expected := filepath.Join(configuration, "sber-go", "profile.json")
+	expected := filepath.Join(configuration, "sber-sdk", "profile.json")
 	if runtime.GOOS == "darwin" {
-		expected = filepath.Join(home, "Library", "Application Support", "sber-go", "profile.json")
+		expected = filepath.Join(home, "Library", "Application Support", "sber-sdk", "profile.json")
 	}
 	profile, err := defaultProfilePath()
 	if err != nil || profile != expected {
@@ -269,7 +269,7 @@ func TestDefaultProfileUsesUserConfigurationDirectory(t *testing.T) {
 	if runtime.GOOS == "linux" {
 		t.Setenv("XDG_CONFIG_HOME", "")
 		profile, err = defaultProfilePath()
-		if err != nil || profile != filepath.Join(home, ".config", "sber-go", "profile.json") {
+		if err != nil || profile != filepath.Join(home, ".config", "sber-sdk", "profile.json") {
 			t.Fatal("default profile did not use the user home directory")
 		}
 		t.Setenv("XDG_CONFIG_HOME", "synthetic-relative-directory")

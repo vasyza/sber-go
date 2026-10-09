@@ -10,8 +10,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	"github.com/vasyza/sber-go/internal/strictjson"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 const MaxFrontendHTMLCharacters = 4 * 1024 * 1024

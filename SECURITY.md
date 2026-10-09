@@ -2,7 +2,7 @@
 
 ## Report a vulnerability
 
-Use [GitHub private vulnerability reporting](https://github.com/vasyza/sber-go/security/advisories/new).
+Use [GitHub private vulnerability reporting](https://github.com/vasyza/sber-sdk/security/advisories/new).
 Select **Report a vulnerability** in the repository security tab.
 Do not put an unpatched vulnerability or private account data in a public issue.
 

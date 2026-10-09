@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	sdkBank "github.com/vasyza/sber-go/internal/bank"
+	sdkBank "github.com/vasyza/sber-sdk/internal/bank"
 )
 
 type ClientTransportFactory = sdkBank.ClientTransportFactory

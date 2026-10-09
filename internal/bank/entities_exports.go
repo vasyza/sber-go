@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"unicode/utf8"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 // ExportJSON is an explicit, complete financial snapshot export, not display

@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/vasyza/sber-go/internal/errs"
-	"github.com/vasyza/sber-go/internal/testproxy"
+	"github.com/vasyza/sber-sdk/internal/errs"
+	"github.com/vasyza/sber-sdk/internal/testproxy"
 )
 
 func TestProxyTLSClosureIsClassifiedBeforeSendingHTTP(t *testing.T) {

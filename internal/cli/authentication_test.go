@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	"github.com/vasyza/sber-go/internal/ownerinput"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
 )
 
 type preparingPrimary struct {

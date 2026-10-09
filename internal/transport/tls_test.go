@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 func bundledRootForTest(t *testing.T) *x509.Certificate {

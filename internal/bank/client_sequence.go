@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // MutationSequence holds the operation gate for the WHOLE workflow against

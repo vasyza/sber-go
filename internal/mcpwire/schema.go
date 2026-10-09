@@ -6,7 +6,7 @@ import (
 	"errors"
 	"unicode/utf8"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 var ErrConfiguration = errors.New("invalid MCP configuration")

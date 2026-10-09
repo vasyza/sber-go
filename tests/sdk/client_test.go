@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	sdk "github.com/vasyza/sber-go"
+	sdk "github.com/vasyza/sber-sdk"
 )
 
 // Embedding the exported interface legitimately promotes its private marker.

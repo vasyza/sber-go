@@ -5,7 +5,7 @@ import (
 	"errors"
 	"reflect"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // Interface markers and even SDK concrete fields are not evidence of safe

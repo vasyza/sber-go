@@ -11,11 +11,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	sber "github.com/vasyza/sber-go"
-	cliCommand "github.com/vasyza/sber-go/internal/command"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
-	"github.com/vasyza/sber-go/internal/strictjson"
+	sber "github.com/vasyza/sber-sdk"
+	cliCommand "github.com/vasyza/sber-sdk/internal/command"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	sdkProxy "github.com/vasyza/sber-sdk/internal/proxy"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 // Disk records are the single explicit serialization boundary for credentials.

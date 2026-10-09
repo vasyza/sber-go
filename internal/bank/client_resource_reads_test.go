@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 func TestClientBindingAccountsFunctionalAccess(t *testing.T) {

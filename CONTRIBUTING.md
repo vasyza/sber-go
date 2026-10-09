@@ -1,7 +1,7 @@
 # Contributing to sber
 
 The CLI and public Go package are named `sber`.
-The module path is `github.com/vasyza/sber-go`.
+The module path is `github.com/vasyza/sber-sdk`.
 
 ## Local development
 
@@ -9,8 +9,8 @@ The module path is `github.com/vasyza/sber-go`.
 2. Clone the repository:
 
    ```sh
-   git clone https://github.com/vasyza/sber-go.git
-   cd sber-go
+   git clone https://github.com/vasyza/sber-sdk.git
+   cd sber-sdk
    ```
 
 3. Run the complete checks:

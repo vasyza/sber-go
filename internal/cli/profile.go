@@ -17,7 +17,7 @@ func defaultProfilePath() (string, error) {
 	if !filepath.IsAbs(directory) || strings.IndexByte(directory, 0) >= 0 {
 		return "", errDefaultProfile
 	}
-	return filepath.Join(directory, "sber-go", "profile.json"), nil
+	return filepath.Join(directory, "sber-sdk", "profile.json"), nil
 }
 
 func selectProfile(args *commandArguments, resolve func() (string, error)) error {

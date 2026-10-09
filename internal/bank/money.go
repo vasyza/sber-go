@@ -12,7 +12,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/vasyza/sber-go/internal/strictjson"
+	"github.com/vasyza/sber-sdk/internal/strictjson"
 )
 
 // Decimal is an immutable base-ten value. Its zero value is zero. It preserves

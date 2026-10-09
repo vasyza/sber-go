@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"reflect"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	"github.com/vasyza/sber-go/internal/ownerinput"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 // PrimaryAuthenticator is the owner login state machine, separate from bank

@@ -2,7 +2,7 @@
 package sber
 
 import (
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 type HeaderOverrides = sdkTransport.HeaderOverrides

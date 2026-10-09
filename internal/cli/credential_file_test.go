@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/vasyza/sber-go/internal/ownerinput"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
 )
 
 func TestCredentialFileLiteralSyntax(t *testing.T) {

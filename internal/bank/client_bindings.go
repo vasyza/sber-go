@@ -3,7 +3,7 @@ package bank
 import (
 	"context"
 
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 // clientResourceRequester is a private delegation boundary, not a new owner.

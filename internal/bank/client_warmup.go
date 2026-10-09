@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 const clientWarmUpDebounce = 60 * time.Second

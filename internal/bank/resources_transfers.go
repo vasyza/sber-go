@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"sync"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 const (

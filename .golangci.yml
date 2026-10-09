@@ -20,7 +20,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/vasyza/sber-go
+        - github.com/vasyza/sber-sdk
 
 linters:
   # Keep the checks explicit so an upgrade cannot silently change the policy.

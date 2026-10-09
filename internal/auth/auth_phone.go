@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	"github.com/vasyza/sber-go/internal/rsaoaep"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	"github.com/vasyza/sber-go/internal/srp"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	"github.com/vasyza/sber-sdk/internal/rsaoaep"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	"github.com/vasyza/sber-sdk/internal/srp"
 )
 
 // PhoneAuth authenticates a phone number with the online banking password.

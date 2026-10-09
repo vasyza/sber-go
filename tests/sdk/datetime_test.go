@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 var _ func(string) (sber.SourceDateTime, error) = sber.ParseSourceDateTime

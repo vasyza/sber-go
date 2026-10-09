@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/ownerinput"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
 )
 
 type syntheticCard struct{ syntheticPrimary }

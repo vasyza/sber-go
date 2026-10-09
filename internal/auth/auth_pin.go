@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	"github.com/vasyza/sber-go/internal/srp"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	"github.com/vasyza/sber-sdk/internal/srp"
 )
 
 // CaptchaAnswer contains an owner-supplied answer, never a solver. Nil is absent;

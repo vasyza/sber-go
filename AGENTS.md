@@ -1,6 +1,6 @@
 # Development boundaries
 
-- Module: github.com/vasyza/sber-go; native Go runtime, no Python subprocess adapter.
+- Module: github.com/vasyza/sber-sdk; native Go runtime, no Python subprocess adapter.
 - Source parity reference is the audited ex3lite/sber-mcp SDK and its synthetic fixtures. Preserve upstream MIT attribution.
 - Implement test-first vertical slices (RED → minimal GREEN → refactor), never a placeholder counted as a port.
 - Tests use localhost/synthetic data and must not reach a bank unless a separately bounded public-only probe is explicitly requested.

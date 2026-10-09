@@ -34,7 +34,7 @@ Private unit tests stay beside implementations and are grouped by behavior. Publ
 
 ## Public API compatibility
 
-The module remains `github.com/vasyza/sber-go`.
+The module remains `github.com/vasyza/sber-sdk`.
 Root aliases and function forwards preserve exported names, signatures, and source assignability.
 Reflection and diagnostics can display the implementation package.
 SDK errors share the `SDKError` marker; use `errors.Is` and `errors.As` for wrapped client outcomes.

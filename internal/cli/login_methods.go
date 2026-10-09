@@ -9,10 +9,10 @@ import (
 
 	qrcode "github.com/skip2/go-qrcode"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	"github.com/vasyza/sber-go/internal/ownerinput"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 type CardAuthenticator interface {

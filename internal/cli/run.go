@@ -10,11 +10,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	sber "github.com/vasyza/sber-go"
-	cliCommand "github.com/vasyza/sber-go/internal/command"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	"github.com/vasyza/sber-go/mcp"
+	sber "github.com/vasyza/sber-sdk"
+	cliCommand "github.com/vasyza/sber-sdk/internal/command"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	"github.com/vasyza/sber-sdk/mcp"
 )
 
 // Options supplies application dependencies. No client is constructed until

@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/pflag"
 
-	sber "github.com/vasyza/sber-go"
-	sdkProxy "github.com/vasyza/sber-go/internal/proxy"
+	sber "github.com/vasyza/sber-sdk"
+	sdkProxy "github.com/vasyza/sber-sdk/internal/proxy"
 )
 
 type commandDefinition struct{ name, description string }

@@ -12,7 +12,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/vasyza/sber-go/internal/errs"
+	"github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // Options selects an HTTP, HTTPS, or SOCKS5 proxy. URL is an address without

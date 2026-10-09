@@ -5,7 +5,7 @@ import (
 	"errors"
 	"unicode/utf8"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 func resourceWorkflowURL(body map[string]any, expected string) error {

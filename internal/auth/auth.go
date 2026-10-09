@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"sync"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	"github.com/vasyza/sber-go/internal/srp"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	"github.com/vasyza/sber-sdk/internal/srp"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 // AuthOptions injects a transport for tests or caller-owned verified transport.
@@ -79,7 +79,7 @@ func newAuthFlow(bundle sdkSession.SessionBundle, o AuthOptions, primary bool) (
 	// Declare the native SDK rather than a browser engine. Explicit observed
 	// headers remain authoritative; no browser process or security cookie is made.
 	if _, present := b.Browser.AsMap()["user-agent"]; !present {
-		b.Browser.Headers = append(b.Browser.Headers, sdkSession.BrowserHeader{Name: "user-agent", Value: "Mozilla/5.0 (compatible; sber-go/1.0; +https://github.com/vasyza/sber-go)"})
+		b.Browser.Headers = append(b.Browser.Headers, sdkSession.BrowserHeader{Name: "user-agent", Value: "Mozilla/5.0 (compatible; sber-sdk/1.0; +https://github.com/vasyza/sber-sdk)"})
 	}
 	if b.Deviceprint == nil {
 		return nil, &sdkErrs.MissingSession{Message: "auth deviceprint required"}

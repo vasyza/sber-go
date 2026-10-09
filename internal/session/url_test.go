@@ -8,7 +8,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // Minimal end-to-end tracer for the remaining cycle-1 comment-closure finding.

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strconv"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
-	"github.com/vasyza/sber-go/internal/rsaoaep"
-	sdkSession "github.com/vasyza/sber-go/internal/session"
-	"github.com/vasyza/sber-go/internal/srp"
-	sdkTransport "github.com/vasyza/sber-go/internal/transport"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
+	"github.com/vasyza/sber-sdk/internal/rsaoaep"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
+	"github.com/vasyza/sber-sdk/internal/srp"
+	sdkTransport "github.com/vasyza/sber-sdk/internal/transport"
 )
 
 // PrimaryAuth performs primary SRP, owner OTP and optional PIN enrollment.

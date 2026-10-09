@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	sdkErrs "github.com/vasyza/sber-go/internal/errs"
+	sdkErrs "github.com/vasyza/sber-sdk/internal/errs"
 )
 
 // This public root is read at build time. No external bank certificate file,

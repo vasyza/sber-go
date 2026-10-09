@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 func FuzzModelsReviewCycle4AuthoritativeKey(f *testing.F) {

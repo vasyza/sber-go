@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/enrollment"
-	"github.com/vasyza/sber-go/internal/ownerinput"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/enrollment"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
 )
 
 var errCredentialFile = errors.New("credential file is not safe or valid")

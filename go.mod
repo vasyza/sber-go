@@ -1,4 +1,4 @@
-module github.com/vasyza/sber-go
+module github.com/vasyza/sber-sdk
 
 go 1.27.0
 

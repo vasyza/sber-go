@@ -1,6 +1,6 @@
 # Go SDK contracts
 
-Import `github.com/vasyza/sber-go` as `sber`.
+Import `github.com/vasyza/sber-sdk` as `sber`.
 The root package exposes the public API through aliases and function forwards.
 [AUTH.md](AUTH.md) describes authentication and profile handling.
 [ARCHITECTURE.md](ARCHITECTURE.md) describes package boundaries.
@@ -67,7 +67,7 @@ Formatting and JSON hide its content; `Content()` is the deliberate display acce
 
 `AuthOptions.Browser` retains explicit HTTP headers for compatibility with saved profiles.
 It does not select or launch a browser.
-Without an explicit User-Agent, authentication uses a compatibility header that declares `sber-go`.
+Without an explicit User-Agent, authentication uses a compatibility header that declares `sber-sdk`.
 The bank web-session handoff requires this prefix.
 The SDK never creates protection cookies or continues through a browser security check.
 Transport deadlines, TLS verification, proxy selection, and the POST no-replay policy apply to every method.

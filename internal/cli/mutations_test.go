@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	sber "github.com/vasyza/sber-go"
-	"github.com/vasyza/sber-go/internal/ownerinput"
-	"github.com/vasyza/sber-go/internal/testutil"
-	"github.com/vasyza/sber-go/mcp"
+	sber "github.com/vasyza/sber-sdk"
+	"github.com/vasyza/sber-sdk/internal/ownerinput"
+	"github.com/vasyza/sber-sdk/internal/testutil"
+	"github.com/vasyza/sber-sdk/mcp"
 )
 
 var fixtureTransferArgs = []string{"transfer-own", "--profile", "synthetic-selected", "--source", "account:source", "--destination", "account:destination", "--amount", "10.50"}

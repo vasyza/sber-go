@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "Complete Python → native Go migration acceptance matrix",
-  "target_module": "github.com/vasyza/sber-go",
+  "target_module": "github.com/vasyza/sber-sdk",
   "initial_status": "pending",
   "reference": {
     "head": "984d45ae6ddbf37224e8146df2788e8821108c9e",

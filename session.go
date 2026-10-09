@@ -2,7 +2,7 @@
 package sber
 
 import (
-	sdkSession "github.com/vasyza/sber-go/internal/session"
+	sdkSession "github.com/vasyza/sber-sdk/internal/session"
 )
 
 const MaxFrontendHTMLCharacters = sdkSession.MaxFrontendHTMLCharacters

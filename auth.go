@@ -2,7 +2,7 @@
 package sber
 
 import (
-	sdkAuth "github.com/vasyza/sber-go/internal/auth"
+	sdkAuth "github.com/vasyza/sber-sdk/internal/auth"
 )
 
 type AuthTransportFactory = sdkAuth.AuthTransportFactory

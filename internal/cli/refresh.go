@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 func runRefresh(ctx context.Context, args *commandArguments, output, diagnostics io.Writer, dependencies *Authentication) int {

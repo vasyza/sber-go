@@ -13,7 +13,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	sber "github.com/vasyza/sber-go"
+	sber "github.com/vasyza/sber-sdk"
 )
 
 // A comparable private credential layout: its key-facing serializer is authoritative.
